@@ -164,8 +164,3 @@ addValues env newValues =
 
 
 instantiateType = error "TODO instantiateType"
-
-
-(<|) :: TypeAnnot -> TypeAnnot -> TypeAnnot
-(<|) f a =
-  error "TODO <|"

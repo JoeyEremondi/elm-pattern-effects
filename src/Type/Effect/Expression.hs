@@ -28,7 +28,7 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain env annotatedExpr@(A.A region expression) tipe =
-    let list t = Effect.getType env "List" <| t
+    let 
         (<?) = CInstance region
     in
     case expression of
@@ -64,7 +64,9 @@ constrain env annotatedExpr@(A.A region expression) tipe =
           in
               return (if name == E.saveEnvName then CSaveEnv else name <? tipe)
 
-      E.Range lowExpr highExpr -> error "TODO ranges"
+      --We never know if a range is empty or not without evaluating the input arguments
+      E.Range lowExpr highExpr ->
+        return $ CEqual (error "TODO range hint") region tipe (TopAnnot)
       {-
           existsNumber $ \n ->
               do  lowCon <- constrain env lowExpr n
