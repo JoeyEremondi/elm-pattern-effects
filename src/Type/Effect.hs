@@ -164,3 +164,10 @@ addValues env newValues =
 
 
 instantiateType = error "TODO instantiateType"
+
+
+initializeEnv = error "TODO initializeEnv"
+
+mkCtors = error "TODO mkCtors"
+
+canonicalizeValues = error "TODO canonicalizeValues"

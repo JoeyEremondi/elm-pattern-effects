@@ -11,11 +11,14 @@ import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
+import Reporting.Warning as Warning
 import qualified Type.Constrain.Expression as TcExpr
 import qualified Type.Environment as Env
 import qualified Type.Solve as Solve
 import qualified Type.State as TS
 import qualified Type.Type as T
+import qualified Type.Effect as Effect
+import qualified Type.Effect.Expression
 
 import System.IO.Unsafe
     -- Maybe possible to switch over to ST instead of IO.
@@ -65,6 +68,34 @@ genConstraints interfaces modul =
           TcExpr.constrain env (program (body modul)) (T.VarN fvar)
 
       return (header, environ constraint)
+
+
+genPatternWarnings
+    :: Module.Interfaces
+    -> Module.CanonicalModule
+    -> IO (Map.Map String T.Type, [Warning.Warning])
+genPatternWarnings interfaces modul =
+  do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
+
+      ctors <- Effect.mkCtors env
+          --forM (Env.ctorNames env) $ \name ->
+          --  do  (_, vars, args, result) <- Env.freshDataScheme env name
+          --      return (name, (vars, foldr (T.==>) result args))
+
+      importedVars <-
+          mapM (Effect.canonicalizeValues env) (Map.toList interfaces)
+
+      let allTypes = concat (ctors : importedVars)
+      let vars = concatMap (fst . snd) allTypes
+      let header = Map.map snd (Map.fromList allTypes)
+      let environ = T.CLet [ T.Scheme vars [] T.CTrue (Map.map (A.A undefined) header) ]
+
+      fvar <- Effect.mkVar
+
+      constraint <-
+          Type.Effect.Expression.constrain env (program (body modul)) (Effect.VarAnnot fvar)
+
+      return (header, [])
 
 
 canonicalizeValues
