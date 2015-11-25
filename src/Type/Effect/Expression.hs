@@ -107,13 +107,14 @@ constrain env annotatedExpr@(A.A region expression) tipe =
 
       E.Data name exprs ->
           do  vars <- Monad.forM exprs $ \_ -> mkVar
-              let pairs = error "TODO" --zip exprs (map VarAnnot vars)
-              (ctipe, cs) <- Monad.foldM step (tipe, CTrue) (reverse pairs)
-              return $ ex vars (cs /\ name <? ctipe)
-          where
-            step (t,c) (e,x) =
-                do  c' <- constrain env e x
-                    return (x ==> t, c /\ c')
+              let pairs = zip exprs (map VarAnnot vars)
+              argConstrs <- mapM (\(expr, tp) -> constrain env expr tp) pairs
+              let dataTypeConstr =
+                    CEqual (error "Hint TODO") region tipe $
+                      ClosedSet [(name, map snd pairs)]
+              --TODO why need ex here?
+              return $ ex vars (CAnd $ dataTypeConstr : argConstrs)
+
       {-
       E.Access expr label ->
           exists $ \t ->
