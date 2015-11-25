@@ -77,14 +77,13 @@ genConstraints interfaces modul =
 genPatternWarnings
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> IO (Map.Map String T.Type, [Warning.Warning])
+    -> IO (Map.Map String Effect.TypeAnnot, [Warning.Warning])
 genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 
-      ctors <- _ -- Effect.mkCtors env
-          --forM (Env.ctorNames env) $ \name ->
-          --  do  (_, vars, args, result) <- Env.freshDataScheme env name
-          --      return (name, (vars, foldr (T.==>) result args))
+      ctors <- forM (Effect.ctorNames env) $ \name ->
+          do  (_, vars, args, result) <- Effect.freshDataScheme env name
+              return (name, (vars, foldr (Effect.==>) result args))
 
       importedVars <-
           mapM (Effect.canonicalizeValues env) (Map.toList interfaces)

@@ -18,6 +18,8 @@ import qualified Data.List as List
 import qualified Reporting.Error.Type as Error
 import qualified Reporting.Region as R
 
+import qualified Control.Monad.State as State
+
 import Control.Monad (forM)
 import Data.Map ((!))
 
@@ -250,9 +252,26 @@ makeConstructors env datatypes =
         [ ("[]", inst 1 $ \ [t] -> ([], list t))
         , ("::", inst 1 $ \ [t] -> ([t, list t], list t))
         ] ++ List.map tupleCtor [0..9]
-          ++ concatMap (ctorToType env) datatypes
+          ++ concatMap annotationForCtor datatypes
 
-ctorToType = error "CtorToType"
+
+annotationForCtor
+    :: (V.Canonical, Module.AdtInfo V.Canonical)
+    -> [(String, IO (Int, [AnnVar], [TypeAnnot], TypeAnnot))]
+annotationForCtor (_, (_, ctors)) =
+    zip (List.map (V.toString . fst) ctors) (List.map inst ctors)
+  where
+    inst :: (V.Canonical, [T.Canonical]) -> IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)
+    inst (nm, args) =
+      do  let numArgs = length args
+          argTypes <- forM args $ \_ -> mkVar
+          return (numArgs
+                 , [] --TODO what is this?
+                 , List.map VarAnnot argTypes
+                 , ClosedSet [(V.toString nm, List.map VarAnnot argTypes)]
+                 )
+
+
 
 canonicalizeValues
     :: Environment
@@ -265,3 +284,10 @@ canonicalizeValues env (moduleName, iface)=
               ( ModuleName.canonicalToString moduleName ++ "." ++ name
               , tipe'
               )
+
+freshDataScheme :: Environment -> String -> IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)
+freshDataScheme = error "Error freshData"
+
+
+ctorNames env =
+  Map.keys (_constructor env)
