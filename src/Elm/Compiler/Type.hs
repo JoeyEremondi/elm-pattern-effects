@@ -2,7 +2,7 @@
 module Elm.Compiler.Type
     ( Type(..)
     , toString
-    ) where
+    ) where  
 
 import Control.Arrow (second)
 import Data.Aeson ((.:))
@@ -194,4 +194,3 @@ fromRawType (A.A _ astType) =
 
       Type.RRecord fields ext ->
           Record (map (second fromRawType) fields) (fmap fromRawType ext)
-

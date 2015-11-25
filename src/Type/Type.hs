@@ -6,7 +6,7 @@ import qualified Control.Monad.State as State
 import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Set as Set
-import qualified Data.Traversable as Traverse (traverse)
+import qualified Data.Traversable as Traverse (traverse) 
 import qualified Data.UnionFind.IO as UF
 
 import qualified AST.Type as T
@@ -455,4 +455,3 @@ getVarNamesTerm term =
     Record1 fields extension ->
         do  fieldVars <- Set.unions <$> mapM go (Map.elems fields)
             Set.union fieldVars <$> go extension
-

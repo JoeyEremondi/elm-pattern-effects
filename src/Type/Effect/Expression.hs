@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Type.Constrain.Expression where
+module Type.Effect.Expression where
 
 import Control.Arrow (second)
 import qualified Control.Monad as Monad
@@ -8,18 +8,20 @@ import qualified Data.Map as Map
 import qualified AST.Expression.General as E
 import qualified AST.Expression.Canonical as Canonical
 import qualified AST.Literal as Lit
-import qualified AST.Pattern as P 
+import qualified AST.Pattern as P
 import qualified AST.Type as ST
 import qualified AST.Variable as V
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
 import qualified Reporting.Region as R
-import qualified Type.Effect.Literal as Literal
-import qualified Type.Effect.Pattern as Pattern
+import qualified Type.Constrain.Literal as Literal
+import qualified Type.Constrain.Pattern as Pattern
 import qualified Type.Environment as Env
 import qualified Type.Fragment as Fragment
-import Type.Type hiding (Descriptor(..))
+import qualified Type.Type 
+import Type.Type ((<|))
 
+import Type.Effect
 
 constrain
     :: Env.Environment
