@@ -280,13 +280,16 @@ constrainBinop env region op leftExpr@(A.A leftRegion _) rightExpr@(A.A rightReg
 
       let opType = VarAnnot leftVar' ==> VarAnnot rightVar' ==> VarAnnot answerVar
 
+      --Same as application, ensure that given arguments contain no patterns
+      --That the binop can't match
+
       return $
         ex [leftVar,rightVar,leftVar',rightVar',answerVar] $ CAnd $
           [ leftCon
           , rightCon
           , CInstance region (V.toString op) opType
-          , CEqual (Error.BinopLeft op leftRegion) region (VarAnnot leftVar') (VarAnnot leftVar)
-          , CEqual (Error.BinopRight op rightRegion) region (VarAnnot rightVar') (VarAnnot rightVar)
+          , CContainsOnly region (VarAnnot leftVar) (VarAnnot leftVar')
+          , CContainsOnly region (VarAnnot rightVar) (VarAnnot rightVar')
           , CEqual (Error.Binop op) region (VarAnnot answerVar) tipe
           ]
 
@@ -300,6 +303,16 @@ constrainList
     -> TypeAnnot
     -> IO AnnotConstr
 constrainList env region exprs tipe =
+  case exprs of
+    [] ->
+      return $ CEqual Error.List region tipe (ClosedSet [("[]", [])]) --TODO open or closed?
+
+    (expr : rest) -> do
+      restAnnot <- VarAnnot <$> mkVar
+      restConstr <- constrainList env region rest  restAnnot
+      let consConstr = CEqual Error.List region tipe (ClosedSet [("::", [restAnnot])])
+      return $ CAnd [consConstr,  restConstr]
+  {-
   do  (exprInfo, exprCons) <-
           unzip <$> mapM elementConstraint exprs
 
@@ -314,7 +327,7 @@ constrainList env region exprs tipe =
 
     varToCon var =
       CEqual Error.List region (Effect.getType env "List" <| VarAnnot var) tipe
-
+-}
 
 -- CONSTRAIN IF EXPRESSIONS
 
