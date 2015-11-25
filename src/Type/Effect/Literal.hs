@@ -16,40 +16,29 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain env region literal tipe =
-  do  definiteType <- litType
-      return (CEqual (error "TODO") region tipe $ OpenSet [(asString, [])])
+  do  return (CEqual (error "TODO") region tipe $ OpenSet [(asString, [])])
   where
     prim name =
         return (getType env name)
 
-    (name, litType, asString) =
+    asString =
         case literal of
           L.IntNum i ->
-              ( "number"
-              , T.VarN <$> T.mkVar (Just T.Number)
-              , show i
+              ( show i
               )
 
           L.FloatNum f ->
-              ( "float"
-              , prim "Float"
-              , show f
+              (show f
               )
 
           L.Chr c ->
-              ( "character"
-              , prim "Char"
-              , show c
+              ( show c
               )
 
           L.Str _ ->
-              ( "string"
-              , prim "String"
-              , error "TODO string as list"
+              ( error "TODO string as list"
               )
 
           L.Boolean b ->
-              ( "boolean"
-              , prim "Bool"
-              , show b
+              ( show b
               )

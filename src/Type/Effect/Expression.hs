@@ -184,14 +184,14 @@ constrainApp env region f args tipe =
   do  funcVar <- mkVar
       funcCon <- constrain env f (VarAnnot funcVar)
 
-      (vars, argCons, numberOfArgsCons, argMatchCons, _, returnVar) <-
+      (vars, argCons, _, argMatchCons, _, returnVar) <-
           argConstraints env maybeName region (length args) funcVar 1 args
 
       let returnCon =
             CEqual (Error.Function maybeName) region (VarAnnot returnVar) tipe
 
       return $ ex (funcVar : vars) $
-        CAnd (funcCon : argCons ++ numberOfArgsCons ++ argMatchCons ++ [returnCon])
+        CAnd (funcCon : argCons  ++ argMatchCons ++ [returnCon])
   where
     maybeName =
       case f of
@@ -222,22 +222,25 @@ argConstraints env name region totalArgs overallVar index args =
           argIndexVar <- mkVar
           localReturnVar <- mkVar
 
-          (vars, argConRest, numberOfArgsRest, argMatchRest, restRegion, returnVar) <-
+          (vars, argConRest, decomposeLambdaRest, subsetOfMatchedRest, restRegion, returnVar) <-
               argConstraints env name region totalArgs localReturnVar (index + 1) rest
 
           let arityRegion =
                 maybe subregion (R.merge subregion) restRegion
 
-          let numberOfArgsCon =
+          --Decompose our lambda into (to ==> From)
+          let decomposeLambdaCon =
                 CEqual
                   (Error.FunctionArity name (index - 1) totalArgs arityRegion)
                   region
                   (VarAnnot argIndexVar ==> VarAnnot localReturnVar)
                   (VarAnnot overallVar)
 
-          let argMatchCon =
-                CEqual
-                  (Error.UnexpectedArg name index totalArgs subregion)
+          --Constraint so that argument expressions contain no patterns
+          --Which cannot be matched by the function (specified by the first)
+          --Argument of the lambda annotation
+          let subsetOfMatchedCon =
+                CContainsOnly
                   region
                   (VarAnnot argIndexVar)
                   (VarAnnot argVar)
@@ -245,8 +248,8 @@ argConstraints env name region totalArgs overallVar index args =
           return
             ( argVar : argIndexVar : localReturnVar : vars
             , argCon : argConRest
-            , numberOfArgsCon : numberOfArgsRest
-            , argMatchCon : argMatchRest
+            , decomposeLambdaCon : decomposeLambdaRest
+            , subsetOfMatchedCon : subsetOfMatchedRest
             , Just arityRegion
             , returnVar
             )
@@ -383,20 +386,32 @@ constrainCase env region expr branches tipe =
   do  exprVar <- mkVar
       exprCon <- constrain env expr (VarAnnot exprVar)
 
-      (branchInfo, branchExprCons) <-
-          unzip <$> mapM (branch (VarAnnot exprVar)) branches
+      (branchResultInfo, branchResultConstraints, branchPatternAnnots) <-
+          unzip3 <$> mapM branch branches
 
-      (vars, cons) <- pairCons region Error.CaseBranch varToCon branchInfo
+      --TODO what is this?
+      (vars, cons) <- pairCons region Error.CaseBranch varToCon branchResultInfo
 
-      return $ ex (exprVar : vars) (CAnd (exprCon : branchExprCons ++ cons))
+      --The type of the value we split on must contain only the patterns we match on
+      let inPatternsConstrs = error "TODO join patterns"
+
+      --The annotation of the case statement must contain each possible branch result annotation
+      let joinBranchesConstr = --TODO which region
+            CAnd $ map (\branchVar -> CContainsAtLeast region tipe (VarAnnot branchVar)) $ vars
+
+      --TODO what is ex doing?
+      return $ ex (exprVar : vars) $
+        CAnd (exprCon : joinBranchesConstr : cons ++ branchResultConstraints ++ inPatternsConstrs)
   where
-    branch patternType (pattern, branchExpr@(A.A branchRegion _)) =
+    branch (pattern, branchExpr@(A.A branchRegion _)) =
         do  branchVar <- mkVar
-            fragment <- Pattern.constrain env pattern patternType
+            patternVar <- mkVar
+            fragment <- Pattern.constrain env pattern (VarAnnot patternVar)
             branchCon <- constrain env branchExpr (VarAnnot branchVar)
             return
                 ( (branchVar, branchRegion)
                 , CLet [Effect.toScheme fragment] branchCon
+                , VarAnnot patternVar
                 )
 
     varToCon var =

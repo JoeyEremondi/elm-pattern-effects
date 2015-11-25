@@ -53,6 +53,8 @@ data AnnotConstr =
   | CAnd [AnnotConstr]
   | CLet [AnnScheme] (AnnotConstr)
   | CInstance R.Region String TypeAnnot
+  | CContainsAtLeast R.Region TypeAnnot TypeAnnot
+  | CContainsOnly R.Region TypeAnnot TypeAnnot
 
 
 data AnnScheme = Scheme
@@ -133,14 +135,36 @@ toScheme fragment =
 
 
 data Environment = Environment
+    { _constructor :: Map.Map String (IO (Int, [AnnVar], [TypeAnnot], TypeAnnot))
+    , _types :: (Map.Map String TypeAnnot)
+    , _value :: (Map.Map String TypeAnnot)
+    }
 
-getEnvType = error "TODO getEnvType"
 
-getType = error "TODO getType"
+get :: (Environment -> Map.Map String a) -> Environment -> String -> a
+get subDict env key =
+    Map.findWithDefault (error msg) key (subDict env)
+  where
+    msg = "Could not find type constructor `" ++ key ++ "` while checking types."
 
-addValues = error "TODO addValues"
+
+getType :: Environment -> String -> TypeAnnot
+getType = get _types
+
+
+addValues :: Environment -> [(String, AnnVar)] -> Environment
+addValues env newValues =
+  env
+    { _value =
+        List.foldl'
+          (\dict (name, var) -> Map.insert name (VarAnnot var) dict)
+          (_value env)
+          newValues
+    }
+
 
 instantiateType = error "TODO instantiateType"
+
 
 (<|) :: TypeAnnot -> TypeAnnot -> TypeAnnot
 (<|) f a =
