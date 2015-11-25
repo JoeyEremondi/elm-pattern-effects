@@ -42,6 +42,7 @@ infer interfaces modul =
 
         (annotHeader, annotWarns) <- liftIO $ genPatternWarnings interfaces modul
 
+
         liftIO (Traverse.traverse T.toSrcType types)
 
 
@@ -80,7 +81,7 @@ genPatternWarnings
 genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 
-      ctors <- Effect.mkCtors env
+      ctors <- _ -- Effect.mkCtors env
           --forM (Env.ctorNames env) $ \name ->
           --  do  (_, vars, args, result) <- Env.freshDataScheme env name
           --      return (name, (vars, foldr (T.==>) result args))
@@ -97,6 +98,9 @@ genPatternWarnings interfaces modul =
 
       constraint <-
           Type.Effect.Expression.constrain env (program (body modul)) (Effect.VarAnnot fvar)
+
+      --Just for debugging
+      putStrLn $ show constraint
 
       return (header, [])
 

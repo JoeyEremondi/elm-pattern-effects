@@ -1,8 +1,15 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Type.Effect where
 
 import System.IO.Unsafe
 import qualified Data.IORef as IORef
 import qualified Data.UnionFind.IO as UF
+
+import qualified AST.Type as T
+import qualified AST.Variable as V
+import qualified AST.Module as Module
+import qualified AST.Module.Name as ModuleName
+
 
 import Reporting.Annotation as A
 import qualified Data.Map as Map
@@ -10,6 +17,9 @@ import qualified Data.Map as Map
 import qualified Data.List as List
 import qualified Reporting.Error.Type as Error
 import qualified Reporting.Region as R
+
+import Control.Monad (forM)
+import Data.Map ((!))
 
 
 --TODO beter solution?
@@ -25,6 +35,9 @@ freshInt = do
 
 newtype AnnVar = AnnVar (UF.Point RealAnnot, Int)
 
+instance Show AnnVar where
+  show (AnnVar (_, i)) = show i
+
 
 mkVar :: IO AnnVar
 mkVar = do
@@ -36,6 +49,7 @@ mkVar = do
 data RealAnnot =
   ClosedRealSet [(String, [RealAnnot])]
   | OpenRealSet [(String, [RealAnnot])]
+  deriving (Show)
 
 
 data TypeAnnot =
@@ -44,6 +58,7 @@ data TypeAnnot =
   | ClosedSet [(String, [TypeAnnot])]
   | LambdaAnn TypeAnnot TypeAnnot
   | TopAnnot
+  deriving (Show)
 
 
 data AnnotConstr =
@@ -55,6 +70,7 @@ data AnnotConstr =
   | CInstance R.Region String TypeAnnot
   | CContainsAtLeast R.Region TypeAnnot TypeAnnot
   | CContainsOnly R.Region TypeAnnot TypeAnnot
+  deriving (Show)
 
 
 data AnnScheme = Scheme
@@ -63,13 +79,20 @@ data AnnScheme = Scheme
     , _constraint :: AnnotConstr
     , _header :: Map.Map String (A.Located TypeAnnot)
     }
+    deriving (Show)
 
+instance Show Error.Hint where
+  show _ = ""
+
+instance Show (Annotated R.Region TypeAnnot) where
+  show (A.A r a) = show a
 
 data AnnFragment = Fragment
     { typeEnv :: Map.Map String (A.Located TypeAnnot)
     , vars :: [AnnVar]
     , typeConstraint :: AnnotConstr
     }
+    deriving (Show)
 
 emptyFragment :: AnnFragment
 emptyFragment = Fragment Map.empty [] CTrue
@@ -166,8 +189,79 @@ addValues env newValues =
 instantiateType = error "TODO instantiateType"
 
 
-initializeEnv = error "TODO initializeEnv"
+initializeEnv :: [Module.CanonicalAdt] -> IO Environment
+initializeEnv datatypes =
+  do  types <- adtAnnots datatypes
+      let env =
+            Environment
+              { _constructor = Map.empty
+              , _value = Map.empty
+              , _types = types
+              }
+      return $ env { _constructor = makeConstructors env datatypes }
 
-mkCtors = error "TODO mkCtors"
+adtAnnots :: [Module.CanonicalAdt] -> IO (Map.Map String TypeAnnot)
+adtAnnots datatypes =
+  do  adts <- mapM makeImported datatypes
+      bs   <- mapM makeBuiltin builtins
+      return (Map.fromList (adts ++ bs)) --TODO check this whole thing
+  where
+    makeImported (name, _) =
+      do  tvar <- mkVar
+          return (V.toString name, VarAnnot tvar)
 
-canonicalizeValues = error "TODO canonicalizeValues"
+    makeBuiltin (name, _) =
+      do  name' <- mkVar
+          return (name, VarAnnot name')
+
+    builtins =
+        concat
+          [ List.map tuple [0..9]
+          , kind 1 ["List"]
+          , kind 0 ["Int","Float","Char","String","Bool"]
+          ]
+      where
+        tuple n = ("_Tuple" ++ show n, n)
+        kind n names = List.map (\name -> (name, n)) names
+
+
+makeConstructors
+    :: Environment
+    -> [Module.CanonicalAdt]
+    -> Map.Map String (IO (Int, [AnnVar], [TypeAnnot], TypeAnnot))
+makeConstructors env datatypes =
+    Map.fromList builtins
+  where
+    list t =
+      (_types env ! "List")
+
+    inst :: Int -> ([TypeAnnot] -> ([TypeAnnot], TypeAnnot)) -> IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)
+    inst numTVars tipe =
+      do  vars <- mapM (\_ -> mkVar) [1..numTVars]
+          let (args, result) = tipe (List.map (VarAnnot) vars)
+          return (length args, vars, args, result)
+
+    tupleCtor n =
+        let name = "_Tuple" ++ show n
+        in  (name, inst n $ \vs -> (vs, (_types env ! name) ))
+
+    builtins :: [ (String, IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)) ]
+    builtins =
+        [ ("[]", inst 1 $ \ [t] -> ([], list t))
+        , ("::", inst 1 $ \ [t] -> ([t, list t], list t))
+        ] ++ List.map tupleCtor [0..9]
+          ++ concatMap (ctorToType env) datatypes
+
+ctorToType = error "CtorToType"
+
+canonicalizeValues
+    :: Environment
+    -> (ModuleName.Canonical, Module.Interface)
+    -> IO [(String, ([AnnVar], TypeAnnot))]
+canonicalizeValues env (moduleName, iface)=
+  forM (Map.toList (Module.iTypes iface)) $ \(name,tipe) ->
+        do  tipe' <- instantiateType env tipe Map.empty
+            return
+              ( ModuleName.canonicalToString moduleName ++ "." ++ name
+              , tipe'
+              )

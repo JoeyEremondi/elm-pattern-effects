@@ -33,7 +33,7 @@ source-repository head
 
 Library
     ghc-options:
-        -O2 -W
+        -W
 
     Hs-Source-Dirs:
         src
@@ -157,7 +157,7 @@ Library
 
 Executable elm
     ghc-options:
-        -threaded -O2 -W
+        -threaded -W
 
     Hs-Source-Dirs:
         src
