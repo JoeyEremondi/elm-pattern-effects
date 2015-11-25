@@ -9,7 +9,7 @@ import qualified AST.Expression.General as E
 import qualified AST.Expression.Canonical as Canonical
 import qualified AST.Literal as Lit
 import qualified AST.Pattern as P
-import qualified AST.Type as ST
+import qualified AST.Type as ST 
 import qualified AST.Variable as V
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
@@ -18,7 +18,7 @@ import qualified Type.Constrain.Literal as Literal
 import qualified Type.Constrain.Pattern as Pattern
 import qualified Type.Environment as Env
 import qualified Type.Fragment as Fragment
-import qualified Type.Type 
+import qualified Type.Type
 import Type.Type ((<|))
 
 import Type.Effect
@@ -26,8 +26,8 @@ import Type.Effect
 constrain
     :: Env.Environment
     -> Canonical.Expr
-    -> Type
-    -> IO TypeConstraint
+    -> TypeAnnot
+    -> IO AnnotConstr
 constrain env annotatedExpr@(A.A region expression) tipe =
     let list t = Env.getType env "List" <| t
         (<?) = CInstance region
@@ -52,7 +52,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                       if Map.size decls == 0 then
                           baseRec
                       else
-                          record (Map.map glToType decls) baseRec
+                          error "TODO" --record (Map.map glToType decls) baseRec
 
                 attribute = makeRec Lit.attribute attr
                 uniform = makeRec Lit.uniform unif
