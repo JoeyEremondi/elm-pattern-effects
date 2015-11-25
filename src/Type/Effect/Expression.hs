@@ -348,8 +348,9 @@ constrainIf env region branches finally tipe =
       (branchInfo, branchExprCons) <-
           unzip <$> mapM constrainBranch branchExprs
 
-      (vars,cons) <- branchCons branchInfo
+      (vars,cons) <- branchCons tipe branchInfo
 
+      --TODO what is ex doing here?
       return $ ex (condVars ++ vars) (CAnd (condCons ++ branchExprCons ++ cons))
   where
     bool =
@@ -369,12 +370,15 @@ constrainIf env region branches finally tipe =
             , exprCon
             )
 
-    branchCons branchInfo =
+    --Constraint that the value of an if contains at least all patterns
+    --As the annotation of a branch
+    branchCons finalTipe branchInfo =
       case branchInfo of
         [(thenVar, _), (elseVar, _)] ->
             return
               ( [thenVar,elseVar]
-              , [ CEqual Error.IfBranches region (VarAnnot thenVar) (VarAnnot elseVar)
+              , [ CContainsAtLeast region finalTipe (VarAnnot thenVar)
+                , CContainsAtLeast region finalTipe (VarAnnot elseVar)
                 , varToCon thenVar
                 ]
               )
