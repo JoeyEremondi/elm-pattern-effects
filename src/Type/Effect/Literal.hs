@@ -17,7 +17,7 @@ constrain
     -> IO AnnotConstr
 constrain env region literal tipe =
   do  definiteType <- litType
-      return (CEqual (error "TODO") tipe $ OpenSet [(error "TODO make string", [])])
+      return (CEqual (error "TODO") region tipe $ OpenSet [(error "TODO make string", [])])
   where
     prim name =
         return (Env.getType env name)

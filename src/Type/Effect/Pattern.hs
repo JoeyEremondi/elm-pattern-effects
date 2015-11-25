@@ -26,7 +26,7 @@ constrain env (A.A region pattern) tipe =
       CEqual (Error.Pattern patternError) region leftType rightType
 
     rvar v =
-      A.A region v
+      A.A region (VarAnnot v)
   in
   case pattern of
     P.Anything ->
@@ -42,17 +42,17 @@ constrain env (A.A region pattern) tipe =
                 { typeEnv = Map.singleton name (rvar variable)
                 , vars = [variable]
                 , typeConstraint =
-                    equal (Error.PVar name) variable tipe
+                    equal (Error.PVar name) (VarAnnot variable) tipe
                 }
 
     P.Alias name p ->
-        do  variable <- mkVar Nothing
+        do  variable <- mkVar
             fragment <- constrain env p tipe
             return $ fragment
               { typeEnv = Map.insert name (rvar variable) (typeEnv fragment)
               , vars = variable : vars fragment
               , typeConstraint =
-                  equal (Error.PAlias name) variable tipe
+                  equal (Error.PAlias name) (VarAnnot variable) tipe
                   /\ typeConstraint fragment
               }
 
@@ -60,7 +60,7 @@ constrain env (A.A region pattern) tipe =
         do  let stringName = V.toString name
 
             (_kind, cvars, args, result) <-
-                Env.freshDataScheme env stringName
+                error "TODO" --Env.freshDataScheme env stringName
 
             fragList <- Monad.zipWithM (constrain env) patterns args
             let fragment = joinFragments fragList
@@ -73,7 +73,7 @@ constrain env (A.A region pattern) tipe =
 
     P.Record fields ->
         do  pairs <-
-                mapM (\name -> (,) name <$> mkVar Nothing) fields
+                mapM (\name -> (,) name <$> mkVar) fields
 
             let tenv =
                   Map.fromList (map (second rvar) pairs)
