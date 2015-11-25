@@ -34,10 +34,13 @@ infer interfaces modul =
     do  (header, constraint) <-
             liftIO (genConstraints interfaces modul)
 
+
         state <- Solve.solve constraint
 
         let header' = Map.delete "::" header
         let types = Map.map A.drop (Map.difference (TS.sSavedEnv state) header')
+
+        (annotHeader, annotWarns) <- liftIO $ genPatternWarnings interfaces modul
 
         liftIO (Traverse.traverse T.toSrcType types)
 
