@@ -9,42 +9,41 @@ import qualified AST.Expression.General as E
 import qualified AST.Expression.Canonical as Canonical
 import qualified AST.Literal as Lit
 import qualified AST.Pattern as P
-import qualified AST.Type as ST 
+import qualified AST.Type as ST
 import qualified AST.Variable as V
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
 import qualified Reporting.Region as R
-import qualified Type.Constrain.Literal as Literal
-import qualified Type.Constrain.Pattern as Pattern
-import qualified Type.Environment as Env
-import qualified Type.Fragment as Fragment
+import qualified Type.Effect.Literal as Literal
+import qualified Type.Effect.Pattern as Pattern
+--import qualified Type.Environment as Env
+--import qualified Type.Fragment as Fragment
 import qualified Type.Type
-import Type.Type ((<|))
 
-import Type.Effect
+import Type.Effect as Effect
 
 constrain
-    :: Env.Environment
+    :: Effect.Environment
     -> Canonical.Expr
     -> TypeAnnot
     -> IO AnnotConstr
 constrain env annotatedExpr@(A.A region expression) tipe =
-    let list t = Env.getType env "List" <| t
+    let list t = Effect.getType env "List" <| t
         (<?) = CInstance region
     in
     case expression of
       E.Literal lit ->
           Literal.constrain env region lit tipe
 
-      E.GLShader _uid _src gltipe ->
-          exists $ \attr ->
+      E.GLShader _uid _src gltipe -> error "GLSL not supported"
+          {- exists $ \attr ->
           exists $ \unif ->
             let
                 shaderTipe a u v =
-                    Env.getType env "WebGL.Shader" <| a <| u <| v
+                    Effect.getType env "WebGL.Shader" <| a <| u <| v
 
                 glToType glTipe =
-                    Env.getType env (Lit.glTipeName glTipe)
+                    Effect.getType env (Lit.glTipeName glTipe)
 
                 makeRec accessor baseRec =
                     let decls = accessor gltipe
@@ -58,14 +57,15 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                 uniform = makeRec Lit.uniform unif
                 varying = makeRec Lit.varying (TermN EmptyRecord1)
             in
-                return (CEqual Error.Shader region (shaderTipe attribute uniform varying) tipe)
+                return (CEqual Error.Shader region (shaderTipe attribute uniform varying) tipe) -}
 
       E.Var var ->
           let name = V.toString var
           in
               return (if name == E.saveEnvName then CSaveEnv else name <? tipe)
 
-      E.Range lowExpr highExpr ->
+      E.Range lowExpr highExpr -> error "TODO ranges"
+      {-
           existsNumber $ \n ->
               do  lowCon <- constrain env lowExpr n
                   highCon <- constrain env highExpr n
@@ -73,7 +73,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                     [ lowCon
                     , highCon
                     , CEqual Error.Range region (list n) tipe
-                    ]
+                    ] -}
 
       E.ExplicitList exprs ->
           constrainList env region exprs tipe
@@ -87,9 +87,9 @@ constrain env annotatedExpr@(A.A region expression) tipe =
               do  fragment <- Pattern.constrain env pattern argType
                   bodyCon <- constrain env body resType
                   let con =
-                        ex (Fragment.vars fragment)
-                            (CLet [monoscheme (Fragment.typeEnv fragment)]
-                                  (Fragment.typeConstraint fragment /\ bodyCon)
+                        ex (Effect.vars fragment)
+                            (CLet [monoscheme (Effect.typeEnv fragment)]
+                                  (Effect.typeConstraint fragment /\ bodyCon)
                             )
                   return $ con /\ CEqual Error.Lambda region (argType ==> resType) tipe
 
@@ -106,43 +106,44 @@ constrain env annotatedExpr@(A.A region expression) tipe =
           constrainCase env region expr branches tipe
 
       E.Data name exprs ->
-          do  vars <- Monad.forM exprs $ \_ -> mkVar Nothing
-              let pairs = zip exprs (map VarN vars)
+          do  vars <- Monad.forM exprs $ \_ -> mkVar
+              let pairs = error "TODO" --zip exprs (map VarAnnot vars)
               (ctipe, cs) <- Monad.foldM step (tipe, CTrue) (reverse pairs)
               return $ ex vars (cs /\ name <? ctipe)
           where
             step (t,c) (e,x) =
                 do  c' <- constrain env e x
                     return (x ==> t, c /\ c')
-
+      {-
       E.Access expr label ->
           exists $ \t ->
               constrain env expr (record (Map.singleton label tipe) t)
 
       E.Update expr fields ->
           exists $ \t ->
-              do  oldVars <- mapM (\_ -> mkVar Nothing) fields
-                  let oldFields = Map.fromList (zip (map fst fields) (map VarN oldVars))
+              do  oldVars <- mapM (\_ -> mkVar) fields
+                  let oldFields = Map.fromList (zip (map fst fields) (map VarAnnot oldVars))
                   cOld <- ex oldVars <$> constrain env expr (record oldFields t)
 
-                  newVars <- mapM (\_ -> mkVar Nothing) fields
-                  let newFields = Map.fromList (zip (map fst fields) (map VarN newVars))
+                  newVars <- mapM (\_ -> mkVar) fields
+                  let newFields = Map.fromList (zip (map fst fields) (map VarAnnot newVars))
                   let cNew = CEqual Error.Record region (record newFields t) tipe
 
-                  cs <- Monad.zipWithM (constrain env) (map snd fields) (map VarN newVars)
+                  cs <- Monad.zipWithM (constrain env) (map snd fields) (map VarAnnot newVars)
 
                   return $ cOld /\ ex newVars (CAnd (cNew : cs))
 
       E.Record fields ->
-          do  vars <- Monad.forM fields (\_ -> mkVar Nothing)
+          do  vars <- Monad.forM fields (\_ -> mkVar)
               fieldCons <-
                   Monad.zipWithM
                       (constrain env)
                       (map snd fields)
-                      (map VarN vars)
-              let fields' = Map.fromList (zip (map fst fields) (map VarN vars))
+                      (map VarAnnot vars)
+              let fields' = Map.fromList (zip (map fst fields) (map VarAnnot vars))
               let recordType = record fields' (TermN EmptyRecord1)
               return (ex vars (CAnd (fieldCons ++ [CEqual Error.Record region recordType tipe])))
+              -}
 
       E.Let defs body ->
           do  bodyCon <- constrain env body tipe
@@ -173,21 +174,21 @@ constrain env annotatedExpr@(A.A region expression) tipe =
 -- CONSTRAIN APP
 
 constrainApp
-    :: Env.Environment
+    :: Effect.Environment
     -> R.Region
     -> Canonical.Expr
     -> [Canonical.Expr]
-    -> Type
-    -> IO TypeConstraint
+    -> TypeAnnot
+    -> IO AnnotConstr
 constrainApp env region f args tipe =
-  do  funcVar <- mkVar Nothing
-      funcCon <- constrain env f (VarN funcVar)
+  do  funcVar <- mkVar
+      funcCon <- constrain env f (VarAnnot funcVar)
 
       (vars, argCons, numberOfArgsCons, argMatchCons, _, returnVar) <-
           argConstraints env maybeName region (length args) funcVar 1 args
 
       let returnCon =
-            CEqual (Error.Function maybeName) region (VarN returnVar) tipe
+            CEqual (Error.Function maybeName) region (VarAnnot returnVar) tipe
 
       return $ ex (funcVar : vars) $
         CAnd (funcCon : argCons ++ numberOfArgsCons ++ argMatchCons ++ [returnCon])
@@ -202,24 +203,24 @@ constrainApp env region f args tipe =
 
 
 argConstraints
-    :: Env.Environment
+    :: Effect.Environment
     -> Maybe V.Canonical
     -> R.Region
     -> Int
-    -> Variable
+    -> AnnVar
     -> Int
     -> [Canonical.Expr]
-    -> IO ([Variable], [TypeConstraint], [TypeConstraint], [TypeConstraint], Maybe R.Region, Variable)
+    -> IO ([AnnVar], [AnnotConstr], [AnnotConstr], [AnnotConstr], Maybe R.Region, AnnVar)
 argConstraints env name region totalArgs overallVar index args =
   case args of
     [] ->
       return ([], [], [], [], Nothing, overallVar)
 
     expr@(A.A subregion _) : rest ->
-      do  argVar <- mkVar Nothing
-          argCon <- constrain env expr (VarN argVar)
-          argIndexVar <- mkVar Nothing
-          localReturnVar <- mkVar Nothing
+      do  argVar <- mkVar
+          argCon <- constrain env expr (VarAnnot argVar)
+          argIndexVar <- mkVar
+          localReturnVar <- mkVar
 
           (vars, argConRest, numberOfArgsRest, argMatchRest, restRegion, returnVar) <-
               argConstraints env name region totalArgs localReturnVar (index + 1) rest
@@ -231,15 +232,15 @@ argConstraints env name region totalArgs overallVar index args =
                 CEqual
                   (Error.FunctionArity name (index - 1) totalArgs arityRegion)
                   region
-                  (VarN argIndexVar ==> VarN localReturnVar)
-                  (VarN overallVar)
+                  (VarAnnot argIndexVar ==> VarAnnot localReturnVar)
+                  (VarAnnot overallVar)
 
           let argMatchCon =
                 CEqual
                   (Error.UnexpectedArg name index totalArgs subregion)
                   region
-                  (VarN argIndexVar)
-                  (VarN argVar)
+                  (VarAnnot argIndexVar)
+                  (VarAnnot argVar)
 
           return
             ( argVar : argIndexVar : localReturnVar : vars
@@ -256,45 +257,45 @@ argConstraints env name region totalArgs overallVar index args =
 -- CONSTRAIN BINOP
 
 constrainBinop
-    :: Env.Environment
+    :: Effect.Environment
     -> R.Region
     -> V.Canonical
     -> Canonical.Expr
     -> Canonical.Expr
-    -> Type
-    -> IO TypeConstraint
+    -> TypeAnnot
+    -> IO AnnotConstr
 constrainBinop env region op leftExpr@(A.A leftRegion _) rightExpr@(A.A rightRegion _) tipe =
-  do  leftVar <- mkVar Nothing
-      rightVar <- mkVar Nothing
+  do  leftVar <- mkVar
+      rightVar <- mkVar
 
-      leftCon <- constrain env leftExpr (VarN leftVar)
-      rightCon <- constrain env rightExpr (VarN rightVar)
+      leftCon <- constrain env leftExpr (VarAnnot leftVar)
+      rightCon <- constrain env rightExpr (VarAnnot rightVar)
 
-      leftVar' <- mkVar Nothing
-      rightVar' <- mkVar Nothing
-      answerVar <- mkVar Nothing
+      leftVar' <- mkVar
+      rightVar' <- mkVar
+      answerVar <- mkVar
 
-      let opType = VarN leftVar' ==> VarN rightVar' ==> VarN answerVar
+      let opType = VarAnnot leftVar' ==> VarAnnot rightVar' ==> VarAnnot answerVar
 
       return $
         ex [leftVar,rightVar,leftVar',rightVar',answerVar] $ CAnd $
           [ leftCon
           , rightCon
           , CInstance region (V.toString op) opType
-          , CEqual (Error.BinopLeft op leftRegion) region (VarN leftVar') (VarN leftVar)
-          , CEqual (Error.BinopRight op rightRegion) region (VarN rightVar') (VarN rightVar)
-          , CEqual (Error.Binop op) region (VarN answerVar) tipe
+          , CEqual (Error.BinopLeft op leftRegion) region (VarAnnot leftVar') (VarAnnot leftVar)
+          , CEqual (Error.BinopRight op rightRegion) region (VarAnnot rightVar') (VarAnnot rightVar)
+          , CEqual (Error.Binop op) region (VarAnnot answerVar) tipe
           ]
 
 
 -- CONSTRAIN LISTS
 
 constrainList
-    :: Env.Environment
+    :: Effect.Environment
     -> R.Region
     -> [Canonical.Expr]
-    -> Type
-    -> IO TypeConstraint
+    -> TypeAnnot
+    -> IO AnnotConstr
 constrainList env region exprs tipe =
   do  (exprInfo, exprCons) <-
           unzip <$> mapM elementConstraint exprs
@@ -304,23 +305,23 @@ constrainList env region exprs tipe =
       return $ ex vars (CAnd (exprCons ++ cons))
   where
     elementConstraint expr@(A.A region' _) =
-      do  var <- mkVar Nothing
-          con <- constrain env expr (VarN var)
+      do  var <- mkVar
+          con <- constrain env expr (VarAnnot var)
           return ( (var, region'), con )
 
     varToCon var =
-      CEqual Error.List region (Env.getType env "List" <| VarN var) tipe
+      CEqual Error.List region (Effect.getType env "List" <| VarAnnot var) tipe
 
 
 -- CONSTRAIN IF EXPRESSIONS
 
 constrainIf
-    :: Env.Environment
+    :: Effect.Environment
     -> R.Region
     -> [(Canonical.Expr, Canonical.Expr)]
     -> Canonical.Expr
-    -> Type
-    -> IO TypeConstraint
+    -> TypeAnnot
+    -> IO AnnotConstr
 constrainIf env region branches finally tipe =
   do  let (conditions, branchExprs) =
             second (++ [finally]) (unzip branches)
@@ -336,17 +337,17 @@ constrainIf env region branches finally tipe =
       return $ ex (condVars ++ vars) (CAnd (condCons ++ branchExprCons ++ cons))
   where
     bool =
-      Env.getType env "Bool"
+      Effect.getType env "Bool"
 
     constrainCondition condition@(A.A condRegion _) =
-      do  condVar <- mkVar Nothing
-          condCon <- constrain env condition (VarN condVar)
-          let boolCon = CEqual Error.IfCondition condRegion (VarN condVar) bool
+      do  condVar <- mkVar
+          condCon <- constrain env condition (VarAnnot condVar)
+          let boolCon = CEqual Error.IfCondition condRegion (VarAnnot condVar) bool
           return (condVar, CAnd [ condCon, boolCon ])
 
     constrainBranch expr@(A.A branchRegion _) =
-      do  branchVar <- mkVar Nothing
-          exprCon <- constrain env expr (VarN branchVar)
+      do  branchVar <- mkVar
+          exprCon <- constrain env expr (VarAnnot branchVar)
           return
             ( (branchVar, branchRegion)
             , exprCon
@@ -357,7 +358,7 @@ constrainIf env region branches finally tipe =
         [(thenVar, _), (elseVar, _)] ->
             return
               ( [thenVar,elseVar]
-              , [ CEqual Error.IfBranches region (VarN thenVar) (VarN elseVar)
+              , [ CEqual Error.IfBranches region (VarAnnot thenVar) (VarAnnot elseVar)
                 , varToCon thenVar
                 ]
               )
@@ -366,48 +367,48 @@ constrainIf env region branches finally tipe =
             pairCons region Error.MultiIfBranch varToCon branchInfo
 
     varToCon var =
-      CEqual Error.If region (VarN var) tipe
+      CEqual Error.If region (VarAnnot var) tipe
 
 
 -- CONSTRAIN CASE EXPRESSIONS
 
 constrainCase
-    :: Env.Environment
+    :: Effect.Environment
     -> R.Region
     -> Canonical.Expr
     -> [(P.CanonicalPattern, Canonical.Expr)]
-    -> Type
-    -> IO TypeConstraint
+    -> TypeAnnot
+    -> IO AnnotConstr
 constrainCase env region expr branches tipe =
-  do  exprVar <- mkVar Nothing
-      exprCon <- constrain env expr (VarN exprVar)
+  do  exprVar <- mkVar
+      exprCon <- constrain env expr (VarAnnot exprVar)
 
       (branchInfo, branchExprCons) <-
-          unzip <$> mapM (branch (VarN exprVar)) branches
+          unzip <$> mapM (branch (VarAnnot exprVar)) branches
 
       (vars, cons) <- pairCons region Error.CaseBranch varToCon branchInfo
 
       return $ ex (exprVar : vars) (CAnd (exprCon : branchExprCons ++ cons))
   where
     branch patternType (pattern, branchExpr@(A.A branchRegion _)) =
-        do  branchVar <- mkVar Nothing
+        do  branchVar <- mkVar
             fragment <- Pattern.constrain env pattern patternType
-            branchCon <- constrain env branchExpr (VarN branchVar)
+            branchCon <- constrain env branchExpr (VarAnnot branchVar)
             return
                 ( (branchVar, branchRegion)
-                , CLet [Fragment.toScheme fragment] branchCon
+                , CLet [Effect.toScheme fragment] branchCon
                 )
 
     varToCon var =
-      CEqual Error.Case region tipe (VarN var)
+      CEqual Error.Case region tipe (VarAnnot var)
 
 
 -- COLLECT PAIRS
 
 data Pair = Pair
     { _index :: Int
-    , _var1 :: Variable
-    , _var2 :: Variable
+    , _var1 :: AnnVar
+    , _var2 :: AnnVar
     , _region :: R.Region
     }
 
@@ -415,24 +416,24 @@ data Pair = Pair
 pairCons
     :: R.Region
     -> (Int -> R.Region -> Error.Hint)
-    -> (Variable -> TypeConstraint)
-    -> [(Variable, R.Region)]
-    -> IO ([Variable], [TypeConstraint])
+    -> (AnnVar -> AnnotConstr)
+    -> [(AnnVar, R.Region)]
+    -> IO ([AnnVar], [AnnotConstr])
 pairCons region pairHint varToCon items =
   let
     pairToCon (Pair index var1 var2 subregion) =
-      CEqual (pairHint index subregion) region (VarN var1) (VarN var2)
+      CEqual (pairHint index subregion) region (VarAnnot var1) (VarAnnot var2)
   in
   case collectPairs 2 items of
     Nothing ->
-        do  var <- mkVar Nothing
+        do  var <- mkVar
             return ([var], [varToCon var])
 
     Just (pairs, var) ->
         return (map fst items, map pairToCon pairs ++ [varToCon var])
 
 
-collectPairs :: Int -> [(Variable, R.Region)] -> Maybe ([Pair], Variable)
+collectPairs :: Int -> [(AnnVar, R.Region)] -> Maybe ([Pair], AnnVar)
 collectPairs index items =
   case items of
     [] ->
@@ -481,16 +482,16 @@ expandPattern def@(Canonical.Definition facts lpattern expr maybeType) =
 -- CONSTRAIN DEFINITIONS
 
 data Info = Info
-    { iSchemes :: [TypeScheme]
-    , iRigid :: [Variable]
-    , iFlex :: [Variable]
-    , iHeaders :: Map.Map String (A.Located Type)
-    , iC2 :: TypeConstraint
-    , iC1 :: TypeConstraint
+    { iSchemes :: [AnnScheme]
+    , iRigid :: [AnnVar]
+    , iFlex :: [AnnVar]
+    , iHeaders :: Map.Map String (A.Located TypeAnnot)
+    , iC2 :: AnnotConstr
+    , iC1 :: AnnotConstr
     }
 
 
-constrainDef :: Env.Environment -> Info -> Canonical.Def -> IO Info
+constrainDef :: Effect.Environment -> Info -> Canonical.Def -> IO Info
 constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr maybeTipe) =
   let qs = [] -- should come from the def, but I'm not sure what would live there...
   in
@@ -506,7 +507,7 @@ constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr m
 
 
 constrainAnnotatedDef
-    :: Env.Environment
+    :: Effect.Environment
     -> Info
     -> [String]
     -> R.Region
@@ -521,9 +522,9 @@ constrainAnnotatedDef env info qs patternRegion typeRegion name expr tipe =
 
       flexiVars <- mapM mkNamedVar qs
 
-      let env' = Env.addValues env (zip qs flexiVars)
+      let env' = Effect.addValues env (zip qs flexiVars)
 
-      (vars, typ) <- Env.instantiateType env tipe Map.empty
+      (vars, typ) <- Effect.instantiateType env tipe Map.empty
 
       let scheme =
             Scheme
@@ -533,10 +534,10 @@ constrainAnnotatedDef env info qs patternRegion typeRegion name expr tipe =
               , _header = Map.singleton name (A.A patternRegion typ)
               }
 
-      var <- mkVar Nothing
-      defCon <- constrain env' expr (VarN var)
+      var <- mkVar
+      defCon <- constrain env' expr (VarAnnot var)
       let annCon =
-            CEqual (Error.BadTypeAnnotation name) typeRegion typ (VarN var)
+            CEqual (Error.BadTypeAnnotation name) typeRegion typ (VarAnnot var)
 
       return $ info
           { iSchemes = scheme : iSchemes info
@@ -545,7 +546,7 @@ constrainAnnotatedDef env info qs patternRegion typeRegion name expr tipe =
 
 
 constrainUnannotatedDef
-    :: Env.Environment
+    :: Effect.Environment
     -> Info
     -> [String]
     -> R.Region
@@ -556,11 +557,11 @@ constrainUnannotatedDef env info qs patternRegion name expr =
   do  -- Some mistake may be happening here. Currently, qs is always [].
       rigidVars <- mapM mkRigid qs
 
-      v <- mkVar Nothing
+      v <- mkVar
 
-      let tipe = VarN v
+      let tipe = VarAnnot v
 
-      let env' = Env.addValues env (zip qs rigidVars)
+      let env' = Effect.addValues env (zip qs rigidVars)
 
       con <- constrain env' expr tipe
 

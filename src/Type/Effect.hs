@@ -59,7 +59,7 @@ data AnnScheme = Scheme
     { _rigidQuantifiers :: [AnnVar]
     , _flexibleQuantifiers :: [AnnVar]
     , _constraint :: AnnotConstr
-    , _header :: Map.Map String ()
+    , _header :: Map.Map String (A.Located TypeAnnot)
     }
 
 
@@ -90,10 +90,13 @@ joinFragments =
     List.foldl' (flip joinFragment) emptyFragment
 
 
+infixr 9 ==>
 (==>) :: TypeAnnot -> TypeAnnot -> TypeAnnot
 (==>) a b =
   LambdaAnn a b
 
+
+infixl 8 /\
 (/\) a b = CAnd [a,b]
 
 
@@ -113,3 +116,32 @@ exists :: (TypeAnnot -> IO AnnotConstr) -> IO AnnotConstr
 exists f =
   do  v <- mkVar
       ex [v] <$> f (VarAnnot v)
+
+monoscheme :: Map.Map String (A.Located TypeAnnot) -> AnnScheme
+monoscheme headers =
+  Scheme [] [] CTrue headers
+
+mkRigid :: String -> IO AnnVar
+mkRigid = error "TODO mkRigid"
+
+mkNamedVar :: String -> IO AnnVar
+mkNamedVar name = error "TODO mkNamedVar"
+
+toScheme :: AnnFragment -> AnnScheme
+toScheme fragment =
+    Scheme [] (vars fragment) (typeConstraint fragment) (typeEnv fragment)
+
+
+data Environment = Environment
+
+getEnvType = error "TODO getEnvType"
+
+getType = error "TODO getType"
+
+addValues = error "TODO addValues"
+
+instantiateType = error "TODO instantiateType"
+
+(<|) :: TypeAnnot -> TypeAnnot -> TypeAnnot
+(<|) f a =
+  error "TODO <|"

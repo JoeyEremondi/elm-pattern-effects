@@ -4,13 +4,13 @@ import qualified AST.Literal as L
 import qualified Reporting.Error.Type as Error
 import qualified Reporting.Region as R
 import qualified Type.Type as T
-import qualified Type.Environment as Env
+--import qualified Type.Environment as Env
 
 import Type.Effect
 
 
 constrain
-    :: Env.Environment
+    :: Environment
     -> R.Region
     -> L.Literal
     -> TypeAnnot
@@ -20,7 +20,7 @@ constrain env region literal tipe =
       return (CEqual (error "TODO") region tipe $ OpenSet [(asString, [])])
   where
     prim name =
-        return (Env.getType env name)
+        return (getType env name)
 
     (name, litType, asString) =
         case literal of

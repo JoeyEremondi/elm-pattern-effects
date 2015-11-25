@@ -4,19 +4,19 @@ import Control.Arrow (second)
 import qualified Control.Monad as Monad
 import qualified Data.Map as Map
 
-import qualified AST.Pattern as P 
+import qualified AST.Pattern as P
 import qualified AST.Variable as V
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
 import qualified Type.Effect.Literal as Literal
-import qualified Type.Environment as Env
+--import qualified Type.Environment as Env
 import qualified Type.Type as T
 import qualified Reporting.Region as R
 
 import Type.Effect
 
 constrain
-    :: Env.Environment
+    :: Environment
     -> P.CanonicalPattern
     -> TypeAnnot
     -> IO AnnFragment
