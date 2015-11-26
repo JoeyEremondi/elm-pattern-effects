@@ -396,7 +396,7 @@ constrainCase env region expr branches tipe =
 
       let matchedSet = Pattern.patternLitAnnot env $ map fst branches
       --The type of the value we split on must contain only the patterns we match on
-      let inPatternsConstr = COnlyMatches region tipe matchedSet -- TODO join patterns
+      let inPatternsConstr = COnlyMatches region tipe (wrapReal matchedSet) -- TODO join patterns
 
       --The annotation of the case statement must contain each possible branch result annotation
       let joinBranchesConstr = --TODO which region

@@ -60,7 +60,7 @@ data AnnotConstr =
   | CLet [AnnScheme] (AnnotConstr)
   | CInstance R.Region String TypeAnnot
   | CContainsAtLeast R.Region TypeAnnot TypeAnnot
-  | COnlyMatches R.Region TypeAnnot RealAnnot
+  | COnlyMatches R.Region TypeAnnot TypeAnnot
   deriving (Show)
 
 
