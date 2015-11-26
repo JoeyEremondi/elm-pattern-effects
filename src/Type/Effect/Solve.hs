@@ -4,7 +4,7 @@ import Type.Effect
 import Control.Monad.Writer
 import qualified  Control.Monad.State as State
 import Control.Monad.Trans
-import Control.Monad (forM, forM_)
+import Control.Monad (forM, forM_, filterM)
 
 import qualified Data.List as List
 
@@ -24,15 +24,15 @@ data SolverState =
   , sSavedEnv :: Env
   }
 
-getEnv :: SolverM Env
+getEnv :: SolverM' a Env
 getEnv =
     State.gets sEnv
 
-modifyEnv :: (Env -> Env) -> SolverM ()
+modifyEnv :: (Env -> Env) -> SolverM' a ()
 modifyEnv f =
     State.modify $ \state -> state { sEnv = f (sEnv state) }
 
-saveLocalEnv :: SolverM ()
+saveLocalEnv :: SolverM' a ()
 saveLocalEnv =
   do  currentEnv <- getEnv
       State.modify $ \state -> state { sSavedEnv = currentEnv }
@@ -45,21 +45,21 @@ type WorklistM = SolverM' Warning.Warning
 
 type Point = UF.Point AnnotData
 
-getRepr :: AnnVar -> SolverM (Maybe TypeAnnot)
+getRepr :: AnnVar -> SolverM' a (Maybe TypeAnnot)
 getRepr (AnnVar (pt, _)) = do
-  AnnotData (repr, _, _) <- liftIO $ UF.descriptor pt
+  AnnotData repr _ _ <- liftIO $ UF.descriptor pt
   return repr
 
-setRepr :: AnnVar -> TypeAnnot -> SolverM ()
+setRepr :: AnnVar -> TypeAnnot -> SolverM' a ()
 setRepr (AnnVar (pt, _)) repr = liftIO $ do
-  AnnotData (_, lb, ub) <- UF.descriptor pt
-  UF.setDescriptor pt $ AnnotData (Just repr, lb, ub)
+  annData <- UF.descriptor pt
+  UF.setDescriptor pt $ annData {_annRepr = Just repr}
 
-union :: AnnVar -> AnnVar -> SolverM ()
+union :: AnnVar -> AnnVar -> SolverM' a ()
 union (AnnVar (pt1, _)) (AnnVar (pt2, _)) =
   liftIO $ UF.union pt1 pt2
 
-areSame :: AnnVar -> AnnVar -> SolverM Bool
+areSame :: AnnVar -> AnnVar -> SolverM' a Bool
 areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 
 applyUnifications :: AnnotConstr -> SolverM ()
@@ -112,10 +112,11 @@ makeFreshCopy ann = do
         vnew <- liftIO $ mkVar
         return $ (VarAnnot vnew, [(v, vnew)])
       PatternSet pats -> do
-        newVarPairs <- forM pats (\(s, subPats) -> (\x -> (s, x)) <$> forM subPats copyHelper)
+        let patsList = Map.toList pats
+        newVarPairs <- forM patsList (\(s, subPats) -> (\x -> (s, x)) <$> forM subPats copyHelper)
         let allPairs = concatMap ((concatMap snd) . snd) newVarPairs
         let newPatList = List.map (\(s, pl) -> (s, List.map fst pl)) newVarPairs
-        return (PatternSet newPatList, allPairs)
+        return (PatternSet $ Map.fromList newPatList, allPairs)
       LambdaAnn a1 a2 -> do
         (b1, pairs1) <- copyHelper a1
         (b2, pairs2) <- copyHelper a2
@@ -215,9 +216,46 @@ intersectAnn x RealTop = x
 intersectAnn (RealAnnot dict1) (RealAnnot dict2) =
   RealAnnot $ Map.intersectionWith (zipWith intersectAnn) dict1 dict2
 
-outgoingUB :: [AnnotConstr] -> AnnVar -> WorklistM [AnnotConstr]
-outgoingUB allConstrs v = do
-  return [] --TODO impelement
+
+canMatchAll :: RealAnnot -> RealAnnot -> [Warning.Warning]
+canMatchAll RealTop _ = []
+canMatchAll _ RealTop = [error "All cases must be matched here"]
+canMatchAll (RealAnnot d1) (RealAnnot d2) =
+  concatMap (\(s, subPatsToMatch) ->
+      case Map.lookup s d1 of
+        Nothing -> [error "TODO warning for unmatched pattern"]
+        --TODO assert same size lists?
+        Just subPats -> concat $ zipWith canMatchAll subPats subPatsToMatch
+      )  (Map.toList d2)
+
+
+unionUB :: AnnVar -> RealAnnot -> WorklistM ()
+unionUB (AnnVar (pt, _)) ann = do
+  annData <- liftIO $ UF.descriptor pt
+  let newUB = _ub annData `unionAnn` ann
+  liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
+  tell $ canMatchAll newUB (_lb annData)
+
+  --TODO emit warning
+
+intersectLB :: AnnVar -> RealAnnot -> WorklistM ()
+intersectLB (AnnVar (pt, _)) ann = do
+  annData <- liftIO $ UF.descriptor pt
+  let newLB = _lb annData `intersectAnn` ann
+  liftIO $ UF.setDescriptor pt $ annData {_ub = _ub annData `unionAnn` ann}
+  tell $ canMatchAll newLB (_lb annData)
+
+
+
+outgoingEdges :: [AnnotConstr] -> AnnVar -> WorklistM [AnnotConstr]
+outgoingEdges allConstrs v = filterM (\constr -> do
+  case constr of
+    --TODO looking at right var in each case?
+    CContainsAtLeast _ (VarAnnot x) _ -> areSame x v
+    COnlyMatches _ (VarAnnot x) _ -> areSame x v
+    _ -> return False
+  ) allConstrs
+
 
 
 solveSubsetConstraints :: SolverM () -> WorklistM ()
@@ -226,11 +264,12 @@ solveSubsetConstraints sm = do
       ((), clist) <- ios
       return (clist, [])
       ) sm
+  workList emittedConstrs emittedConstrs
   return ()
 
 
-workList :: [AnnotConstr] -> WorklistM ()
-worklist [] = return () --When we're finished
-workList (c:rest) = case c of
-  CContainsAtLeast _ (VarAnnot v1) (VarAnnot v2) ->
+workList :: [AnnotConstr] -> [AnnotConstr] -> WorklistM ()
+worklist _ [] = return () --When we're finished
+workList allConstrs (c:rest) = case c of
+  CContainsAtLeast _ (VarAnnot v1) (VarAnnot v2) -> do
     error "TODO"

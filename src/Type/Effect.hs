@@ -41,7 +41,7 @@ freshInt = do
 
 mkVar :: IO AnnVar
 mkVar = do
-  newPoint <- UF.fresh $ AnnotData (Nothing, RealTop, RealAnnot Map.empty)
+  newPoint <- UF.fresh $ AnnotData Nothing RealTop realBottom
   i <- freshInt
   return $ AnnVar (newPoint, i)
 

@@ -18,8 +18,13 @@ instance Show AnnVar where
 --During unification, we store a (possibly empty) representation of
 --our type so far, and our currently calculated lower and upper bounds,
 --which are used if our point is a variable
-newtype AnnotData = AnnotData (Maybe TypeAnnot, RealAnnot, RealAnnot )
+data AnnotData = AnnotData
+  { _annRepr :: Maybe TypeAnnot
+  , _lb :: RealAnnot
+  , _ub :: RealAnnot
+  }
 
+realBottom = RealAnnot Map.empty
 
 data RealAnnot =
   RealAnnot (Map.Map String [RealAnnot])
