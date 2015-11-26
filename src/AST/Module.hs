@@ -23,6 +23,8 @@ import qualified Elm.Package as Package
 import qualified Elm.Compiler.Version as Compiler
 import qualified Reporting.Annotation as A
 
+import qualified Type.Effect.Common
+
 
 -- HELPFUL TYPE ALIASES
 
@@ -115,6 +117,7 @@ data Interface = Interface
     , iPackage  :: Package.Name
     , iExports  :: [Var.Value]
     , iTypes    :: Types
+    , iAnnots   :: Type.Effect.Common.CanonicalAnnot
     , iImports  :: [Name.Raw]
     , iAdts     :: ADTs
     , iAliases  :: Aliases
@@ -140,12 +143,13 @@ toInterface pkgName modul =
 
 
 instance Binary Interface where
-  get = Interface <$> get <*> get <*> get <*> get <*> get <*> get <*> get <*> get <*> get
+  get = Interface <$> get <*> get <*> get <*> get <*> get <*> get <*> get <*> get <*> get <*> get
   put modul = do
       put (iVersion modul)
       put (iPackage modul)
       put (iExports modul)
       put (iTypes modul)
+      put (iAnnots modul)
       put (iImports modul)
       put (iAdts modul)
       put (iAliases modul)
