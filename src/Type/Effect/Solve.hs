@@ -203,9 +203,22 @@ unifyAnnots r1 r2 =
 -- Worklist algorithm for solving subset constraints
 -------------------------
 
-outgoingUB :: [AnnotConstr] -> AnnVar -> [AnnotConstr]
+unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
+unionAnn RealTop _ = RealTop
+unionAnn _ RealTop = RealTop
+unionAnn (RealAnnot dict1) (RealAnnot dict2) =
+  RealAnnot $ Map.unionWith (zipWith unionAnn) dict1 dict2
+
+intersectAnn :: RealAnnot -> RealAnnot -> RealAnnot
+intersectAnn RealTop x = x
+intersectAnn x RealTop = x
+intersectAnn (RealAnnot dict1) (RealAnnot dict2) =
+  RealAnnot $ Map.intersectionWith (zipWith intersectAnn) dict1 dict2
+
+outgoingUB :: [AnnotConstr] -> AnnVar -> WorklistM [AnnotConstr]
 outgoingUB allConstrs v = do
   return [] --TODO impelement
+
 
 solveSubsetConstraints :: SolverM () -> WorklistM ()
 solveSubsetConstraints sm = do
