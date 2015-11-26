@@ -9,6 +9,7 @@ import Control.Monad (forM, forM_)
 import qualified Data.List as List
 
 import Reporting.Annotation as A
+import Reporting.Warning as Warning
 
 import qualified Data.UnionFind.IO as UF
 
@@ -36,7 +37,11 @@ saveLocalEnv =
   do  currentEnv <- getEnv
       State.modify $ \state -> state { sSavedEnv = currentEnv }
 
-type SolverM = State.StateT SolverState (WriterT [AnnotConstr] IO)
+type SolverM' a =  WriterT [a] (State.StateT SolverState IO)
+
+type SolverM = SolverM' AnnotConstr
+
+type WorklistM = SolverM' Warning.Warning
 
 type Point = UF.Point AnnotData
 
@@ -48,9 +53,7 @@ getRepr (AnnVar (pt, _)) = do
 setRepr :: AnnVar -> TypeAnnot -> SolverM ()
 setRepr (AnnVar (pt, _)) repr = liftIO $ do
   AnnotData (_, lb, ub) <- UF.descriptor pt
-  dummyPoint <- UF.fresh $ AnnotData (Just repr, lb, ub)
-  UF.union pt dummyPoint
-  return ()
+  UF.setDescriptor pt $ AnnotData (Just repr, lb, ub)
 
 union :: AnnVar -> AnnVar -> SolverM ()
 union (AnnVar (pt1, _)) (AnnVar (pt2, _)) =
@@ -194,3 +197,27 @@ unifyAnnots r1 r2 =
         unifyAnnots a2 TopAnnot
         return $ LambdaAnn TopAnnot TopAnnot
     _ -> error $ "Invalid unify " ++ show r1 ++ " " ++ show r2
+
+
+-------------------------
+-- Worklist algorithm for solving subset constraints
+-------------------------
+
+outgoingUB :: [AnnotConstr] -> AnnVar -> [AnnotConstr]
+outgoingUB allConstrs v = do
+  return [] --TODO impelement
+
+solveSubsetConstraints :: SolverM () -> WorklistM ()
+solveSubsetConstraints sm = do
+  emittedConstrs <- mapWriterT (\ios -> do
+      ((), clist) <- ios
+      return (clist, [])
+      ) sm
+  return ()
+
+
+workList :: [AnnotConstr] -> WorklistM ()
+worklist [] = return () --When we're finished
+workList (c:rest) = case c of
+  CContainsAtLeast _ (VarAnnot v1) (VarAnnot v2) ->
+    error "TODO"
