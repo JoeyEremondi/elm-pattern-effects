@@ -51,9 +51,12 @@ getRepr (AnnVar (pt, _)) = do
   return repr
 
 setRepr :: AnnVar -> TypeAnnot -> SolverM' a ()
-setRepr (AnnVar (pt, _)) repr = liftIO $ do
-  annData <- UF.descriptor pt
-  UF.setDescriptor pt $ annData {_annRepr = Just repr}
+setRepr (AnnVar (pt, _)) repr = liftIO $
+  case repr of
+    (VarAnnot _) -> error "Should never set repr to another var"
+    _ -> do
+      annData <- UF.descriptor pt
+      UF.setDescriptor pt $ annData {_annRepr = Just repr}
 
 union :: AnnVar -> AnnVar -> SolverM' a ()
 union (AnnVar (pt1, _)) (AnnVar (pt2, _)) =
@@ -91,8 +94,45 @@ applyUnifications con =
       return ()
     CSaveEnv -> saveLocalEnv
     CTrue -> return ()
+
     --For our other constraints, we defer solving until after unification is done
-    c -> tell [c]
+makeWConstrs :: AnnotConstr -> SolverM' a [WConstr]
+makeWConstrs c = case c of
+    CContainsAtLeast r (VarAnnot v1) a2 -> do
+      mrepr1 <- getRepr v1
+      case mrepr1 of
+        Just rep1 ->
+          makeWConstrs $ CContainsAtLeast r rep1 a2
+
+        Nothing -> do
+          case a2 of
+            VarAnnot v2 -> do
+              mrepr2 <- getRepr v2
+              case mrepr2 of
+                Nothing ->
+                  return [WContainsAtLeast v1 v2]
+
+                Just rep2 ->
+                  makeWConstrs $ CContainsAtLeast r (VarAnnot v1) rep2
+
+            PatternSet s -> do
+              let allPairs = Map.toList s
+              subLists <- forM allPairs $ \(ctor, subPats) -> do
+                let indices = [0 .. length subPats]
+                subVars <- forM subPats $ \_ -> liftIO mkVar
+                let varPatTriples = zip3 subPats subVars indices
+                --Constrain our new variables to the sub-annotations they're linked to
+                --as well as adding a constraint for our overall variable to that var as a sub-pattern
+                listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
+                  subConstrs <- makeWConstrs (CContainsAtLeast r (VarAnnot subVar) subPat)
+                  return $ (WContainsPat v1 ctor i subVar) : subConstrs
+                return $ concat listsPerTriple
+              return $ concat subLists
+
+
+
+      --Make a new variable for each constructor of the pattern
+
 
 solveScheme :: AnnScheme -> SolverM Env
 solveScheme s = do
@@ -204,6 +244,15 @@ unifyAnnots r1 r2 =
 -- Worklist algorithm for solving subset constraints
 -------------------------
 
+--Constraints we can actually deal with in our worklist algorithm
+data WConstr =
+  WContainsAtLeast AnnVar AnnVar
+  | WContainsPat AnnVar String Int AnnVar --Specific sub-pattern constraints
+  | WContainsLit AnnVar RealAnnot
+  | WCanMatch AnnVar RealAnnot
+  | LambdaSubType (AnnVar, AnnVar) (AnnVar, AnnVar)
+
+
 unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
 unionAnn RealTop _ = RealTop
 unionAnn _ RealTop = RealTop
@@ -281,25 +330,47 @@ solveSubsetConstraints sm = do
       ((), clist) <- ios
       return (clist, [])
       ) sm
-  workList emittedConstrs emittedConstrs
+  workList [] [] --TODO emittedConstrs emittedConstrs
   return ()
 
 
 workList :: [AnnotConstr] -> [AnnotConstr] -> WorklistM ()
 worklist _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
-  CContainsAtLeast _ (VarAnnot v1) a2 -> do
+  CContainsAtLeast reg (VarAnnot v1) a2 -> do
     d1 <- getAnnData v1
-    didChange <- case a2 of
-      VarAnnot v2 -> do
-        d2 <- getAnnData v2
-        case (_annRepr d1, _annRepr d2) of
-          --Simple case: unification gave us no restrictions on these variables
-          --Other than the subset constraints, which we solve
-          (Nothing, Nothing) -> do
-            unionUB v1 (_ub d2)
-    case didChange of
-          False -> worklist allConstrs rest
-          True -> do
-            needsUpdate <- outgoingEdges allConstrs v1
-            worklist allConstrs (rest ++ needsUpdate)
+    case (_annRepr d1) of
+      --If this variable represents another structure (Lambda, literal set)
+      --Then solve our constraint with that structure
+      Just repr ->
+        worklist allConstrs ( (CContainsAtLeast reg repr a2) : rest)
+      Nothing ->
+        case a2 of
+          VarAnnot v2 -> do
+            d2 <- getAnnData v2
+            case _annRepr d2 of
+              --If reprs are present, we just extract them and solve the constraints on them
+              Just rep ->
+                workList allConstrs (CContainsAtLeast reg (VarAnnot v1) rep : rest)
+              --Simple case: unification gave us no restrictions on these variables
+              --Other than the subset constraints, which we solve
+              Nothing -> do
+                didChange <- unionUB v1 (_ub d2)
+                case didChange of
+                      False ->
+                        worklist allConstrs rest
+                      True -> do
+                        needsUpdate <- outgoingEdges allConstrs v1
+                        worklist allConstrs (rest ++ needsUpdate)
+          _ -> do
+            didChange <- case a2 of
+              PatternSet s ->
+                error "TODO: constraints to real sets?"
+              TopAnnot ->
+                unionUB v1 RealTop
+            case didChange of
+              False ->
+                worklist allConstrs rest
+              True -> do
+                needsUpdate <- outgoingEdges allConstrs v1
+                worklist allConstrs (rest ++ needsUpdate)
