@@ -51,7 +51,7 @@ mkVar = do
 data AnnotConstr =
   CTrue
   | CSaveEnv
-  | CEqual Error.Hint R.Region TypeAnnot TypeAnnot
+  | CEqual R.Region TypeAnnot TypeAnnot
   | CAnd [AnnotConstr]
   | CLet [AnnScheme] (AnnotConstr)
   | CInstance R.Region String TypeAnnot
@@ -251,7 +251,7 @@ annotationForCtor (_, (_, ctors)) =
           return (numArgs
                  , [] --TODO what is this?
                  , List.map VarAnnot argTypes
-                 , ClosedSet [(V.toString nm, List.map VarAnnot argTypes)]
+                 , PatternSet [(V.toString nm, List.map VarAnnot argTypes)]
                  )
 
 
@@ -283,8 +283,7 @@ fromCanonical canonAnnot = do
 
         Just v -> return $ VarAnnot v
 
-    OpenSet l -> OpenSet <$> forM l (\(s, subPats) -> ((,) s) <$> forM subPats fromCanonical )
-    ClosedSet l -> ClosedSet <$> forM l (\(s, subPats) -> ((,) s) <$> forM subPats fromCanonical )
+    PatternSet l -> PatternSet <$> forM l (\(s, subPats) -> ((,) s) <$> forM subPats fromCanonical )
     LambdaAnn t1 t2 -> LambdaAnn <$> fromCanonical t1 <*>  fromCanonical t2
     TopAnnot -> return TopAnnot
 

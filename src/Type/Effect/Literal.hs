@@ -16,7 +16,7 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain env region literal tipe =
-  do  return (CEqual (error "TODO lit hint") region tipe $ OpenSet [(asString, [])])
+  do  return (CEqual region tipe $ PatternSet [(asString, [])])
   where
     prim name =
         return (getType env name)

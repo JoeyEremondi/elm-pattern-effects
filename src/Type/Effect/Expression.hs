@@ -66,7 +66,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
 
       --We never know if a range is empty or not without evaluating the input arguments
       E.Range lowExpr highExpr ->
-        return $ CEqual (error "TODO range hint") region tipe (TopAnnot)
+        return $ CEqual region tipe (TopAnnot)
       {-
           existsNumber $ \n ->
               do  lowCon <- constrain env lowExpr n
@@ -93,7 +93,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                             (CLet [monoscheme (Effect.typeEnv fragment)]
                                   (Effect.typeConstraint fragment /\ bodyCon)
                             )
-                  return $ con /\ CEqual Error.Lambda region (argType ==> resType) tipe
+                  return $ con /\ CEqual region (argType ==> resType) tipe
 
       E.App _ _ ->
           let
@@ -112,8 +112,8 @@ constrain env annotatedExpr@(A.A region expression) tipe =
               let pairs = zip exprs (map VarAnnot vars)
               argConstrs <- mapM (\(expr, tp) -> constrain env expr tp) pairs
               let dataTypeConstr =
-                    CEqual (error "Hint TODO") region tipe $
-                      ClosedSet [(name, map snd pairs)]
+                    CEqual region tipe $
+                      PatternSet [(name, map snd pairs)]
               --TODO why need ex here?
               return $ ex vars (CAnd $ dataTypeConstr : argConstrs)
 
@@ -192,7 +192,7 @@ constrainApp env region f args tipe =
           argConstraints env maybeName region (length args) funcVar 1 args
 
       let returnCon =
-            CEqual (Error.Function maybeName) region (VarAnnot returnVar) tipe
+            CEqual region (VarAnnot returnVar) tipe
 
       return $ ex (funcVar : vars) $
         CAnd (funcCon : argCons  ++ argMatchCons ++ [returnCon])
@@ -235,7 +235,6 @@ argConstraints env name region totalArgs overallVar index args =
           --Decompose our lambda into (to ==> From)
           let decomposeLambdaCon =
                 CEqual
-                  (Error.FunctionArity name (index - 1) totalArgs arityRegion)
                   region
                   (VarAnnot argIndexVar ==> VarAnnot localReturnVar)
                   (VarAnnot overallVar)
@@ -294,7 +293,7 @@ constrainBinop env region op leftExpr@(A.A leftRegion _) rightExpr@(A.A rightReg
           , CInstance region (V.toString op) opType
           , CContainsOnly region (VarAnnot leftVar) (VarAnnot leftVar')
           , CContainsOnly region (VarAnnot rightVar) (VarAnnot rightVar')
-          , CEqual (Error.Binop op) region (VarAnnot answerVar) tipe
+          , CEqual region (VarAnnot answerVar) tipe
           ]
 
 
@@ -309,12 +308,12 @@ constrainList
 constrainList env region exprs tipe =
   case exprs of
     [] ->
-      return $ CEqual Error.List region tipe (ClosedSet [("[]", [])]) --TODO open or closed?
+      return $ CEqual region tipe (PatternSet [("[]", [])]) --TODO open or closed?
 
     (expr : rest) -> do
       restAnnot <- VarAnnot <$> mkVar
       restConstr <- constrainList env region rest  restAnnot
-      let consConstr = CEqual Error.List region tipe (ClosedSet [("::", [restAnnot])])
+      let consConstr = CEqual region tipe (PatternSet [("::", [restAnnot])])
       return $ CAnd [consConstr,  restConstr]
   {-
   do  (exprInfo, exprCons) <-
@@ -363,7 +362,7 @@ constrainIf env region branches finally tipe =
     constrainCondition condition@(A.A condRegion _) =
       do  condVar <- mkVar
           condCon <- constrain env condition (VarAnnot condVar)
-          let boolCon = CEqual Error.IfCondition condRegion (VarAnnot condVar) bool
+          let boolCon = CEqual condRegion (VarAnnot condVar) bool
           return (condVar, CAnd [ condCon, boolCon ])
 
     constrainBranch expr@(A.A branchRegion _) =
@@ -391,7 +390,7 @@ constrainIf env region branches finally tipe =
             pairCons region Error.MultiIfBranch varToCon branchInfo
 
     varToCon var =
-      CEqual Error.If region (VarAnnot var) tipe
+      CEqual region (VarAnnot var) tipe
 
 
 -- CONSTRAIN CASE EXPRESSIONS
@@ -436,7 +435,7 @@ constrainCase env region expr branches tipe =
                 )
 
     varToCon var =
-      CEqual Error.Case region tipe (VarAnnot var)
+      CEqual region tipe (VarAnnot var)
 
 
 -- COLLECT PAIRS
@@ -458,7 +457,7 @@ pairCons
 pairCons region pairHint varToCon items =
   let
     pairToCon (Pair index var1 var2 subregion) =
-      CEqual (pairHint index subregion) region (VarAnnot var1) (VarAnnot var2)
+      CEqual region (VarAnnot var1) (VarAnnot var2)
   in
   case collectPairs 2 items of
     Nothing ->

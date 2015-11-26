@@ -23,7 +23,7 @@ constrain
 constrain env (A.A region pattern) tipe =
   let
     equal patternError leftType rightType =
-      CEqual (Error.Pattern patternError) region leftType rightType
+      CEqual region leftType rightType
 
     rvar v =
       A.A region (VarAnnot v)

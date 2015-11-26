@@ -22,8 +22,7 @@ data RealAnnot =
 
 data TypeAnnot' v =
   VarAnnot v
-  | OpenSet [(String, [TypeAnnot' v])]
-  | ClosedSet [(String, [TypeAnnot' v])]
+  | PatternSet [(String, [TypeAnnot' v])]
   | LambdaAnn (TypeAnnot' v) (TypeAnnot' v)
   | TopAnnot
   deriving (Show, Generic)
