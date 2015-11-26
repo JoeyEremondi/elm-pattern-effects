@@ -1,5 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Type.Effect where
+module Type.Effect (module Type.Effect.Common, module Type.Effect) where
+
+import Type.Effect.Common
 
 import System.IO.Unsafe
 import qualified Data.IORef as IORef
@@ -35,10 +37,6 @@ freshInt = do
   IORef.writeIORef globalIntFeed (i+1)
   return i
 
-newtype AnnVar = AnnVar (UF.Point RealAnnot, Int)
-
-instance Show AnnVar where
-  show (AnnVar (_, i)) = show i
 
 
 mkVar :: IO AnnVar
@@ -48,19 +46,6 @@ mkVar = do
   return $ AnnVar (newPoint, i)
 
 
-data RealAnnot =
-  ClosedRealSet [(String, [RealAnnot])]
-  | OpenRealSet [(String, [RealAnnot])]
-  deriving (Show)
-
-
-data TypeAnnot =
-  VarAnnot AnnVar
-  | OpenSet [(String, [TypeAnnot])]
-  | ClosedSet [(String, [TypeAnnot])]
-  | LambdaAnn TypeAnnot TypeAnnot
-  | TopAnnot
-  deriving (Show)
 
 
 data AnnotConstr =
@@ -278,15 +263,21 @@ canonicalizeValues
     -> (ModuleName.Canonical, Module.Interface)
     -> IO [(String, ([AnnVar], TypeAnnot))]
 canonicalizeValues env (moduleName, iface)=
-  forM (Map.toList (Module.iTypes iface)) $ \(name,tipe) ->
-        do  tipe' <- instantiateType env tipe Map.empty
+  forM (Map.toList (error "iTypes")) $ \(name,tipe) ->
+        do  -- TODO canonicalAnnots stored in iface
             return
               ( ModuleName.canonicalToString moduleName ++ "." ++ name
-              , tipe'
+              , ([], TopAnnot) --TODO convert stored type into type we can deal with
               )
 
 freshDataScheme :: Environment -> String -> IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)
-freshDataScheme = error "Error freshData"
+freshDataScheme = envGet _constructor
+
+envGet :: (Environment -> Map.Map String a) -> Environment -> String -> a
+envGet subDict env key =
+    Map.findWithDefault (error msg) key (subDict env)
+  where
+    msg = "Could not find type constructor `" ++ key ++ "` while checking types."
 
 
 ctorNames env =

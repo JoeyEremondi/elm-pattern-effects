@@ -28,7 +28,7 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain env annotatedExpr@(A.A region expression) tipe =
-    let 
+    let
         (<?) = CInstance region
     in
     case expression of
