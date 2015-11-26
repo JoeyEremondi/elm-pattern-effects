@@ -134,16 +134,16 @@ constrain env annotatedExpr@(A.A region expression) tipe =
       E.Let defs body ->
           do  bodyCon <- constrain env body tipe
 
-              (Info schemes rqs fqs headers c2 c1) <-
+              (Info schemes fqs headers constr) <-
                   Monad.foldM
                       (constrainDef env)
-                      (Info [] [] [] Map.empty CTrue CTrue)
+                      (Info [] [] Map.empty CTrue)
                       (concatMap expandPattern defs)
 
-              let letScheme =
-                    [ Scheme rqs fqs (CLet [monoscheme headers] c2) headers ]
+              let letScheme = error "TODO let scheme "
+                    --[ Scheme rqs fqs (CLet [monoscheme headers] c2) headers ]
 
-              return $ CLet schemes (CLet letScheme (c1 /\ bodyCon))
+              return $ CLet schemes (CLet letScheme ( constr /\ bodyCon))
 
       E.Port impl ->
           case impl of
@@ -501,21 +501,17 @@ expandPattern def@(Canonical.Definition facts lpattern expr maybeType) =
 
 data Info = Info
     { iSchemes :: [AnnScheme]
-    , iRigid :: [AnnVar]
-    , iFlex :: [AnnVar]
+    , iVars :: [AnnVar]
     , iHeaders :: Map.Map String (A.Located TypeAnnot)
-    , iC2 :: AnnotConstr
-    , iC1 :: AnnotConstr
+    , iConstr :: AnnotConstr
     }
 
 
 constrainDef :: Effect.Environment -> Info -> Canonical.Def -> IO Info
 constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr maybeTipe) =
-  let qs = [] -- should come from the def, but I'm not sure what would live there...
-  in
   case (pattern, maybeTipe) of
     (P.Var name, _) ->
-        constrainUnannotatedDef env info qs patternRegion name expr
+        constrainUnannotatedDef env info patternRegion name expr
 
     _ ->
         error "canonical definitions must not have complex patterns as names in the contstraint generation phase"
@@ -525,26 +521,21 @@ constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr m
 constrainUnannotatedDef
     :: Effect.Environment
     -> Info
-    -> [String]
     -> R.Region
     -> String
     -> Canonical.Expr
     -> IO Info
-constrainUnannotatedDef env info qs patternRegion name expr =
+constrainUnannotatedDef env info patternRegion name expr =
   do  -- Some mistake may be happening here. Currently, qs is always [].
-      rigidVars <- error "TODO rigid vars" --mapM mkRigid qs
+      rhsVar <- mkVar
 
-      v <- mkVar
+      let tipe = VarAnnot rhsVar
 
-      let tipe = VarAnnot v
-
-      let env' = Effect.addValues env (zip qs rigidVars)
-
-      con <- constrain env' expr tipe
+      --TODO what do we add to env here?
+      con <- constrain env expr tipe
 
       return $ info
-          { iRigid = rigidVars ++ iRigid info
-          , iFlex = v : iFlex info
+          { iVars = rhsVar : iVars info
           , iHeaders = Map.insert name (A.A patternRegion tipe) (iHeaders info)
-          , iC2 = con /\ iC2 info
+          , iConstr = con /\ iConstr info
           }

@@ -93,5 +93,17 @@ unifyAnnots env r1 r2 =
               setRepr v newRepr
               return newRepr
 
-    (LambdaAnn a1 a2) (LambdaAnn b1 b2) ->
+    (LambdaAnn a1 a2, LambdaAnn b1 b2) ->
       LambdaAnn <$> unifyAnnots env a1 b1 <*> unifyAnnots env a2 b2
+
+    --Special cases: we can unify lambda with Top, giving a TopLambda
+    --This helps us deal with Native values, or any other places our analysis fails
+    (LambdaAnn a1 a2, TopAnnot) -> do
+      unifyAnnots env a1 TopAnnot
+      unifyAnnots env a2 TopAnnot
+      return $ LambdaAnn TopAnnot TopAnnot
+    (TopAnnot, LambdaAnn a1 a2) -> do
+        unifyAnnots env a1 TopAnnot
+        unifyAnnots env a2 TopAnnot
+        return $ LambdaAnn TopAnnot TopAnnot
+    _ -> error $ "Invalid unify " ++ show r1 ++ " " ++ show r2

@@ -65,8 +65,7 @@ data AnnotConstr =
 
 
 data AnnScheme = Scheme
-    { _rigidQuantifiers :: [AnnVar]
-    , _flexibleQuantifiers :: [AnnVar]
+    { _quantifiers :: [AnnVar]
     , _constraint :: AnnotConstr
     , _header :: Map.Map String (A.Located TypeAnnot)
     }
@@ -119,13 +118,15 @@ infixl 8 /\
 -- ex qs constraint == exists qs. constraint
 ex :: [AnnVar] -> AnnotConstr -> AnnotConstr
 ex fqs constraint =
-    CLet [Scheme [] fqs constraint Map.empty] CTrue
+    CLet [Scheme fqs constraint Map.empty] CTrue
 
 
+{-
 -- fl qs constraint == forall qs. constraint
 fl :: [AnnVar] -> AnnotConstr -> AnnotConstr
 fl rqs constraint =
     CLet [Scheme rqs [] constraint Map.empty] CTrue
+-}
 
 
 exists :: (TypeAnnot -> IO AnnotConstr) -> IO AnnotConstr
@@ -135,12 +136,12 @@ exists f =
 
 monoscheme :: Map.Map String (A.Located TypeAnnot) -> AnnScheme
 monoscheme headers =
-  Scheme [] [] CTrue headers
+  Scheme [] CTrue headers
 
 
 toScheme :: AnnFragment -> AnnScheme
 toScheme fragment =
-    Scheme [] (vars fragment) (typeConstraint fragment) (typeEnv fragment)
+    Scheme (vars fragment) (typeConstraint fragment) (typeEnv fragment)
 
 
 data Environment = Environment
