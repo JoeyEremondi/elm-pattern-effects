@@ -229,21 +229,38 @@ canMatchAll (RealAnnot d1) (RealAnnot d2) =
       )  (Map.toList d2)
 
 
-unionUB :: AnnVar -> RealAnnot -> WorklistM ()
+getAnnData :: AnnVar -> SolverM' a (AnnotData)
+getAnnData (AnnVar (pt, _)) =  liftIO $ UF.descriptor pt
+
+
+--Return true if this union makes a change, false otherwise
+unionUB :: AnnVar -> RealAnnot -> WorklistM Bool
 unionUB (AnnVar (pt, _)) ann = do
   annData <- liftIO $ UF.descriptor pt
   let newUB = _ub annData `unionAnn` ann
   liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
-  tell $ canMatchAll newUB (_lb annData)
+  --Check if we changed the set at all
+  --TODO faster shortcut method
+  case (canMatchAll (_ub annData) newUB) of
+    [] -> return False
+    _ -> do
+      tell $ canMatchAll newUB (_lb annData)
+      return True
 
   --TODO emit warning
 
-intersectLB :: AnnVar -> RealAnnot -> WorklistM ()
+intersectLB :: AnnVar -> RealAnnot -> WorklistM Bool
 intersectLB (AnnVar (pt, _)) ann = do
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
   liftIO $ UF.setDescriptor pt $ annData {_ub = _ub annData `unionAnn` ann}
-  tell $ canMatchAll newLB (_lb annData)
+  case (canMatchAll newLB (_lb annData)) of
+      [] -> return False
+      _ -> do
+        tell $ canMatchAll (_ub annData) newLB
+        return True
+
+
 
 
 
@@ -271,5 +288,18 @@ solveSubsetConstraints sm = do
 workList :: [AnnotConstr] -> [AnnotConstr] -> WorklistM ()
 worklist _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
-  CContainsAtLeast _ (VarAnnot v1) (VarAnnot v2) -> do
-    error "TODO"
+  CContainsAtLeast _ (VarAnnot v1) a2 -> do
+    d1 <- getAnnData v1
+    didChange <- case a2 of
+      VarAnnot v2 -> do
+        d2 <- getAnnData v2
+        case (_annRepr d1, _annRepr d2) of
+          --Simple case: unification gave us no restrictions on these variables
+          --Other than the subset constraints, which we solve
+          (Nothing, Nothing) -> do
+            unionUB v1 (_ub d2)
+    case didChange of
+          False -> worklist allConstrs rest
+          True -> do
+            needsUpdate <- outgoingEdges allConstrs v1
+            worklist allConstrs (rest ++ needsUpdate)
