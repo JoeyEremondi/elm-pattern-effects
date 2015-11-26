@@ -128,4 +128,4 @@ patternLitAnnot env patList =
       tposedPatTree = Map.map transpose patternTree
 
 
-    in RealAnnot $ Map.toList $ Map.map (map $ patternLitAnnot env) tposedPatTree
+    in RealAnnot $ Map.map (map $ patternLitAnnot env) tposedPatTree

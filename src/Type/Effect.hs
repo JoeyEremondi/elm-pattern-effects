@@ -41,7 +41,7 @@ freshInt = do
 
 mkVar :: IO AnnVar
 mkVar = do
-  newPoint <- UF.fresh $ AnnotData (Nothing, RealTop, RealAnnot [])
+  newPoint <- UF.fresh $ AnnotData (Nothing, RealTop, RealAnnot Map.empty)
   i <- freshInt
   return $ AnnVar (newPoint, i)
 
@@ -49,7 +49,7 @@ wrapReal :: RealAnnot -> TypeAnnot
 wrapReal realAnn =
   case realAnn of
     RealTop -> TopAnnot
-    RealAnnot pats -> PatternSet $ List.map (\(s, reals) -> (s, List.map wrapReal reals)) pats
+    RealAnnot pats -> PatternSet $ Map.map (List.map wrapReal) pats
 
 
 data AnnotConstr =
@@ -251,7 +251,7 @@ annotationForCtor (_, (_, ctors)) =
           return (numArgs
                  , [] --TODO what is this?
                  , List.map VarAnnot argTypes
-                 , PatternSet [(V.toString nm, List.map VarAnnot argTypes)]
+                 , PatternSet $ Map.fromList [(V.toString nm, List.map VarAnnot argTypes)]
                  )
 
 
@@ -269,6 +269,13 @@ canonicalizeValues _env (moduleName, iface)=
               , (allVars, instResult)
               )
 
+dictMapM :: (Ord k, Monad m) => Map.Map k (m a) -> m (Map.Map k a)
+dictMapM dict = do
+  let (klist, mlist) = unzip $ Map.toList dict
+  vlist <- sequence mlist
+  return $ Map.fromList $ zip klist vlist
+
+
 fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO TypeAnnot
 fromCanonical canonAnnot = do
   currentMap <- State.get
@@ -283,7 +290,7 @@ fromCanonical canonAnnot = do
 
         Just v -> return $ VarAnnot v
 
-    PatternSet l -> PatternSet <$> forM l (\(s, subPats) -> ((,) s) <$> forM subPats fromCanonical )
+    PatternSet s -> PatternSet <$> dictMapM ( (Map.map ( mapM fromCanonical )) s )
     LambdaAnn t1 t2 -> LambdaAnn <$> fromCanonical t1 <*>  fromCanonical t2
     TopAnnot -> return TopAnnot
 

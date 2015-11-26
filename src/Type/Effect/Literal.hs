@@ -1,6 +1,7 @@
 module Type.Effect.Literal where
 
 import qualified AST.Literal as L
+import qualified Data.Map as Map
 import qualified Reporting.Region as R
 --import qualified Type.Environment as Env
 
@@ -14,7 +15,7 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain _ region literal tipe =
-  return (CEqual region tipe $ PatternSet [(toCtorString literal, [])] )
+  return (CEqual region tipe $ PatternSet $ Map.fromList [(toCtorString literal, [])] )
 
 
 
