@@ -362,8 +362,8 @@ constrainIf env region branches finally tipe =
         [(thenVar, _), (elseVar, _)] ->
             return
               ( [thenVar,elseVar]
-              , [ CContainsAtLeast region finalTipe (VarAnnot thenVar)
-                , CContainsAtLeast region finalTipe (VarAnnot elseVar)
+              , [ CSubEffect region (VarAnnot thenVar) finalTipe
+                , CSubEffect region (VarAnnot elseVar) finalTipe
                 , varToCon thenVar
                 ]
               )
@@ -396,11 +396,11 @@ constrainCase env region expr branches tipe =
 
       let matchedSet = Pattern.patternLitAnnot env $ map fst branches
       --The type of the value we split on must contain only the patterns we match on
-      let inPatternsConstr = COnlyMatches region tipe (wrapReal matchedSet) -- TODO join patterns
+      let inPatternsConstr = CSubEffect region (VarAnnot exprVar) (wrapReal matchedSet) -- TODO join patterns
 
       --The annotation of the case statement must contain each possible branch result annotation
       let joinBranchesConstr = --TODO which region
-            CAnd $ map (\branchVar -> CContainsAtLeast region tipe (VarAnnot branchVar)) $ vars
+            CAnd $ map (\branchVar -> CSubEffect region (VarAnnot branchVar) tipe) $ vars
 
       --TODO what is ex doing?
       return $ ex (exprVar : vars) $

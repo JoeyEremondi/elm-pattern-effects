@@ -14,6 +14,7 @@ import Reporting.Warning as Warning
 import qualified Data.UnionFind.IO as UF
 
 import qualified Data.Map as Map
+
 import qualified Reporting.Region as R
 
 --TODO shouldn't this hold schemes, not vars?
@@ -95,17 +96,15 @@ applyUnifications con =
       return ()
     CSaveEnv -> saveLocalEnv
     CTrue -> return ()
-    c -> tell [c]
 
---Avoid a bunch of code duplication
---makeWHelp :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM' a [WConstr]
-makeWHelp mkConstr mkPat mkWLit mkWVar r a1 a2 =
-  case (a1, a2) of
-    (VarAnnot v1, _) -> do
+    --For our other constraints, we defer solving until after unification is done
+makeWConstrs :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM' a [WConstr]
+makeWConstrs r a1 a2 = case a1 of
+    VarAnnot v1 -> do
       mrepr1 <- getRepr v1
       case mrepr1 of
         Just rep1 ->
-          makeWConstrs $ mkConstr r rep1 a2
+          makeWConstrs  r rep1 a2
 
         Nothing -> do
           case a2 of
@@ -113,10 +112,10 @@ makeWHelp mkConstr mkPat mkWLit mkWVar r a1 a2 =
               mrepr2 <- getRepr v2
               case mrepr2 of
                 Nothing ->
-                  return [mkWVar v1 v2]
+                  return [WContainsAtLeast r v1 v2]
 
                 Just rep2 ->
-                  makeWConstrs $ mkConstr r (VarAnnot v1) rep2
+                  makeWConstrs  r (VarAnnot v1) rep2
 
             PatternSet s -> do
               let allPairs = Map.toList s
@@ -127,59 +126,31 @@ makeWHelp mkConstr mkPat mkWLit mkWVar r a1 a2 =
                 --Constrain our new variables to the sub-annotations they're linked to
                 --as well as adding a constraint for our overall variable to that var as a sub-pattern
                 listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
-                  subConstrs <- makeWConstrs (mkConstr r (VarAnnot subVar) subPat)
-                  return $ (WContainsPat v1 ctor i subVar) : subConstrs
+                  subConstrs <- makeWConstrs  r (VarAnnot subVar) subPat
+                  return $ (WContainsPat r v1 ctor i subVar) : subConstrs
                 return $ concat listsPerTriple
               return $ concat subLists
 
-            LambdaAnn _ _ -> do
+            LambdaAnn arg ret -> do
               --If there are only subset constraints stating that this variable is a lambda
               --We unify it now to be a lambda
               varg <- liftIO mkVar
               vret <- liftIO mkVar
-              let newRepr = (LambdaAnn (VarAnnot varg) (VarAnnot vret))
-              setRepr v1 newRepr
-              makeWConstrs $ mkConstr r newRepr a2
+              setRepr v1 (LambdaAnn (VarAnnot varg) (VarAnnot vret))
               --TODO is this backwards?
-
+              --Then, constrain that the argument variable matches at most our lambda
+              --And the return matches at least our lambda
+              --Basic covariance and contravariance stuff
+              argConstrs <- makeWConstrs  r (VarAnnot varg) arg
+              retConstrs <- makeWConstrs  r (VarAnnot vret) ret
+              return $ argConstrs ++ retConstrs
 
             TopAnnot ->
-              return [mkWLit v1 RealTop]
-
-    (_, VarAnnot v2) -> do
-            mrepr2 <- getRepr v2
-            case mrepr2 of
-              Nothing -> error "Can't be subset of unconstrained variable"
-              Just repr -> makeWConstrs $ mkConstr r a1 repr
-
-    (PatternSet d1, PatternSet d2) -> do
-      listPerCtor <- forM (Map.toList d2) $ \(ctor, subPats) ->
-        case (Map.lookup ctor d1) of
-          Nothing -> error "Literal violates pattern constraint"
-          Just leftSubPats -> do
-            listPerArg <- forM (zip leftSubPats subPats) $ \(left, right) ->
-              makeWConstrs (mkConstr r left right )
-            return $ concat listPerArg
-      return $ concat listPerCtor
-
-    (LambdaAnn a1 a2, LambdaAnn b1 b2) -> do
-      --Constrain that the argument variable matches at most our lambda
-      --And the return matches at least our lambda
-      --Basic covariance and contravariance stuff
-      argList <- makeWConstrs (COnlyMatches r a1 b1)
-      retList <- makeWConstrs (mkConstr r a2 b2 )
-      return $ argList ++ retList
-
-    (TopAnnot, TopAnnot) -> return []
+              return [WContainsLit r v1 RealTop]
 
 
-    --For our other constraints, we defer solving until after unification is done
-makeWConstrs :: AnnotConstr -> SolverM' a [WConstr]
-makeWConstrs c = case c of
-    CContainsAtLeast r a1 a2 ->
-      makeWHelp CContainsAtLeast WContainsPat WContainsLit WContainsAtLeast r a1 a2
-    COnlyMatches r a1 a2 ->
-      makeWHelp COnlyMatches WContainsPat WCanMatchLit WCanMatchVar r a1 a2
+
+      --Make a new variable for each constructor of the pattern
 
 
 solveScheme :: AnnScheme -> SolverM Env
@@ -294,12 +265,9 @@ unifyAnnots r1 r2 =
 
 --Constraints we can actually deal with in our worklist algorithm
 data WConstr =
-  WContainsAtLeast AnnVar AnnVar
-  | WContainsPat AnnVar String Int AnnVar --Specific sub-pattern constraints
-  | WContainsLit AnnVar RealAnnot
-  | WCanMatchVar AnnVar AnnVar
-  | WCanMatchPat AnnVar String Int AnnVar
-  | WCanMatchLit AnnVar RealAnnot
+  WContainsAtLeast R.Region AnnVar AnnVar
+  | WContainsPat R.Region AnnVar String Int AnnVar --Specific sub-pattern constraints
+  | WContainsLit R.Region AnnVar RealAnnot
 
 
 unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
@@ -363,13 +331,7 @@ intersectLB (AnnVar (pt, _)) ann = do
 
 
 outgoingEdges :: [AnnotConstr] -> AnnVar -> WorklistM [AnnotConstr]
-outgoingEdges allConstrs v = filterM (\constr -> do
-  case constr of
-    --TODO looking at right var in each case?
-    CContainsAtLeast _ (VarAnnot x) _ -> areSame x v
-    COnlyMatches _ (VarAnnot x) _ -> areSame x v
-    _ -> return False
-  ) allConstrs
+outgoingEdges allConstrs v = error "TODO edges"
 
 
 
@@ -383,43 +345,7 @@ solveSubsetConstraints sm = do
   return ()
 
 
-workList :: [AnnotConstr] -> [AnnotConstr] -> WorklistM ()
+workList :: [WConstr] -> [WConstr] -> WorklistM ()
 worklist _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
-  CContainsAtLeast reg (VarAnnot v1) a2 -> do
-    d1 <- getAnnData v1
-    case (_annRepr d1) of
-      --If this variable represents another structure (Lambda, literal set)
-      --Then solve our constraint with that structure
-      Just repr ->
-        worklist allConstrs ( (CContainsAtLeast reg repr a2) : rest)
-      Nothing ->
-        case a2 of
-          VarAnnot v2 -> do
-            d2 <- getAnnData v2
-            case _annRepr d2 of
-              --If reprs are present, we just extract them and solve the constraints on them
-              Just rep ->
-                workList allConstrs (CContainsAtLeast reg (VarAnnot v1) rep : rest)
-              --Simple case: unification gave us no restrictions on these variables
-              --Other than the subset constraints, which we solve
-              Nothing -> do
-                didChange <- unionUB v1 (_ub d2)
-                case didChange of
-                      False ->
-                        worklist allConstrs rest
-                      True -> do
-                        needsUpdate <- outgoingEdges allConstrs v1
-                        worklist allConstrs (rest ++ needsUpdate)
-          _ -> do
-            didChange <- case a2 of
-              PatternSet s ->
-                error "TODO: constraints to real sets?"
-              TopAnnot ->
-                unionUB v1 RealTop
-            case didChange of
-              False ->
-                worklist allConstrs rest
-              True -> do
-                needsUpdate <- outgoingEdges allConstrs v1
-                worklist allConstrs (rest ++ needsUpdate)
+  _ -> error "TODO worklist"
