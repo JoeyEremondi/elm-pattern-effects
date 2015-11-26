@@ -8,10 +8,15 @@ import GHC.Generics (Generic)
 
 
 
-newtype AnnVar = AnnVar (UF.Point (RealAnnot, RealAnnot), Int)
+newtype AnnVar = AnnVar (UF.Point AnnotData, Int)
 
 instance Show AnnVar where
   show (AnnVar (_, i)) = show i
+
+--During unification, we store a (possibly empty) representation of
+--our type so far, and our currently calculated lower and upper bounds,
+--which are used if our point is a variable
+newtype AnnotData = AnnotData (Maybe TypeAnnot, RealAnnot, RealAnnot )
 
 
 data RealAnnot =
@@ -37,5 +42,5 @@ prettyAnn :: CanonicalAnnot -> String
 prettyAnn ann = case ann of
   VarAnnot i -> "_" ++ show i
   PatternSet sset -> show $ map (\(s,a) -> (s, map prettyAnn a) ) sset
-  LambdaAnn from to = prettyAnn from ++ " ==> " ++ prettyAnn to
-  TopAnnot = "T"
+  LambdaAnn from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
+  TopAnnot -> "T"

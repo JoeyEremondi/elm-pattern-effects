@@ -394,7 +394,7 @@ constrainCase env region expr branches tipe =
       --TODO what is this?
       (vars, cons) <- pairCons region Error.CaseBranch varToCon branchResultInfo
 
-      let matchedSet = wrapReal $ Pattern.patternLitAnnot env $ map fst branches
+      let matchedSet = Pattern.patternLitAnnot env $ map fst branches
       --The type of the value we split on must contain only the patterns we match on
       let inPatternsConstr = COnlyMatches region tipe matchedSet -- TODO join patterns
 

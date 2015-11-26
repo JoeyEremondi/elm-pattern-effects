@@ -119,6 +119,7 @@ Library
         Type.Constrain.Pattern,
         Type.Effect,
         Type.Effect.Common,
+        Type.Effect.Solve,
         Type.Effect.Expression,
         Type.Effect.Literal,
         Type.Effect.Pattern,

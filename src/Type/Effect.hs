@@ -41,7 +41,7 @@ freshInt = do
 
 mkVar :: IO AnnVar
 mkVar = do
-  newPoint <- UF.fresh $ (RealTop, RealTop)
+  newPoint <- UF.fresh $ AnnotData (Nothing, RealTop, RealAnnot [])
   i <- freshInt
   return $ AnnVar (newPoint, i)
 
@@ -49,7 +49,7 @@ wrapReal :: RealAnnot -> TypeAnnot
 wrapReal realAnn =
   case realAnn of
     RealTop -> TopAnnot
-    RealAnnot pats -> PatternSet $ List.map (\(s, reals) -> (s, List.map wrapReal reals)) pats 
+    RealAnnot pats -> PatternSet $ List.map (\(s, reals) -> (s, List.map wrapReal reals)) pats
 
 
 data AnnotConstr =
@@ -60,7 +60,7 @@ data AnnotConstr =
   | CLet [AnnScheme] (AnnotConstr)
   | CInstance R.Region String TypeAnnot
   | CContainsAtLeast R.Region TypeAnnot TypeAnnot
-  | COnlyMatches R.Region TypeAnnot TypeAnnot
+  | COnlyMatches R.Region TypeAnnot RealAnnot
   deriving (Show)
 
 
@@ -298,3 +298,6 @@ envGet subDict env key =
 
 ctorNames env =
   Map.keys (_constructor env)
+
+toCanonicalAnnot :: AnnVar -> IO CanonicalAnnot
+toCanonicalAnnot _ = error "TODO toCanonicalAnnot"
