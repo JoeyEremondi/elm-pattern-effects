@@ -129,6 +129,23 @@ makeWConstrs c = case c of
                 return $ concat listsPerTriple
               return $ concat subLists
 
+            LambdaAnn arg ret -> do
+              --If there are only subset constraints stating that this variable is a lambda
+              --We unify it now to be a lambda
+              varg <- liftIO mkVar
+              vret <- liftIO mkVar
+              setRepr v1 (LambdaAnn (VarAnnot varg) (VarAnnot vret))
+              --TODO is this backwards?
+              --Then, constrain that the argument variable matches at most our lambda
+              --And the return matches at least our lambda
+              --Basic covariance and contravariance stuff
+              argConstrs <- makeWConstrs $ COnlyMatches r (VarAnnot varg) arg
+              retConstrs <- makeWConstrs $ CContainsAtLeast r (VarAnnot vret) ret
+              return $ argConstrs ++ retConstrs
+
+            TopAnnot ->
+              return [WContainsLit v1 RealTop]
+
 
 
       --Make a new variable for each constructor of the pattern
@@ -250,7 +267,6 @@ data WConstr =
   | WContainsPat AnnVar String Int AnnVar --Specific sub-pattern constraints
   | WContainsLit AnnVar RealAnnot
   | WCanMatch AnnVar RealAnnot
-  | LambdaSubType (AnnVar, AnnVar) (AnnVar, AnnVar)
 
 
 unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
