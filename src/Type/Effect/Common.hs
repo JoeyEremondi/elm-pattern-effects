@@ -32,3 +32,10 @@ type TypeAnnot = TypeAnnot' AnnVar
 type CanonicalAnnot = TypeAnnot' Int
 
 instance (Binary a) => Binary (TypeAnnot' a)
+
+prettyAnn :: CanonicalAnnot -> String
+prettyAnn ann = case ann of
+  VarAnnot i -> "_" ++ show i
+  PatternSet sset -> show $ map (\(s,a) -> (s, map prettyAnn a) ) sset
+  LambdaAnn from to = prettyAnn from ++ " ==> " ++ prettyAnn to
+  TopAnnot = "T"
