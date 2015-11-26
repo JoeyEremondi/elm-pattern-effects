@@ -6,12 +6,15 @@ import qualified  Control.Monad.State as State
 import Control.Monad.Trans
 import Control.Monad (forM, forM_)
 
+import qualified Data.List as List
+
 import Reporting.Annotation as A
 
 import qualified Data.UnionFind.IO as UF
 
 import qualified Data.Map as Map
 
+--TODO shouldn't this hold schemes, not vars?
 type Env = Map.Map String (A.Located AnnVar)
 
 data SolverState =
@@ -23,6 +26,10 @@ data SolverState =
 getEnv :: SolverM Env
 getEnv =
     State.gets sEnv
+
+modifyEnv :: (Env -> Env) -> SolverM ()
+modifyEnv f =
+    State.modify $ \state -> state { sEnv = f (sEnv state) }
 
 saveLocalEnv :: SolverM ()
 saveLocalEnv =
@@ -49,6 +56,9 @@ union :: AnnVar -> AnnVar -> SolverM ()
 union (AnnVar (pt1, _)) (AnnVar (pt2, _)) =
   liftIO $ UF.union pt1 pt2
 
+areSame :: AnnVar -> AnnVar -> SolverM Bool
+areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
+
 applyUnifications :: AnnotConstr -> SolverM ()
 applyUnifications con =
   case con of
@@ -56,12 +66,70 @@ applyUnifications con =
       _ <- unifyAnnots r1 r2
       return ()
     CAnd constrs -> forM_ constrs applyUnifications
-    CLet schemes constrs -> error "TODO what is CLet?"
-    CInstance _ var annot -> error "TODO get instance"
+    CLet schemes letConstr -> do
+      oldEnv <- getEnv
+      --TODO do something with vars in the scheme?
+      headers <- Map.unions <$> forM schemes solveScheme
+      modifyEnv $ \env -> Map.union headers env
+      applyUnifications letConstr
+      --TODO occurs check?
+      modifyEnv $ \_ -> oldEnv
+    CInstance _ var annot -> do
+      env <- getEnv
+      freshCopy <-
+        case Map.lookup var env of
+          Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve"
+          Just (A.A _ annVar) -> do
+            mrepr <- getRepr annVar
+            case mrepr of
+              Nothing -> error "Can't make fresh copy of blank var"
+              Just repr -> makeFreshCopy repr
+      unifyAnnots freshCopy annot
+      return ()
     CSaveEnv -> saveLocalEnv
     CTrue -> return ()
     --For our other constraints, we defer solving until after unification is done
     c -> tell [c]
+
+solveScheme :: AnnScheme -> SolverM Env
+solveScheme s = do
+  let oldHeader = Map.toList $ _header s
+  newHeader <- forM oldHeader $ \(nm, (A.A region ann)) -> do
+    newVar <- liftIO mkVar
+    unifyAnnots (VarAnnot newVar) ann
+    return (nm, A.A region newVar)
+  return $ Map.fromList newHeader
+
+makeFreshCopy :: TypeAnnot -> SolverM TypeAnnot
+makeFreshCopy ann = do
+  let --TODO check if free or not?
+    copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
+    copyHelper a = case a of
+      VarAnnot v -> do
+        vnew <- liftIO $ mkVar
+        return $ (VarAnnot vnew, [(v, vnew)])
+      PatternSet pats -> do
+        newVarPairs <- forM pats (\(s, subPats) -> (\x -> (s, x)) <$> forM subPats copyHelper)
+        let allPairs = concatMap ((concatMap snd) . snd) newVarPairs
+        let newPatList = List.map (\(s, pl) -> (s, List.map fst pl)) newVarPairs
+        return (PatternSet newPatList, allPairs)
+      LambdaAnn a1 a2 -> do
+        (b1, pairs1) <- copyHelper a1
+        (b2, pairs2) <- copyHelper a2
+        return (LambdaAnn b1 b2, pairs1 ++ pairs2)
+      TopAnnot -> return (TopAnnot, [])
+
+    unifyPairs pairList =
+      forM_ pairList $ \(old1, new1) -> forM_ pairList $ \(old2, new2) -> do
+        sm <- areSame old1 old2
+        case sm of
+          True -> union new1 new2
+          False -> return ()
+
+  (newCopy, pairList) <- copyHelper ann
+  unifyPairs pairList
+  return newCopy
+
 
 unifyAnnots :: TypeAnnot -> TypeAnnot -> SolverM TypeAnnot
 unifyAnnots r1 r2 =
