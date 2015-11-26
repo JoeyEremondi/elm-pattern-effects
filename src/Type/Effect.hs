@@ -41,11 +41,15 @@ freshInt = do
 
 mkVar :: IO AnnVar
 mkVar = do
-  newPoint <- UF.fresh $ OpenRealSet []
+  newPoint <- UF.fresh $ (RealTop, RealTop)
   i <- freshInt
   return $ AnnVar (newPoint, i)
 
-
+wrapReal :: RealAnnot -> TypeAnnot
+wrapReal realAnn =
+  case realAnn of
+    RealTop -> TopAnnot
+    RealAnnot pats -> PatternSet $ List.map (\(s, reals) -> (s, List.map wrapReal reals)) pats 
 
 
 data AnnotConstr =
@@ -56,7 +60,7 @@ data AnnotConstr =
   | CLet [AnnScheme] (AnnotConstr)
   | CInstance R.Region String TypeAnnot
   | CContainsAtLeast R.Region TypeAnnot TypeAnnot
-  | CContainsOnly R.Region TypeAnnot TypeAnnot
+  | COnlyMatches R.Region TypeAnnot TypeAnnot
   deriving (Show)
 
 
@@ -133,11 +137,6 @@ monoscheme :: Map.Map String (A.Located TypeAnnot) -> AnnScheme
 monoscheme headers =
   Scheme [] [] CTrue headers
 
-mkRigid :: String -> IO AnnVar
-mkRigid = error "TODO mkRigid"
-
-mkNamedVar :: String -> IO AnnVar
-mkNamedVar name = error "TODO mkNamedVar"
 
 toScheme :: AnnFragment -> AnnScheme
 toScheme fragment =
@@ -260,13 +259,13 @@ canonicalizeValues
     :: Environment
     -> (ModuleName.Canonical, Module.Interface)
     -> IO [(String, ([AnnVar], TypeAnnot))]
-canonicalizeValues env (moduleName, iface)=
+canonicalizeValues _env (moduleName, iface)=
   forM (Map.toList (Module.iAnnots iface)) $ \(name,canonAnnot) ->
         do  (instResult, finalState) <- State.runStateT (fromCanonical canonAnnot) Map.empty
             let allVars = Map.elems  finalState
             return
               ( ModuleName.canonicalToString moduleName ++ "." ++ name
-              , (allVars, instResult) --TODO convert stored type into type we can deal with
+              , (allVars, instResult)
               )
 
 fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO TypeAnnot

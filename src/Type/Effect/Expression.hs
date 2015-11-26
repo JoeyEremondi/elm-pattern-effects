@@ -4,13 +4,14 @@ module Type.Effect.Expression where
 import Control.Arrow (second)
 import qualified Control.Monad as Monad
 import qualified Data.Map as Map
+import qualified Data.List as List
 
 import qualified AST.Expression.General as E
 import qualified AST.Expression.Canonical as Canonical
-import qualified AST.Literal as Lit
 import qualified AST.Pattern as P
 import qualified AST.Type as ST
 import qualified AST.Variable as V
+import qualified AST.Module.Name as ModName
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
 import qualified Reporting.Region as R
@@ -35,33 +36,15 @@ constrain env annotatedExpr@(A.A region expression) tipe =
       E.Literal lit ->
           Literal.constrain env region lit tipe
 
-      E.GLShader _uid _src gltipe -> error "GLSL not supported"
-          {- exists $ \attr ->
-          exists $ \unif ->
-            let
-                shaderTipe a u v =
-                    Effect.getType env "WebGL.Shader" <| a <| u <| v
-
-                glToType glTipe =
-                    Effect.getType env (Lit.glTipeName glTipe)
-
-                makeRec accessor baseRec =
-                    let decls = accessor gltipe
-                    in
-                      if Map.size decls == 0 then
-                          baseRec
-                      else
-                          error "TODO" --record (Map.map glToType decls) baseRec
-
-                attribute = makeRec Lit.attribute attr
-                uniform = makeRec Lit.uniform unif
-                varying = makeRec Lit.varying (TermN EmptyRecord1)
-            in
-                return (CEqual Error.Shader region (shaderTipe attribute uniform varying) tipe) -}
-
       E.Var var ->
-          let name = V.toString var
-          in
+        case (V.home var) of
+          --We always assume that a Native value accepts and returns all patterns
+          V.Module (ModName.Canonical _ raw)
+            | ModName.isNative raw ->
+              return $ CEqual region tipe TopAnnot
+          _ ->
+            let name = V.toString var
+            in
               return (if name == E.saveEnvName then CSaveEnv else name <? tipe)
 
       --We never know if a range is empty or not without evaluating the input arguments
@@ -239,11 +222,10 @@ argConstraints env name region totalArgs overallVar index args =
                   (VarAnnot argIndexVar ==> VarAnnot localReturnVar)
                   (VarAnnot overallVar)
 
-          --Constraint so that argument expressions contain no patterns
-          --Which cannot be matched by the function (specified by the first)
-          --Argument of the lambda annotation
+          --The constraints from the functon apply to the arguments
+          --TODO enforce subset constraints here?
           let subsetOfMatchedCon =
-                CContainsOnly
+                CEqual
                   region
                   (VarAnnot argIndexVar)
                   (VarAnnot argVar)
@@ -283,16 +265,16 @@ constrainBinop env region op leftExpr@(A.A leftRegion _) rightExpr@(A.A rightReg
 
       let opType = VarAnnot leftVar' ==> VarAnnot rightVar' ==> VarAnnot answerVar
 
-      --Same as application, ensure that given arguments contain no patterns
-      --That the binop can't match
+      --The constraints from the functon apply to the arguments
+      --TODO enforce subset constraints here?
 
       return $
         ex [leftVar,rightVar,leftVar',rightVar',answerVar] $ CAnd $
           [ leftCon
           , rightCon
           , CInstance region (V.toString op) opType
-          , CContainsOnly region (VarAnnot leftVar) (VarAnnot leftVar')
-          , CContainsOnly region (VarAnnot rightVar) (VarAnnot rightVar')
+          , CEqual region (VarAnnot leftVar) (VarAnnot leftVar')
+          , CEqual region (VarAnnot rightVar) (VarAnnot rightVar')
           , CEqual region (VarAnnot answerVar) tipe
           ]
 
@@ -412,8 +394,9 @@ constrainCase env region expr branches tipe =
       --TODO what is this?
       (vars, cons) <- pairCons region Error.CaseBranch varToCon branchResultInfo
 
+      let matchedSet = wrapReal $ Pattern.patternLitAnnot env $ map fst branches
       --The type of the value we split on must contain only the patterns we match on
-      let inPatternsConstrs = [] -- TODO join patterns
+      let inPatternsConstr = COnlyMatches region tipe matchedSet -- TODO join patterns
 
       --The annotation of the case statement must contain each possible branch result annotation
       let joinBranchesConstr = --TODO which region
@@ -421,7 +404,7 @@ constrainCase env region expr branches tipe =
 
       --TODO what is ex doing?
       return $ ex (exprVar : vars) $
-        CAnd (exprCon : joinBranchesConstr : cons ++ branchResultConstraints ++ inPatternsConstrs)
+        CAnd (exprCon : joinBranchesConstr  : inPatternsConstr : branchResultConstraints ++ cons )
   where
     branch (pattern, branchExpr@(A.A branchRegion _)) =
         do  branchVar <- mkVar
@@ -549,7 +532,7 @@ constrainUnannotatedDef
     -> IO Info
 constrainUnannotatedDef env info qs patternRegion name expr =
   do  -- Some mistake may be happening here. Currently, qs is always [].
-      rigidVars <- mapM mkRigid qs
+      rigidVars <- error "TODO rigid vars" --mapM mkRigid qs
 
       v <- mkVar
 

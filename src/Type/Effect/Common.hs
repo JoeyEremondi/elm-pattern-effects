@@ -8,15 +8,15 @@ import GHC.Generics (Generic)
 
 
 
-newtype AnnVar = AnnVar (UF.Point RealAnnot, Int)
+newtype AnnVar = AnnVar (UF.Point (RealAnnot, RealAnnot), Int)
 
 instance Show AnnVar where
   show (AnnVar (_, i)) = show i
 
 
 data RealAnnot =
-  ClosedRealSet [(String, [RealAnnot])]
-  | OpenRealSet [(String, [RealAnnot])]
+  RealAnnot [(String, [RealAnnot])]
+  | RealTop
   deriving (Show, Generic)
 
 

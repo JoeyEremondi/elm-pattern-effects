@@ -3,6 +3,7 @@ module Type.Effect.Pattern where
 import Control.Arrow (second)
 import qualified Control.Monad as Monad
 import qualified Data.Map as Map
+import qualified Data.List as List
 
 import qualified AST.Pattern as P
 import qualified AST.Variable as V
@@ -10,8 +11,7 @@ import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
 import qualified Type.Effect.Literal as Literal
 --import qualified Type.Environment as Env
-import qualified Type.Type as T
-import qualified Reporting.Region as R
+
 
 import Type.Effect
 
@@ -89,3 +89,43 @@ constrain env (A.A region pattern) tipe =
                 , vars = map snd pairs
                 , typeConstraint = con
                 }
+
+isTotal _ _ = False
+
+patternLitAnnot :: Environment -> [P.CanonicalPattern]  -> RealAnnot
+patternLitAnnot env patList =
+  if (isTotal patList env)
+  then RealTop
+  else
+    let
+      dictAppend nm ann dict =
+        case (Map.lookup nm dict) of
+          Nothing -> Map.insert nm [ann] dict
+          Just listSoFar -> Map.insert nm (ann:listSoFar) dict
+      dictInit nm dict =
+        case (Map.lookup nm dict) of
+          Nothing -> Map.insert nm [] dict
+          _ -> dict
+
+      --Assumes our lists form a rectangular matrix
+      transpose :: [[a]] -> [[a]]
+      transpose [] = []
+      transpose l = (map head l):(transpose $ map tail l)
+
+      extendPatDict (A.A _ pat) dict = case pat of
+        P.Anything -> error "Missed total case"
+        P.Var _ -> error "Missed total case"
+        P.Alias _ subPat -> extendPatDict subPat dict
+        P.Literal lit -> dictInit (Literal.toCtorString lit) dict --We know there are never arguments to a literal
+        P.Data name subPats -> dictAppend (V.toString name) subPats dict
+
+      --Gives us a dict mapping strings to lists of lists patterns
+      --We go through and convert our "list matrix" from horozontal to vertical
+      -- i.e. instead of having a list of lists containing one pattern for each arg,
+      --We have a list which, for each arg, contains a list of possible patterns
+      --TODO does this lose precision?
+      patternTree = List.foldr extendPatDict Map.empty patList
+      tposedPatTree = Map.map transpose patternTree
+
+
+    in RealAnnot $ Map.toList $ Map.map (map $ patternLitAnnot env) tposedPatTree
