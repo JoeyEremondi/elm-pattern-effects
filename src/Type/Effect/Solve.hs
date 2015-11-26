@@ -14,6 +14,7 @@ import Reporting.Warning as Warning
 import qualified Data.UnionFind.IO as UF
 
 import qualified Data.Map as Map
+import qualified Reporting.Region as R
 
 --TODO shouldn't this hold schemes, not vars?
 type Env = Map.Map String (A.Located AnnVar)
@@ -94,15 +95,17 @@ applyUnifications con =
       return ()
     CSaveEnv -> saveLocalEnv
     CTrue -> return ()
+    c -> tell [c]
 
-    --For our other constraints, we defer solving until after unification is done
-makeWConstrs :: AnnotConstr -> SolverM' a [WConstr]
-makeWConstrs c = case c of
-    CContainsAtLeast r (VarAnnot v1) a2 -> do
+--Avoid a bunch of code duplication
+--makeWHelp :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM' a [WConstr]
+makeWHelp mkConstr mkPat mkWLit mkWVar r a1 a2 =
+  case (a1, a2) of
+    (VarAnnot v1, _) -> do
       mrepr1 <- getRepr v1
       case mrepr1 of
         Just rep1 ->
-          makeWConstrs $ CContainsAtLeast r rep1 a2
+          makeWConstrs $ mkConstr r rep1 a2
 
         Nothing -> do
           case a2 of
@@ -110,10 +113,10 @@ makeWConstrs c = case c of
               mrepr2 <- getRepr v2
               case mrepr2 of
                 Nothing ->
-                  return [WContainsAtLeast v1 v2]
+                  return [mkWVar v1 v2]
 
                 Just rep2 ->
-                  makeWConstrs $ CContainsAtLeast r (VarAnnot v1) rep2
+                  makeWConstrs $ mkConstr r (VarAnnot v1) rep2
 
             PatternSet s -> do
               let allPairs = Map.toList s
@@ -124,31 +127,59 @@ makeWConstrs c = case c of
                 --Constrain our new variables to the sub-annotations they're linked to
                 --as well as adding a constraint for our overall variable to that var as a sub-pattern
                 listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
-                  subConstrs <- makeWConstrs (CContainsAtLeast r (VarAnnot subVar) subPat)
+                  subConstrs <- makeWConstrs (mkConstr r (VarAnnot subVar) subPat)
                   return $ (WContainsPat v1 ctor i subVar) : subConstrs
                 return $ concat listsPerTriple
               return $ concat subLists
 
-            LambdaAnn arg ret -> do
+            LambdaAnn _ _ -> do
               --If there are only subset constraints stating that this variable is a lambda
               --We unify it now to be a lambda
               varg <- liftIO mkVar
               vret <- liftIO mkVar
-              setRepr v1 (LambdaAnn (VarAnnot varg) (VarAnnot vret))
+              let newRepr = (LambdaAnn (VarAnnot varg) (VarAnnot vret))
+              setRepr v1 newRepr
+              makeWConstrs $ mkConstr r newRepr a2
               --TODO is this backwards?
-              --Then, constrain that the argument variable matches at most our lambda
-              --And the return matches at least our lambda
-              --Basic covariance and contravariance stuff
-              argConstrs <- makeWConstrs $ COnlyMatches r (VarAnnot varg) arg
-              retConstrs <- makeWConstrs $ CContainsAtLeast r (VarAnnot vret) ret
-              return $ argConstrs ++ retConstrs
+
 
             TopAnnot ->
-              return [WContainsLit v1 RealTop]
+              return [mkWLit v1 RealTop]
+
+    (_, VarAnnot v2) -> do
+            mrepr2 <- getRepr v2
+            case mrepr2 of
+              Nothing -> error "Can't be subset of unconstrained variable"
+              Just repr -> makeWConstrs $ mkConstr r a1 repr
+
+    (PatternSet d1, PatternSet d2) -> do
+      listPerCtor <- forM (Map.toList d2) $ \(ctor, subPats) ->
+        case (Map.lookup ctor d1) of
+          Nothing -> error "Literal violates pattern constraint"
+          Just leftSubPats -> do
+            listPerArg <- forM (zip leftSubPats subPats) $ \(left, right) ->
+              makeWConstrs (mkConstr r left right )
+            return $ concat listPerArg
+      return $ concat listPerCtor
+
+    (LambdaAnn a1 a2, LambdaAnn b1 b2) -> do
+      --Constrain that the argument variable matches at most our lambda
+      --And the return matches at least our lambda
+      --Basic covariance and contravariance stuff
+      argList <- makeWConstrs (COnlyMatches r a1 b1)
+      retList <- makeWConstrs (mkConstr r a2 b2 )
+      return $ argList ++ retList
+
+    (TopAnnot, TopAnnot) -> return []
 
 
-
-      --Make a new variable for each constructor of the pattern
+    --For our other constraints, we defer solving until after unification is done
+makeWConstrs :: AnnotConstr -> SolverM' a [WConstr]
+makeWConstrs c = case c of
+    CContainsAtLeast r a1 a2 ->
+      makeWHelp CContainsAtLeast WContainsPat WContainsLit WContainsAtLeast r a1 a2
+    COnlyMatches r a1 a2 ->
+      makeWHelp COnlyMatches WContainsPat WCanMatchLit WCanMatchVar r a1 a2
 
 
 solveScheme :: AnnScheme -> SolverM Env
@@ -266,7 +297,9 @@ data WConstr =
   WContainsAtLeast AnnVar AnnVar
   | WContainsPat AnnVar String Int AnnVar --Specific sub-pattern constraints
   | WContainsLit AnnVar RealAnnot
-  | WCanMatch AnnVar RealAnnot
+  | WCanMatchVar AnnVar AnnVar
+  | WCanMatchPat AnnVar String Int AnnVar
+  | WCanMatchLit AnnVar RealAnnot
 
 
 unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
