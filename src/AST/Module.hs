@@ -117,7 +117,7 @@ data Interface = Interface
     , iPackage  :: Package.Name
     , iExports  :: [Var.Value]
     , iTypes    :: Types
-    , iAnnots   :: Type.Effect.Common.CanonicalAnnot
+    , iAnnots   :: Map.Map String Type.Effect.Common.CanonicalAnnot
     , iImports  :: [Name.Raw]
     , iAdts     :: ADTs
     , iAliases  :: Aliases

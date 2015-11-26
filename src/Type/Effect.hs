@@ -263,12 +263,32 @@ canonicalizeValues
     -> (ModuleName.Canonical, Module.Interface)
     -> IO [(String, ([AnnVar], TypeAnnot))]
 canonicalizeValues env (moduleName, iface)=
-  forM (Map.toList (error "iTypes")) $ \(name,tipe) ->
-        do  -- TODO canonicalAnnots stored in iface
+  forM (Map.toList (Module.iAnnots iface)) $ \(name,canonAnnot) ->
+        do  (instResult, finalState) <- State.runStateT (fromCanonical canonAnnot) Map.empty
+            let allVars = Map.elems  finalState
             return
               ( ModuleName.canonicalToString moduleName ++ "." ++ name
-              , ([], TopAnnot) --TODO convert stored type into type we can deal with
+              , (allVars, instResult) --TODO convert stored type into type we can deal with
               )
+
+fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO TypeAnnot
+fromCanonical canonAnnot = do
+  currentMap <- State.get
+  case canonAnnot of
+
+    VarAnnot i ->
+      case (Map.lookup i currentMap) of
+        Nothing -> do
+          varI <- State.lift $ mkVar
+          State.put (Map.insert i varI currentMap)
+          return (VarAnnot varI)
+
+        Just v -> return $ VarAnnot v
+
+    OpenSet l -> OpenSet <$> forM l (\(s, subPats) -> ((,) s) <$> forM subPats fromCanonical )
+    ClosedSet l -> ClosedSet <$> forM l (\(s, subPats) -> ((,) s) <$> forM subPats fromCanonical )
+    LambdaAnn t1 t2 -> LambdaAnn <$> fromCanonical t1 <*>  fromCanonical t2
+    TopAnnot -> return TopAnnot
 
 freshDataScheme :: Environment -> String -> IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)
 freshDataScheme = envGet _constructor
