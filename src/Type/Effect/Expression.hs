@@ -140,10 +140,10 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                       (Info [] [] Map.empty CTrue)
                       (concatMap expandPattern defs)
 
-              let letScheme = error "TODO let scheme "
-                    --[ Scheme rqs fqs (CLet [monoscheme headers] c2) headers ]
+              let letScheme = --TODO why nested schemes?
+                    [ Scheme fqs (CLet [monoscheme headers] constr) headers ]
 
-              return $ CLet schemes (CLet letScheme ( constr /\ bodyCon))
+              return $ CLet schemes (CLet letScheme ( bodyCon))
 
       E.Port impl ->
           case impl of
