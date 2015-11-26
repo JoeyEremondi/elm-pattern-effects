@@ -38,7 +38,7 @@ compile packageName isRoot canonicalImports interfaces source =
           Canonicalize.module' canonicalImports interfaces validModule
 
       -- Run type inference on the program.
-      types <-
+      (types, annots) <-
           Result.from Error.Type $
             TI.infer interfaces canonicalModule
 
@@ -52,7 +52,7 @@ compile packageName isRoot canonicalImports interfaces source =
 
       -- Add the real list of types
       let body =
-            (Module.body canonicalModule) { Module.types = types }
+            (Module.body canonicalModule) { Module.types = types, Module.annots = annots }
 
       -- Do some basic optimizations
       let optModule =

@@ -28,7 +28,7 @@ import System.IO.Unsafe
 infer
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> Except [A.Located Error.Error] (Map.Map String Type.Canonical)
+    -> Except [A.Located Error.Error] (Map.Map String Type.Canonical, Map.Map String Effect.CanonicalAnnot)
 infer interfaces modul =
   either throwError return $ unsafePerformIO $ runExceptT $
     do  (header, constraint) <-
@@ -43,7 +43,8 @@ infer interfaces modul =
         (annotHeader, annotWarns) <- liftIO $ genPatternWarnings interfaces modul
 
 
-        liftIO (Traverse.traverse T.toSrcType types)
+        typeDict <- liftIO (Traverse.traverse T.toSrcType types)
+        return (typeDict, Map.empty)
 
 
 genConstraints

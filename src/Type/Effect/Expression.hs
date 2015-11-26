@@ -173,6 +173,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
             E.Task _ expr _ ->
                 constrain env expr tipe
 
+      _ -> return CTrue
 
 -- CONSTRAIN APP
 
@@ -413,7 +414,7 @@ constrainCase env region expr branches tipe =
       (vars, cons) <- pairCons region Error.CaseBranch varToCon branchResultInfo
 
       --The type of the value we split on must contain only the patterns we match on
-      let inPatternsConstrs = error "TODO join patterns"
+      let inPatternsConstrs = [] -- TODO join patterns
 
       --The annotation of the case statement must contain each possible branch result annotation
       let joinBranchesConstr = --TODO which region
@@ -531,53 +532,12 @@ constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr m
   let qs = [] -- should come from the def, but I'm not sure what would live there...
   in
   case (pattern, maybeTipe) of
-    (P.Var name, Just (A.A typeRegion tipe)) ->
-        constrainAnnotatedDef env info qs patternRegion typeRegion name expr tipe
-
-    (P.Var name, Nothing) ->
+    (P.Var name, _) ->
         constrainUnannotatedDef env info qs patternRegion name expr
 
     _ ->
         error "canonical definitions must not have complex patterns as names in the contstraint generation phase"
 
-
-constrainAnnotatedDef
-    :: Effect.Environment
-    -> Info
-    -> [String]
-    -> R.Region
-    -> R.Region
-    -> String
-    -> Canonical.Expr
-    -> ST.Canonical
-    -> IO Info
-constrainAnnotatedDef env info qs patternRegion typeRegion name expr tipe =
-  do  -- Some mistake may be happening here. Currently, qs is always [].
-      rigidVars <- mapM mkRigid qs
-
-      flexiVars <- mapM mkNamedVar qs
-
-      let env' = Effect.addValues env (zip qs flexiVars)
-
-      (vars, typ) <- Effect.instantiateType env tipe Map.empty
-
-      let scheme =
-            Scheme
-              { _rigidQuantifiers = []
-              , _flexibleQuantifiers = flexiVars ++ vars
-              , _constraint = CTrue
-              , _header = Map.singleton name (A.A patternRegion typ)
-              }
-
-      var <- mkVar
-      defCon <- constrain env' expr (VarAnnot var)
-      let annCon =
-            CEqual (Error.BadTypeAnnotation name) typeRegion typ (VarAnnot var)
-
-      return $ info
-          { iSchemes = scheme : iSchemes info
-          , iC1 = iC1 info /\ ex [var] (defCon /\ fl rigidVars annCon)
-          }
 
 
 constrainUnannotatedDef

@@ -60,7 +60,7 @@ constrain env (A.A region pattern) tipe =
         do  let stringName = V.toString name
 
             (_kind, cvars, args, result) <-
-                error "TODO" --Env.freshDataScheme env stringName
+                freshDataScheme env stringName
 
             fragList <- Monad.zipWithM (constrain env) patterns args
             let fragment = joinFragments fragList
@@ -81,8 +81,8 @@ constrain env (A.A region pattern) tipe =
             let unannotatedTenv =
                   Map.map A.drop tenv
 
-            con <- exists $ \t ->
-              return $ error "TODO" -- (equal Error.PRecord tipe (record unannotatedTenv t))
+            con <- return CTrue -- exists $ \t ->
+              --return $ error "TODO record case" -- (equal Error.PRecord tipe (record unannotatedTenv t))
 
             return $ Fragment
                 { typeEnv = tenv

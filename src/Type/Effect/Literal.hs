@@ -16,7 +16,7 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain env region literal tipe =
-  do  return (CEqual (error "TODO") region tipe $ OpenSet [(asString, [])])
+  do  return (CEqual (error "TODO lit hint") region tipe $ OpenSet [(asString, [])])
   where
     prim name =
         return (getType env name)
@@ -35,8 +35,8 @@ constrain env region literal tipe =
               ( show c
               )
 
-          L.Str _ ->
-              ( error "TODO string as list"
+          L.Str s ->
+              ( "\"" ++ s ++ "\""
               )
 
           L.Boolean b ->

@@ -77,6 +77,7 @@ data Module docs imports exports body = Module
 data Body expr = Body
     { program   :: expr
     , types     :: Types
+    , annots    :: Map.Map String Type.Effect.Common.CanonicalAnnot
     , fixities  :: [(Decl.Assoc, Int, String)]
     , aliases   :: Aliases
     , datatypes :: ADTs
@@ -134,6 +135,7 @@ toInterface pkgName modul =
     , iPackage  = pkgName
     , iExports  = exports modul
     , iTypes    = types body'
+    , iAnnots   = annots body'
     , iImports  = imports modul
     , iAdts     = datatypes body'
     , iAliases  = aliases body'

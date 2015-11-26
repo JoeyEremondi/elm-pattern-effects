@@ -173,8 +173,6 @@ addValues env newValues =
     }
 
 
-instantiateType = error "TODO instantiateType"
-
 
 initializeEnv :: [Module.CanonicalAdt] -> IO Environment
 initializeEnv datatypes =
