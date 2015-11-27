@@ -96,7 +96,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
               argConstrs <- mapM (\(expr, tp) -> constrain env expr tp) pairs
               let dataTypeConstr =
                     CEqual region tipe $
-                      PatternSet [(name, map snd pairs)]
+                      SinglePattern name $ map snd pairs
               --TODO why need ex here?
               return $ ex vars (CAnd $ dataTypeConstr : argConstrs)
 
@@ -291,12 +291,12 @@ constrainList
 constrainList env region exprs tipe =
   case exprs of
     [] ->
-      return $ CEqual region tipe (PatternSet [("[]", [])])
+      return $ CEqual region tipe (SinglePattern "[]" [])
 
     (expr : rest) -> do
       restAnnot <- VarAnnot <$> mkVar
       restConstr <- constrainList env region rest  restAnnot
-      let consConstr = CEqual region tipe (PatternSet [("::", [restAnnot])])
+      let consConstr = CEqual region tipe (SinglePattern "::" [restAnnot])
       return $ CAnd [consConstr,  restConstr]
   {-
   do  (exprInfo, exprCons) <-
@@ -397,6 +397,7 @@ constrainCase env region expr branches tipe =
 
       let matchedSet = Pattern.patternLitAnnot env $ map fst branches
       --The type of the value we split on must contain only the patterns we match on
+      let wrapReal = error "TODO better pattern constr solution"
       let inPatternsConstr = CSubEffect region (VarAnnot exprVar) (wrapReal matchedSet) -- TODO join patterns
 
       --The annotation of the case statement must contain each possible branch result annotation

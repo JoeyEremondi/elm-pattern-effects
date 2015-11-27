@@ -15,7 +15,7 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain _ region literal tipe =
-  return (CEqual region tipe $ PatternSet  [(toCtorString literal, [])] )
+  return $ CEqual region tipe $ SinglePattern (toCtorString literal) []
 
 
 

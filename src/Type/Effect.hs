@@ -45,11 +45,13 @@ mkVar = do
   newPoint <- UF.fresh $ AnnotData Nothing RealTop realBottom [] [] i
   return $ AnnVar (newPoint, i)
 
+{-
 wrapReal :: RealAnnot -> TypeAnnot' a
 wrapReal realAnn =
   case realAnn of
     RealTop -> TopAnnot
     RealAnnot pats -> PatternSet $ List.map (\(s,x) -> (s, List.map wrapReal x)) pats
+    -}
 
 
 data AnnotConstr =
@@ -251,7 +253,7 @@ annotationForCtor (_, (_, ctors)) =
           return (numArgs
                  , [] --TODO what is this?
                  , List.map VarAnnot argTypes
-                 , PatternSet $ [(V.toString nm, List.map VarAnnot argTypes)]
+                 , SinglePattern (V.toString nm) $ List.map VarAnnot argTypes
                  )
 
 
@@ -290,7 +292,7 @@ fromCanonical canonAnnot = do
 
         Just v -> return $ VarAnnot v
 
-    PatternSet s -> PatternSet <$> mapPatSetM fromCanonical s
+    SinglePattern s subs -> SinglePattern s <$> forM subs fromCanonical
     LambdaAnn t1 t2 -> LambdaAnn <$> fromCanonical t1 <*>  fromCanonical t2
     TopAnnot -> return TopAnnot
 

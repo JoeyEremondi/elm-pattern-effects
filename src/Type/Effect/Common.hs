@@ -37,7 +37,7 @@ data RealAnnot =
 
 data TypeAnnot' v =
   VarAnnot v
-  | PatternSet [(String, [TypeAnnot' v])]
+  | SinglePattern String [TypeAnnot' v]
   | LambdaAnn (TypeAnnot' v) (TypeAnnot' v)
   | TopAnnot
   deriving (Show, Generic)
@@ -56,6 +56,6 @@ instance (Binary a) => Binary (TypeAnnot' a)
 prettyAnn :: CanonicalAnnot -> String
 prettyAnn ann = case ann of
   VarAnnot i -> "_" ++ show i
-  PatternSet sset -> show $ List.map (\(s,x) -> (s, map prettyAnn x) ) sset
+  SinglePattern s subPats -> show $ (s, map prettyAnn subPats)
   LambdaAnn from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
   TopAnnot -> "T"
