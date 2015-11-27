@@ -41,7 +41,7 @@ saveLocalEnv =
 
 type SolverM' a =  WriterT [a] (State.StateT SolverState IO)
 
-type SolverM = SolverM' AnnotConstr
+type SolverM = SolverM' (R.Region, TypeAnnot, TypeAnnot)
 
 type WorklistM = SolverM' Warning.Warning
 
@@ -96,38 +96,41 @@ applyUnifications con =
       return ()
     CSaveEnv -> saveLocalEnv
     CTrue -> return ()
+    CSubEffect r a1 a2 -> tell [(r, a1, a2)]
+
 
     --For our other constraints, we defer solving until after unification is done
 makeWConstrs :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM' a [WConstr]
-makeWConstrs r a1 a2 = case a1 of
-    VarAnnot v1 -> do
-      mrepr1 <- getRepr v1
-      case mrepr1 of
+makeWConstrs r aLeft aRight = case (aLeft, aRight) of
+    (_, VarAnnot vRight) -> do
+      mreprRight <- getRepr vRight
+      case mreprRight of
         Just rep1 ->
-          makeWConstrs  r rep1 a2
+          makeWConstrs r aLeft rep1
 
         Nothing -> do
-          case a2 of
-            VarAnnot v2 -> do
-              mrepr2 <- getRepr v2
+          case aLeft of
+            VarAnnot vLeft -> do
+              mrepr2 <- getRepr vLeft
               case mrepr2 of
                 Nothing ->
-                  return [WContainsAtLeast r v1 v2]
+                  return [WSubEffect r vLeft vRight]
 
                 Just rep2 ->
-                  makeWConstrs  r (VarAnnot v1) rep2
+                  makeWConstrs  r rep2 (VarAnnot vRight)
 
             PatternSet s -> do
               let allPairs = Map.toList s
               subLists <- forM allPairs $ \(ctor, subPats) -> do
-                let indices = [0 .. length subPats]
+                let numArgs = length subPats
+                let indices = [0 .. numArgs - 1]
                 subVars <- forM subPats $ \_ -> liftIO mkVar
                 let varPatTriples = zip3 subPats subVars indices
                 --Constrain our new variables to the sub-annotations they're linked to
                 --as well as adding a constraint for our overall variable to that var as a sub-pattern
                 listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
                   subConstrs <- makeWConstrs  r (VarAnnot subVar) subPat
-                  return $ (WContainsPat r v1 ctor i subVar) : subConstrs
+                  return $ (WPatSubEffectOf r numArgs ctor i subVar vRight) : subConstrs
                 return $ concat listsPerTriple
               return $ concat subLists
 
@@ -136,17 +139,69 @@ makeWConstrs r a1 a2 = case a1 of
               --We unify it now to be a lambda
               varg <- liftIO mkVar
               vret <- liftIO mkVar
-              setRepr v1 (LambdaAnn (VarAnnot varg) (VarAnnot vret))
-              --TODO is this backwards?
-              --Then, constrain that the argument variable matches at most our lambda
-              --And the return matches at least our lambda
-              --Basic covariance and contravariance stuff
-              argConstrs <- makeWConstrs  r (VarAnnot varg) arg
-              retConstrs <- makeWConstrs  r (VarAnnot vret) ret
-              return $ argConstrs ++ retConstrs
+              let newRepr = (LambdaAnn (VarAnnot varg) (VarAnnot vret))
+              setRepr vRight newRepr
+              makeWConstrs r newRepr aLeft
 
             TopAnnot ->
-              return [WContainsLit r v1 RealTop]
+              return [WLitSubEffectOf r RealTop vRight]
+
+    (_, VarAnnot vLeft) -> do
+            mreprLeft <- getRepr vLeft
+            case mreprLeft of
+              Just repr -> makeWConstrs r repr aRight
+
+              Nothing -> case aRight of
+
+                PatternSet s -> do
+                  let allPairs = Map.toList s
+                  subLists <- forM allPairs $ \(ctor, subPats) -> do
+                    let numArgs = length subPats
+                    let indices = [0 .. numArgs - 1]
+                    subVars <- forM subPats $ \_ -> liftIO mkVar
+                    let varPatTriples = zip3 subPats subVars indices
+                    --Constrain our new variables to the sub-annotations they're linked to
+                    --as well as adding a constraint for our overall variable to that var as a sub-pattern
+                    listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
+                      subConstrs <- makeWConstrs  r (VarAnnot subVar) subPat
+                      return $ (WSubEffectOfPat r numArgs vLeft ctor i subVar) : subConstrs
+                    return $ concat listsPerTriple
+                  return $ concat subLists
+
+                LambdaAnn _ _  -> do
+                  --If there are only subset constraints stating that this variable is a lambda
+                  --We unify it now to be a lambda
+                  varg <- liftIO mkVar
+                  vret <- liftIO mkVar
+                  let newRepr = (LambdaAnn (VarAnnot varg) (VarAnnot vret))
+                  setRepr vLeft newRepr
+                  makeWConstrs r newRepr aRight
+
+                TopAnnot ->
+                  return [WSubEffectOfLit r vLeft RealTop]
+
+
+    (PatternSet d1, PatternSet d2) -> do
+      listPerCtor <- forM (Map.toList d2) $ \(ctor, subPats) ->
+        case (Map.lookup ctor d1) of
+          Nothing -> error "Literal violates pattern constraint"
+          Just leftSubPats -> do
+            listPerArg <- forM (zip leftSubPats subPats) $ \(left, right) ->
+              makeWConstrs  r left right
+            return $ concat listPerArg
+      return $ concat listPerCtor
+
+    (LambdaAnn a1 a2, LambdaAnn b1 b2) -> do
+      --Constrain that the argument variable matches at most our lambda
+      --And the return matches at least our lambda
+      --Basic covariance and contravariance stuff
+      argList <- makeWConstrs r b1 a1
+      retList <- makeWConstrs r a2 b2
+      return $ argList ++ retList
+
+    (TopAnnot, TopAnnot) -> return []
+
+    _ -> error "Mismatch in underlying type system"
 
 
 
@@ -265,9 +320,11 @@ unifyAnnots r1 r2 =
 
 --Constraints we can actually deal with in our worklist algorithm
 data WConstr =
-  WContainsAtLeast R.Region AnnVar AnnVar
-  | WContainsPat R.Region AnnVar String Int AnnVar --Specific sub-pattern constraints
-  | WContainsLit R.Region AnnVar RealAnnot
+  WSubEffect R.Region AnnVar AnnVar
+  | WSubEffectOfPat R.Region Int AnnVar String Int AnnVar --Specific sub-pattern constraints
+  | WPatSubEffectOf R.Region Int String Int AnnVar AnnVar
+  | WSubEffectOfLit R.Region AnnVar RealAnnot
+  | WLitSubEffectOf R.Region RealAnnot AnnVar
 
 
 unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
@@ -344,8 +401,94 @@ solveSubsetConstraints sm = do
   workList [] [] --TODO emittedConstrs emittedConstrs
   return ()
 
+--TODO lower bounds for pat and lit cases?
 
 workList :: [WConstr] -> [WConstr] -> WorklistM ()
 worklist _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
-  _ -> error "TODO worklist"
+  WSubEffect r v1 v2 -> do
+    data1 <- getAnnData v1
+    data2 <- getAnnData v2
+    changed1 <- unionUB v2 (_ub data1)
+    changed2 <- intersectLB v1 (_lb data2)
+
+    needsUpdate1 <-
+      case changed1 of
+        False -> return []
+        True -> error "TODO"
+
+    needsUpdate2 <-
+      case changed2 of
+        False -> return []
+        True -> error "TODO"
+    worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+
+  WSubEffectOfLit r v1 realAnn -> do
+    changed <- intersectLB v1 realAnn
+    needsUpdate <-
+      case changed of
+        False -> return []
+        True -> error "TODO"
+    worklist allConstrs (needsUpdate ++ rest)
+
+  WLitSubEffectOf r realAnn v1 -> do
+    changed <- unionUB v1 realAnn
+    needsUpdate <-
+      case changed of
+        False -> return []
+        True -> error "TODO"
+    worklist allConstrs (needsUpdate ++ rest)
+
+  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> do
+    argData <- getAnnData argVar
+    wholeData <- getAnnData wholeVal
+    let nBottoms =
+          (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
+    changedWhole <- unionUB wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
+    let lbPartOfWhole =
+          case _lb wholeData of
+            RealTop -> RealTop
+            RealAnnot dict ->
+              case Map.lookup ctor dict of
+                Nothing -> error "Should have just added this ctor"
+                Just argVals -> argVals List.!! argNum
+
+    changedPart <- intersectLB argVar lbPartOfWhole
+
+    needsUpdate1 <-
+      case changedPart of
+        False -> return []
+        True -> error "TODO"
+
+    needsUpdate2 <-
+      case changedWhole of
+        False -> return []
+        True -> error "TODO"
+    worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+
+  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> do
+    argData <- getAnnData argVar
+    wholeData <- getAnnData wholeVal
+    let nBottoms =
+          (List.replicate argNum realBottom) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
+    changedWhole <- intersectLB wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
+    let lbPartOfWhole =
+          case _ub wholeData of
+            RealTop -> RealTop
+            RealAnnot dict ->
+              case Map.lookup ctor dict of
+                Nothing -> error "Should have just added this ctor"
+                Just argVals -> argVals List.!! argNum
+
+    changedPart <- unionUB argVar lbPartOfWhole
+
+    needsUpdate1 <-
+      case changedPart of
+        False -> return []
+        True -> error "TODO"
+
+    needsUpdate2 <-
+      case changedWhole of
+        False -> return []
+        True -> error "TODO"
+    worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
