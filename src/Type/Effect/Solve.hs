@@ -17,6 +17,18 @@ import qualified Data.Map as Map
 
 import qualified Reporting.Region as R
 
+solve
+  :: AnnotConstr
+  -> IO ( [(R.Region, Warning.Warning)]
+     , TypeAnnot -> CanonicalAnnot)
+solve c = do
+  let solverComp = applyUnifications c
+      stateComp = runWriterT $ solveSubsetConstraints solverComp
+      ioComp = State.evalStateT stateComp (error "TODO initialState")
+  (_, warnings) <- ioComp
+  return (warnings, error "TODO conversion fn")
+
+
 --TODO shouldn't this hold schemes, not vars?
 type Env = Map.Map String (A.Located AnnVar)
 
@@ -43,7 +55,7 @@ type SolverM' a =  WriterT [a] (State.StateT SolverState IO)
 
 type SolverM = SolverM' (R.Region, TypeAnnot, TypeAnnot)
 
-type WorklistM = SolverM' Warning.Warning
+type WorklistM = SolverM' (R.Region, Warning.Warning)
 
 type Point = UF.Point AnnotData
 
@@ -340,15 +352,15 @@ intersectAnn (RealAnnot dict1) (RealAnnot dict2) =
   RealAnnot $ Map.intersectionWith (zipWith intersectAnn) dict1 dict2
 
 
-canMatchAll :: RealAnnot -> RealAnnot -> [Warning.Warning]
-canMatchAll RealTop _ = []
-canMatchAll _ RealTop = [error "All cases must be matched here"]
-canMatchAll (RealAnnot d1) (RealAnnot d2) =
+canMatchAll :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
+canMatchAll r RealTop _ = []
+canMatchAll r _ RealTop = [(r, Warning.MissingCase "_")]
+canMatchAll r (RealAnnot d1) (RealAnnot d2) =
   concatMap (\(s, subPatsToMatch) ->
       case Map.lookup s d1 of
-        Nothing -> [error "TODO warning for unmatched pattern"]
+        Nothing -> [(r, Warning.MissingCase s)] --TODO better error messages
         --TODO assert same size lists?
-        Just subPats -> concat $ zipWith canMatchAll subPats subPatsToMatch
+        Just subPats -> concat $ zipWith (canMatchAll r) subPats subPatsToMatch
       )  (Map.toList d2)
 
 
@@ -357,30 +369,30 @@ getAnnData (AnnVar (pt, _)) =  liftIO $ UF.descriptor pt
 
 
 --Return true if this union makes a change, false otherwise
-unionUB :: AnnVar -> RealAnnot -> WorklistM Bool
-unionUB (AnnVar (pt, _)) ann = do
+unionUB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
+unionUB r (AnnVar (pt, _)) ann = do
   annData <- liftIO $ UF.descriptor pt
   let newUB = _ub annData `unionAnn` ann
   liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
   --Check if we changed the set at all
   --TODO faster shortcut method
-  case (canMatchAll (_ub annData) newUB) of
+  case (canMatchAll r (_ub annData) newUB) of
     [] -> return False
     _ -> do
-      tell $ canMatchAll newUB (_lb annData)
+      tell $ canMatchAll r newUB (_lb annData)
       return True
 
   --TODO emit warning
 
-intersectLB :: AnnVar -> RealAnnot -> WorklistM Bool
-intersectLB (AnnVar (pt, _)) ann = do
+intersectLB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
+intersectLB r (AnnVar (pt, _)) ann = do
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
   liftIO $ UF.setDescriptor pt $ annData {_ub = _ub annData `unionAnn` ann}
-  case (canMatchAll newLB (_lb annData)) of
+  case (canMatchAll r newLB (_lb annData)) of
       [] -> return False
       _ -> do
-        tell $ canMatchAll (_ub annData) newLB
+        tell $ canMatchAll r (_ub annData) newLB
         return True
 
 
@@ -424,8 +436,8 @@ workList allConstrs (c:rest) = case c of
   WSubEffect r v1 v2 -> do
     data1 <- getAnnData v1
     data2 <- getAnnData v2
-    changed1 <- unionUB v2 (_ub data1)
-    changed2 <- intersectLB v1 (_lb data2)
+    changed1 <- unionUB r v2 (_ub data1)
+    changed2 <- intersectLB r v1 (_lb data2)
 
     let needsUpdate1 =
           case changed1 of
@@ -439,7 +451,7 @@ workList allConstrs (c:rest) = case c of
     worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
   WSubEffectOfLit r v1 realAnn -> do
-    changed <- intersectLB v1 realAnn
+    changed <- intersectLB r v1 realAnn
     ourData <- getAnnData v1
     let needsUpdate =
           case changed of
@@ -448,7 +460,7 @@ workList allConstrs (c:rest) = case c of
     worklist allConstrs (needsUpdate ++ rest)
 
   WLitSubEffectOf r realAnn v1 -> do
-    changed <- unionUB v1 realAnn
+    changed <- unionUB r v1 realAnn
     ourData <- getAnnData v1
     let needsUpdate =
           case changed of
@@ -461,7 +473,7 @@ workList allConstrs (c:rest) = case c of
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
-    changedWhole <- unionUB wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
+    changedWhole <- unionUB r wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
     let lbPartOfWhole =
           case _lb wholeData of
             RealTop -> RealTop
@@ -470,7 +482,7 @@ workList allConstrs (c:rest) = case c of
                 Nothing -> error "Should have just added this ctor"
                 Just argVals -> argVals List.!! argNum
 
-    changedPart <- intersectLB argVar lbPartOfWhole
+    changedPart <- intersectLB r argVar lbPartOfWhole
 
     let needsUpdate1 =
           case changedPart of
@@ -488,7 +500,7 @@ workList allConstrs (c:rest) = case c of
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
-    changedWhole <- intersectLB wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
+    changedWhole <- intersectLB r wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
     let lbPartOfWhole =
           case _ub wholeData of
             RealTop -> RealTop
@@ -497,7 +509,7 @@ workList allConstrs (c:rest) = case c of
                 Nothing -> error "Should have just added this ctor"
                 Just argVals -> argVals List.!! argNum
 
-    changedPart <- unionUB argVar lbPartOfWhole
+    changedPart <- unionUB r argVar lbPartOfWhole
 
     let needsUpdate1 =
           case changedPart of

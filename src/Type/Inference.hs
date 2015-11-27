@@ -20,6 +20,7 @@ import qualified Type.State as TS
 import qualified Type.Type as T
 import qualified Type.Effect as Effect
 import qualified Type.Effect.Expression
+import qualified Type.Effect.Solve
 
 import System.IO.Unsafe
     -- Maybe possible to switch over to ST instead of IO.
@@ -41,11 +42,12 @@ infer interfaces modul =
         let header' = Map.delete "::" header
         let types = Map.map A.drop (Map.difference (TS.sSavedEnv state) header')
 
-        (annotHeader, annotWarns) <- liftIO $ genPatternWarnings interfaces modul
+        (annotHeader, annotWarns, annotFun) <- liftIO $ genPatternWarnings interfaces modul
 
+        let finalAnnots = Map.map annotFun annotHeader
 
         typeDict <- liftIO (Traverse.traverse T.toSrcType types)
-        return (typeDict, Map.empty, annotWarns)
+        return (typeDict, finalAnnots, annotWarns)
 
 
 genConstraints
@@ -79,7 +81,9 @@ genConstraints interfaces modul =
 genPatternWarnings
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> IO (Map.Map String Effect.TypeAnnot, [(R.Region, Warning.Warning)])
+    -> IO ( Map.Map String Effect.TypeAnnot
+          , [(R.Region, Warning.Warning)]
+          , (Effect.TypeAnnot -> Effect.CanonicalAnnot))
 genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 
@@ -100,10 +104,9 @@ genPatternWarnings interfaces modul =
       constraint <-
           Type.Effect.Expression.constrain env (program (body modul)) (Effect.VarAnnot fvar)
 
-      --Just for debugging
-      putStrLn $ show constraint
+      (warnings, canonFun) <- Type.Effect.Solve.solve constraint
 
-      return (header, [])
+      return (header, warnings, canonFun)
 
 
 canonicalizeValues
