@@ -14,6 +14,7 @@ import Reporting.Warning as Warning
 import qualified Data.UnionFind.IO as UF
 
 import qualified Data.Map as Map
+import qualified Data.Maybe as Maybe
 
 import qualified Reporting.Region as R
 
@@ -378,17 +379,53 @@ unionAnn _ RealTop = RealTop
 unionAnn (RealAnnot dict1) (RealAnnot dict2) =
   RealAnnot $  dict1 ++ dict2
 
+
+intersectPairs :: (String, [RealAnnot]) -> (String, [RealAnnot]) -> Maybe (String, [RealAnnot])
+intersectPairs (s1, args1) (s2, args2) =
+  if s1 == s2 then
+    let
+      argIntersections = zipWith intersectAnn args1 args2
+    in
+      Just (s1, argIntersections)
+  else
+      Nothing
+
+
 intersectAnn :: RealAnnot -> RealAnnot -> RealAnnot
 intersectAnn RealTop x = x
 intersectAnn x RealTop = x
 intersectAnn (RealAnnot dict1) (RealAnnot dict2) =
-  RealAnnot $ error "TODO implement intersection" -- Map.intersectionWith (zipWith intersectAnn) dict1 dict2
+  --Take the pairwise intersection of all elements then union them
+  --TODO do this faster?
+  RealAnnot $ Maybe.catMaybes [intersectPairs p1 p2 | p1 <- dict1, p2 <- dict2 ]
 
 
-canMatchAll :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
-canMatchAll r RealTop _ = []
-canMatchAll r _ RealTop = [(r, Warning.MissingCase "_")]
-canMatchAll r (RealAnnot d1) (RealAnnot d2) = error "TODO canMatchAll"
+elemMismatches :: R.Region -> (String, [RealAnnot]) -> (String, [RealAnnot]) -> [(R.Region, Warning.Warning)]
+elemMismatches region (s1,args1) (s2, args2) =
+  if (s1 == s2) then
+    concat $ zipWith (mismatches region) args1 args2
+  else
+    [(region, Warning.MissingCase s1)]
+
+--Return a warning for every element in a1 that is not matched by any element of a2
+mismatches :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
+mismatches _ _ RealTop = []
+mismatches r RealTop _ = [(r, Warning.MissingCase "_")]
+mismatches region (RealAnnot subs1) (RealAnnot subs2) =
+  let
+    for = flip List.map
+    failsForAllSubs =
+      for subs1 $ \sub1 ->
+        let
+          failsForSub1 = for subs2 $ \sub2 ->
+            elemMismatches region sub1 sub2
+        in
+          if (List.any List.null failsForSub1) then
+            []
+          else
+            concat failsForSub1
+  in
+    concat failsForAllSubs
 {-
   concatMap (\(s, subPatsToMatch) ->
       case Map.lookup s d1 of
@@ -411,10 +448,10 @@ unionUB r (AnnVar (pt, _)) ann = do
   liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
   --Check if we changed the set at all
   --TODO faster shortcut method
-  case (canMatchAll r (_ub annData) newUB) of
+  case (mismatches r (_ub annData) newUB) of
     [] -> return False
     _ -> do
-      tell $ canMatchAll r newUB (_lb annData)
+      tell $ mismatches r newUB (_lb annData)
       return True
 
   --TODO emit warning
@@ -424,10 +461,10 @@ intersectLB r (AnnVar (pt, _)) ann = do
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
   liftIO $ UF.setDescriptor pt $ annData {_ub = _ub annData `unionAnn` ann}
-  case (canMatchAll r newLB (_lb annData)) of
+  case (mismatches r newLB (_lb annData)) of
       [] -> return False
       _ -> do
-        tell $ canMatchAll r (_ub annData) newLB
+        tell $ mismatches r (_ub annData) newLB
         return True
 
 
