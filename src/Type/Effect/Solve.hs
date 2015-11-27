@@ -182,7 +182,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
             TopAnnot ->
               return [WLitSubEffectOf r RealTop vRight]
 
-    (_, VarAnnot vLeft) -> do
+    (VarAnnot vLeft, _) -> do
             mreprLeft <- getRepr vLeft
             case mreprLeft of
               Just repr -> makeWConstrs r repr aRight
@@ -220,7 +220,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
     (PatternSet d1, PatternSet d2) -> do
       listPerCtor <- forM (Map.toList d2) $ \(ctor, subPats) ->
         case (Map.lookup ctor d1) of
-          Nothing -> error "Literal violates pattern constraint"
+          Nothing -> return [WWarning r ctor]
           Just leftSubPats -> do
             listPerArg <- forM (zip leftSubPats subPats) $ \(left, right) ->
               makeWConstrs  r left right
@@ -237,7 +237,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
 
     (TopAnnot, TopAnnot) -> return []
 
-    _ -> error "Mismatch in underlying type system"
+    (x,y) -> error $ "Mismatch in underlying type system\n" ++ show x ++ "\n" ++ show y
 
 
 
@@ -364,6 +364,7 @@ data WConstr =
   | WPatSubEffectOf R.Region Int String Int AnnVar AnnVar
   | WSubEffectOfLit R.Region AnnVar RealAnnot
   | WLitSubEffectOf R.Region RealAnnot AnnVar
+  | WWarning R.Region String --Directly throw a warning
   deriving (Show)
 
 
@@ -434,6 +435,7 @@ constraintEdges c = case c of
   WPatSubEffectOf _ _ _ _ v1 v2 -> [(v1, Sub), (v2, Super)]
   WLitSubEffectOf _ _ v2 -> [(v2, Super)]
   WSubEffectOfLit _ v1 _ -> [(v1, Sub)]
+  WWarning _ _ -> []
 
 addConstraintEdge :: Int -> (AnnVar, VarPosition) -> WorklistM ()
 addConstraintEdge i (AnnVar (pt, _), Sub) = liftIO $ do
@@ -461,6 +463,9 @@ solveSubsetConstraints sm = do
 workList :: (Map.Map Int WConstr) -> [WConstr] -> WorklistM ()
 workList _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
+  WWarning r s -> do
+    tell [(r, Warning.MissingCase s)]
+    workList allConstrs rest
   WSubEffect r v1 v2 -> do
     data1 <- getAnnData v1
     data2 <- getAnnData v2

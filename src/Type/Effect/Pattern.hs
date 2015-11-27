@@ -91,7 +91,12 @@ constrain env (A.A region pattern) tipe =
                 , typeConstraint = con
                 }
 
-isTotal _ _ = False
+isWildcard (A.A _ P.Anything) = True
+isWildcard (A.A _ (P.Var _)) = True
+isWildcard _ = False
+
+isTotal patList _ = --TODO check if all cases are exhaustive
+  List.any isWildcard patList
 
 patternLitAnnot :: Environment -> [P.CanonicalPattern]  -> RealAnnot
 patternLitAnnot env patList =
