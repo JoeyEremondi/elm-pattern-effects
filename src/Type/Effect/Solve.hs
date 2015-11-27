@@ -105,12 +105,12 @@ areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 applyUnifications :: AnnotConstr -> SolverM ()
 applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n") $
   case con of
-    CEqual _ r1 r2 -> do
+    CEqual _ r1 r2 -> trace "con Equal" $ do
       _ <- unifyAnnots r1 r2
       return ()
-    CAnd constrs ->
+    CAnd constrs -> trace "con AND" $
       forM_ constrs applyUnifications
-    CLet schemes letConstr -> do
+    CLet schemes letConstr -> trace "con Let" $ do
       oldEnv <- getEnv
       --TODO do something with vars in the scheme?
       headers <- Map.unions <$> forM schemes solveScheme
@@ -118,7 +118,7 @@ applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n
       applyUnifications letConstr
       --TODO occurs check?
       modifyEnv $ \_ -> oldEnv
-    CInstance _ var annot -> do
+    CInstance _ var annot -> trace "con Inst" $ do
       env <- getEnv
       freshCopy <-
         case Map.lookup var env of
@@ -130,8 +130,8 @@ applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n
               Just repr -> makeFreshCopy repr
       unifyAnnots freshCopy annot
       return ()
-    CSaveEnv -> saveLocalEnv
-    CTrue -> return ()
+    CSaveEnv -> trace "con Save" $ saveLocalEnv
+    CTrue -> trace "con ConTrue" $return ()
     CSubEffect r a1 a2 -> trace ("TELLING " ++ show [(r, a1, a2)]) $ tell [(r, a1, a2)]
 
 
@@ -251,6 +251,9 @@ solveScheme s = do
     newVar <- liftIO mkVar
     unifyAnnots (VarAnnot newVar) ann
     return (nm, A.A region newVar)
+  --Now that we have a new header with variables, actually solve the constraint
+  --On our scheme
+  applyUnifications $ _constraint s
   return $ Map.fromList newHeader
 
 makeFreshCopy :: TypeAnnot -> SolverM TypeAnnot

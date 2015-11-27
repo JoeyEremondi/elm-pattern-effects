@@ -139,8 +139,9 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                       (constrainDef env)
                       (Info [] Map.empty CTrue)
                       (concatMap expandPattern defs)
-
-              let letScheme = --TODO why nested schemes?
+              --We solve our def constraints with our defs in a monoscheme
+              --But we generalize them in the body
+              let letScheme =
                     [ Scheme vars (CLet [monoscheme headers] constr) headers ]
 
               return $ CLet letScheme bodyCon
@@ -509,33 +510,21 @@ data Info = Info
 
 constrainDef :: Effect.Environment -> Info -> Canonical.Def -> IO Info
 constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr maybeTipe) =
-  case (pattern, maybeTipe) of
-    (P.Var name, _) ->
-        constrainUnannotatedDef env info patternRegion name expr
+  case pattern of
+    P.Var name ->
+        do  -- Some mistake may be happening here. Currently, qs is always [].
+            rhsVar <- mkVar
+
+            let tipe = VarAnnot rhsVar
+
+            --TODO what do we add to env here?
+            con <- constrain env expr tipe
+
+            return $ info
+                { iVars = rhsVar : iVars info
+                , iHeaders = Map.insert name (A.A patternRegion tipe) (iHeaders info)
+                , iConstr = con /\ iConstr info
+                }
 
     _ ->
         error "canonical definitions must not have complex patterns as names in the contstraint generation phase"
-
-
-
-constrainUnannotatedDef
-    :: Effect.Environment
-    -> Info
-    -> R.Region
-    -> String
-    -> Canonical.Expr
-    -> IO Info
-constrainUnannotatedDef env info patternRegion name expr =
-  do  -- Some mistake may be happening here. Currently, qs is always [].
-      rhsVar <- mkVar
-
-      let tipe = VarAnnot rhsVar
-
-      --TODO what do we add to env here?
-      con <- constrain env expr tipe
-
-      return $ info
-          { iVars = rhsVar : iVars info
-          , iHeaders = Map.insert name (A.A patternRegion tipe) (iHeaders info)
-          , iConstr = con /\ iConstr info
-          }

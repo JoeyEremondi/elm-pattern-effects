@@ -29,6 +29,7 @@ constrain env (A.A region pattern) tipe =
   in
   case pattern of
     P.Anything ->
+        --TODO wildcard as top?
         return emptyFragment
 
     P.Literal lit ->
@@ -36,6 +37,7 @@ constrain env (A.A region pattern) tipe =
             return $ emptyFragment { typeConstraint = c }
 
     P.Var name ->
+        --TODO variables top?
         do  variable <- mkVar
             return $ Fragment
                 { typeEnv = Map.singleton name (rvar variable)

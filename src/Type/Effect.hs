@@ -57,7 +57,7 @@ data AnnotConstr =
   | CSaveEnv
   | CEqual R.Region TypeAnnot TypeAnnot
   | CAnd [AnnotConstr]
-  | CLet (Map.Map String (A.Located TypeAnnot)) (AnnotConstr)
+  | CLet [AnnScheme] (AnnotConstr)
   | CInstance R.Region String TypeAnnot
   | CSubEffect R.Region TypeAnnot TypeAnnot
 --  | COnlyMatches R.Region TypeAnnot TypeAnnot
@@ -116,9 +116,9 @@ infixl 8 /\
 
 
 -- ex qs constraint == exists qs. constraint
--- :: [AnnVar] -> AnnotConstr -> AnnotConstr
---ex fqs constraint =
---    CLet [Scheme fqs constraint Map.empty] CTrue
+ex :: [AnnVar] -> AnnotConstr -> AnnotConstr
+ex fqs constraint =
+    CLet [Scheme fqs constraint Map.empty] CTrue
 
 
 {-
@@ -128,12 +128,11 @@ fl rqs constraint =
     CLet [Scheme rqs [] constraint Map.empty] CTrue
 -}
 
-{-
+
 exists :: (TypeAnnot -> IO AnnotConstr) -> IO AnnotConstr
 exists f =
   do  v <- mkVar
       ex [v] <$> f (VarAnnot v)
-      -}
 
 monoscheme :: Map.Map String (A.Located TypeAnnot) -> AnnScheme
 monoscheme headers =
