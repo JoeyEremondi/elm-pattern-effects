@@ -48,9 +48,9 @@ type WorklistM = SolverM' Warning.Warning
 type Point = UF.Point AnnotData
 
 getRepr :: AnnVar -> SolverM' a (Maybe TypeAnnot)
-getRepr (AnnVar (pt, _)) = do
-  AnnotData repr _ _ <- liftIO $ UF.descriptor pt
-  return repr
+getRepr (AnnVar (pt, _)) =
+   liftIO $ _annRepr <$> UF.descriptor pt
+
 
 setRepr :: AnnVar -> TypeAnnot -> SolverM' a ()
 setRepr (AnnVar (pt, _)) repr = liftIO $
@@ -403,7 +403,7 @@ solveSubsetConstraints sm = do
 
 --TODO lower bounds for pat and lit cases?
 
-workList :: [WConstr] -> [WConstr] -> WorklistM ()
+workList :: (Map.Map Int WConstr) -> [WConstr] -> WorklistM ()
 worklist _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
   WSubEffect r v1 v2 -> do
@@ -412,31 +412,33 @@ workList allConstrs (c:rest) = case c of
     changed1 <- unionUB v2 (_ub data1)
     changed2 <- intersectLB v1 (_lb data2)
 
-    needsUpdate1 <-
-      case changed1 of
-        False -> return []
-        True -> error "TODO"
+    let needsUpdate1 =
+          case changed1 of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _superOf data2
 
-    needsUpdate2 <-
-      case changed2 of
-        False -> return []
-        True -> error "TODO"
+    let needsUpdate2 =
+          case changed2 of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _subOf data1
     worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
   WSubEffectOfLit r v1 realAnn -> do
     changed <- intersectLB v1 realAnn
-    needsUpdate <-
-      case changed of
-        False -> return []
-        True -> error "TODO"
+    ourData <- getAnnData v1
+    let needsUpdate =
+          case changed of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _superOf ourData
     worklist allConstrs (needsUpdate ++ rest)
 
   WLitSubEffectOf r realAnn v1 -> do
     changed <- unionUB v1 realAnn
-    needsUpdate <-
-      case changed of
-        False -> return []
-        True -> error "TODO"
+    ourData <- getAnnData v1
+    let needsUpdate =
+          case changed of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _subOf ourData
     worklist allConstrs (needsUpdate ++ rest)
 
   WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> do
@@ -455,15 +457,15 @@ workList allConstrs (c:rest) = case c of
 
     changedPart <- intersectLB argVar lbPartOfWhole
 
-    needsUpdate1 <-
-      case changedPart of
-        False -> return []
-        True -> error "TODO"
+    let needsUpdate1 =
+          case changedPart of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _superOf argData
 
-    needsUpdate2 <-
-      case changedWhole of
-        False -> return []
-        True -> error "TODO"
+    let needsUpdate2 =
+          case changedPart of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _subOf wholeData
     worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
   WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> do
@@ -482,13 +484,13 @@ workList allConstrs (c:rest) = case c of
 
     changedPart <- unionUB argVar lbPartOfWhole
 
-    needsUpdate1 <-
-      case changedPart of
-        False -> return []
-        True -> error "TODO"
+    let needsUpdate1 =
+          case changedPart of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _subOf argData
 
-    needsUpdate2 <-
-      case changedWhole of
-        False -> return []
-        True -> error "TODO"
+    let needsUpdate2 =
+          case changedPart of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _superOf wholeData
     worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)

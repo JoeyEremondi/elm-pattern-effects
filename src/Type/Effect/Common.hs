@@ -22,6 +22,8 @@ data AnnotData = AnnotData
   { _annRepr :: Maybe TypeAnnot
   , _lb :: RealAnnot
   , _ub :: RealAnnot
+  , _superOf :: [Int]
+  , _subOf :: [Int]
   }
 
 realBottom = RealAnnot Map.empty
