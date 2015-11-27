@@ -24,7 +24,7 @@ solve
 solve c = do
   let solverComp = applyUnifications c
       stateComp = runWriterT $ solveSubsetConstraints solverComp
-      ioComp = State.evalStateT stateComp (error "TODO initialState")
+      ioComp = State.evalStateT stateComp $ SolverState Map.empty Map.empty
   (_, warnings) <- ioComp
   return (warnings, toCanonicalAnnot)
 

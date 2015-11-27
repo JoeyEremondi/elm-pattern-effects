@@ -98,6 +98,7 @@ genPatternWarnings interfaces modul =
       let allTypes = concat (ctors : importedVars)
       let vars = concatMap (fst . snd) allTypes
       let header = Map.map snd (Map.fromList allTypes)
+      --Adds our initial values to our env, basically
       let environ = T.CLet [ T.Scheme vars [] T.CTrue (Map.map (A.A undefined) header) ]
 
       fvar <- Effect.mkVar
