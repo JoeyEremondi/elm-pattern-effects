@@ -38,14 +38,14 @@ toCanonicalAnnot a = case a of
       Nothing ->
         --TODO better way? use schemes?
         case (_lb ourData, _ub ourData) of
-          (RealTop, RealAnnot d) | Map.size d == 0 ->
+          (RealTop, RealAnnot d) | List.length d == 0 ->
             return $ VarAnnot $ _uniqueId ourData
           _ ->
             return $ wrapReal $ _ub ourData
       Just repr ->
         toCanonicalAnnot repr
   PatternSet s ->
-    PatternSet <$> (dictMapM $ Map.map (mapM toCanonicalAnnot) s )
+    PatternSet <$> mapPatSetM toCanonicalAnnot s
   LambdaAnn a b ->
     LambdaAnn <$> toCanonicalAnnot a <*> toCanonicalAnnot b
   TopAnnot ->
@@ -126,7 +126,7 @@ applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n
           Just (A.A _ annVar) -> do
             mrepr <- getRepr annVar
             case mrepr of
-              Nothing -> error "Can't make fresh copy of blank var"
+              Nothing -> return (VarAnnot annVar) --TODO is this right? error "Can't make fresh copy of blank var"
               Just repr -> makeFreshCopy repr
       unifyAnnots freshCopy annot
       return ()

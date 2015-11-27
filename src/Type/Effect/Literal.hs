@@ -15,7 +15,7 @@ constrain
     -> TypeAnnot
     -> IO AnnotConstr
 constrain _ region literal tipe =
-  return (CEqual region tipe $ PatternSet $ Map.fromList [(toCtorString literal, [])] )
+  return (CEqual region tipe $ PatternSet  [(toCtorString literal, [])] )
 
 
 

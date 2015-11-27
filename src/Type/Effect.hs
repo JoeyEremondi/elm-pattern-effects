@@ -49,7 +49,7 @@ wrapReal :: RealAnnot -> TypeAnnot' a
 wrapReal realAnn =
   case realAnn of
     RealTop -> TopAnnot
-    RealAnnot pats -> PatternSet $ Map.map (List.map wrapReal) pats
+    RealAnnot pats -> PatternSet $ List.map (\(s,x) -> (s, List.map wrapReal x)) pats
 
 
 data AnnotConstr =
@@ -251,7 +251,7 @@ annotationForCtor (_, (_, ctors)) =
           return (numArgs
                  , [] --TODO what is this?
                  , List.map VarAnnot argTypes
-                 , PatternSet $ Map.fromList [(V.toString nm, List.map VarAnnot argTypes)]
+                 , PatternSet $ [(V.toString nm, List.map VarAnnot argTypes)]
                  )
 
 
@@ -290,7 +290,7 @@ fromCanonical canonAnnot = do
 
         Just v -> return $ VarAnnot v
 
-    PatternSet s -> PatternSet <$> dictMapM ( (Map.map ( mapM fromCanonical )) s )
+    PatternSet s -> PatternSet <$> mapPatSetM fromCanonical s
     LambdaAnn t1 t2 -> LambdaAnn <$> fromCanonical t1 <*>  fromCanonical t2
     TopAnnot -> return TopAnnot
 

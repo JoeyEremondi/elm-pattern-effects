@@ -113,6 +113,7 @@ patternLitAnnot env patList =
           Nothing -> Map.insert nm [] dict
           _ -> dict
 
+
       --Assumes our lists form a rectangular matrix
       transpose :: [[a]] -> [[a]]
       transpose [] = []
@@ -134,4 +135,4 @@ patternLitAnnot env patList =
       tposedPatTree = Map.map transpose patternTree
 
 
-    in RealAnnot $ Map.map (map $ patternLitAnnot env) tposedPatTree
+    in RealAnnot $ List.map (\(s,anns) -> (s, List.map (patternLitAnnot env) anns)) (error "TODO pat fix")
