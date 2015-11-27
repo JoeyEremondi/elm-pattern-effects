@@ -351,7 +351,7 @@ unifyAnnots r1 r2 =
 -- Worklist algorithm for solving subset constraints
 -------------------------
 
---Constraints we can actually deal with in our worklist algorithm
+--Constraints we can actually deal with in our workList algorithm
 data WConstr =
   WSubEffect R.Region AnnVar AnnVar
   | WSubEffectOfPat R.Region Int AnnVar String Int AnnVar --Specific sub-pattern constraints
@@ -452,7 +452,7 @@ solveSubsetConstraints sm = do
 --TODO lower bounds for pat and lit cases?
 
 workList :: (Map.Map Int WConstr) -> [WConstr] -> WorklistM ()
-worklist _ [] = return () --When we're finished
+workList _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
   WSubEffect r v1 v2 -> do
     data1 <- getAnnData v1
@@ -469,7 +469,7 @@ workList allConstrs (c:rest) = case c of
           case changed2 of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _subOf data1
-    worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+    workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
   WSubEffectOfLit r v1 realAnn -> do
     changed <- intersectLB r v1 realAnn
@@ -478,7 +478,7 @@ workList allConstrs (c:rest) = case c of
           case changed of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _superOf ourData
-    worklist allConstrs (needsUpdate ++ rest)
+    workList allConstrs (needsUpdate ++ rest)
 
   WLitSubEffectOf r realAnn v1 -> do
     changed <- unionUB r v1 realAnn
@@ -487,7 +487,7 @@ workList allConstrs (c:rest) = case c of
           case changed of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _subOf ourData
-    worklist allConstrs (needsUpdate ++ rest)
+    workList allConstrs (needsUpdate ++ rest)
 
   WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> do
     argData <- getAnnData argVar
@@ -514,7 +514,7 @@ workList allConstrs (c:rest) = case c of
           case changedPart of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _subOf wholeData
-    worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+    workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
   WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> do
     argData <- getAnnData argVar
@@ -541,4 +541,4 @@ workList allConstrs (c:rest) = case c of
           case changedPart of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _superOf wholeData
-    worklist allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+    workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
