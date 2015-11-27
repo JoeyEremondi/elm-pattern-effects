@@ -155,8 +155,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                 Just rep2 ->
                   makeWConstrs  r rep2 (VarAnnot vRight)
 
-            PatternSet s -> do
-              let allPairs = Map.toList s
+            PatternSet allPairs -> do
               subLists <- forM allPairs $ \(ctor, subPats) -> do
                 let numArgs = length subPats
                 let indices = [0 .. numArgs - 1]
@@ -189,8 +188,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
 
               Nothing -> case aRight of
 
-                PatternSet s -> do
-                  let allPairs = Map.toList s
+                PatternSet allPairs -> do
                   subLists <- forM allPairs $ \(ctor, subPats) -> do
                     let numArgs = length subPats
                     let indices = [0 .. numArgs - 1]
@@ -217,8 +215,10 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                   return [WSubEffectOfLit r vLeft RealTop]
 
 
-    (PatternSet d1, PatternSet d2) -> do
-      listPerCtor <- forM (Map.toList d2) $ \(ctor, subPats) ->
+    (PatternSet d1, PatternSet d2) -> error "TODO how to express this with pattern lists?"
+    {-
+      do
+      listPerCtor <- forM d2 $ \(ctor, subPats) ->
         case (Map.lookup ctor d1) of
           Nothing -> return [WWarning r ctor]
           Just leftSubPats -> do
@@ -226,6 +226,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
               makeWConstrs  r left right
             return $ concat listPerArg
       return $ concat listPerCtor
+      -}
 
     (LambdaAnn a1 a2, LambdaAnn b1 b2) -> do
       --Constrain that the argument variable matches at most our lambda
@@ -264,12 +265,11 @@ makeFreshCopy ann = do
       VarAnnot v -> do
         vnew <- liftIO $ mkVar
         return $ (VarAnnot vnew, [(v, vnew)])
-      PatternSet pats -> do
-        let patsList = Map.toList pats
+      PatternSet patsList -> do
         newVarPairs <- forM patsList (\(s, subPats) -> (\x -> (s, x)) <$> forM subPats copyHelper)
         let allPairs = concatMap ((concatMap snd) . snd) newVarPairs
         let newPatList = List.map (\(s, pl) -> (s, List.map fst pl)) newVarPairs
-        return (PatternSet $ Map.fromList newPatList, allPairs)
+        return (PatternSet newPatList, allPairs)
       LambdaAnn a1 a2 -> do
         (b1, pairs1) <- copyHelper a1
         (b2, pairs2) <- copyHelper a2
@@ -372,25 +372,27 @@ unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
 unionAnn RealTop _ = RealTop
 unionAnn _ RealTop = RealTop
 unionAnn (RealAnnot dict1) (RealAnnot dict2) =
-  RealAnnot $ Map.unionWith (zipWith unionAnn) dict1 dict2
+  RealAnnot $  dict1 ++ dict2
 
 intersectAnn :: RealAnnot -> RealAnnot -> RealAnnot
 intersectAnn RealTop x = x
 intersectAnn x RealTop = x
 intersectAnn (RealAnnot dict1) (RealAnnot dict2) =
-  RealAnnot $ Map.intersectionWith (zipWith intersectAnn) dict1 dict2
+  RealAnnot $ error "TODO implement intersection" -- Map.intersectionWith (zipWith intersectAnn) dict1 dict2
 
 
 canMatchAll :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
 canMatchAll r RealTop _ = []
 canMatchAll r _ RealTop = [(r, Warning.MissingCase "_")]
-canMatchAll r (RealAnnot d1) (RealAnnot d2) =
+canMatchAll r (RealAnnot d1) (RealAnnot d2) = error "TODO canMatchAll"
+{-
   concatMap (\(s, subPatsToMatch) ->
       case Map.lookup s d1 of
         Nothing -> [(r, Warning.MissingCase s)] --TODO better error messages
         --TODO assert same size lists?
         Just subPats -> concat $ zipWith (canMatchAll r) subPats subPatsToMatch
       )  (Map.toList d2)
+-}
 
 
 getAnnData :: AnnVar -> SolverM' a (AnnotData)
@@ -506,14 +508,16 @@ workList allConstrs (c:rest) = case c of
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
-    changedWhole <- unionUB r wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
+    changedWhole <- unionUB r wholeVal $ RealAnnot  [(ctor, nBottoms)]
     let lbPartOfWhole =
           case _lb wholeData of
             RealTop -> RealTop
-            RealAnnot dict ->
+            RealAnnot dict -> error "TODO sub effect with lists"
+            {-
               case Map.lookup ctor dict of
                 Nothing -> error "Should have just added this ctor"
                 Just argVals -> argVals List.!! argNum
+                -}
 
     changedPart <- intersectLB r argVar lbPartOfWhole
 
@@ -533,14 +537,16 @@ workList allConstrs (c:rest) = case c of
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
-    changedWhole <- intersectLB r wholeVal $ RealAnnot $ Map.fromList [(ctor, nBottoms)]
+    changedWhole <- intersectLB r wholeVal $ RealAnnot [(ctor, nBottoms)]
     let lbPartOfWhole =
           case _ub wholeData of
             RealTop -> RealTop
-            RealAnnot dict ->
+            RealAnnot dict -> error "TODO sub effect with lists"
+            {-
               case Map.lookup ctor dict of
                 Nothing -> error "Should have just added this ctor"
                 Just argVals -> argVals List.!! argNum
+                -}
 
     changedPart <- unionUB r argVar lbPartOfWhole
 
