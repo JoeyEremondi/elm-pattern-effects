@@ -33,8 +33,10 @@ patternMatches interfaces modul =
     tagDict =
       toTagDict interfaces name (Module.datatypes body)
   in
+
     const (Map.map (Map.map length) tagDict)
-      <$> checkExpression tagDict (Module.program body)
+      --Disable temporarily to test Type and Effect
+      <$> Result.ok tagDict -- checkExpression tagDict (Module.program body)
 
 
 -- TAG DICT
@@ -374,4 +376,3 @@ makeArgComplements tagDict tag arity index argPattern =
         : replicate (arity - index - 1) Anything
   in
     map (Data tag . padArgs) complementList
-
