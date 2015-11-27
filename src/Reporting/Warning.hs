@@ -49,6 +49,13 @@ toReport localizer warning =
               ]
           )
 
+    MissingCase theCase ->
+        Report.report
+          "unmatched case"
+          Nothing
+          ("The pattern " ++ theCase ++ " is not matched")
+          (text "TODO put a helpful hint here")
+
 
 
 -- TO JSON
