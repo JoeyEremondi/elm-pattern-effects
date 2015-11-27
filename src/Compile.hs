@@ -17,6 +17,7 @@ import qualified Reporting.Result as Result
 import qualified Reporting.Warning as Warning
 import qualified Type.Inference as TI
 
+import Control.Monad (forM)
 
 compile
     :: Package.Name
@@ -38,9 +39,11 @@ compile packageName isRoot canonicalImports interfaces source =
           Canonicalize.module' canonicalImports interfaces validModule
 
       -- Run type inference on the program.
-      (types, annots) <-
+      (types, annots, patWarnings) <-
           Result.from Error.Type $
             TI.infer interfaces canonicalModule
+
+      forM patWarnings $ \(r, w) -> Result.warn r w
 
       -- One last round of checks
       Result.mapError Error.Type $

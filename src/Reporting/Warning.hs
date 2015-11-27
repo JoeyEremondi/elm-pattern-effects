@@ -21,6 +21,7 @@ import qualified Reporting.Render.Type as RenderType
 data Warning
     = UnusedImport ModuleName.Raw
     | MissingTypeAnnotation String Type.Canonical
+    | MissingCase String
 
 
 

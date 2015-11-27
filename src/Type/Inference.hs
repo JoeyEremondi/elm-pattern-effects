@@ -11,7 +11,8 @@ import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Type as Error
-import Reporting.Warning as Warning
+import qualified Reporting.Warning as Warning
+import qualified Reporting.Region as R
 import qualified Type.Constrain.Expression as TcExpr
 import qualified Type.Environment as Env
 import qualified Type.Solve as Solve
@@ -28,7 +29,7 @@ import System.IO.Unsafe
 infer
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> Except [A.Located Error.Error] (Map.Map String Type.Canonical, Map.Map String Effect.CanonicalAnnot)
+    -> Except [A.Located Error.Error] (Map.Map String Type.Canonical, Map.Map String Effect.CanonicalAnnot, [(R.Region, Warning.Warning)])
 infer interfaces modul =
   either throwError return $ unsafePerformIO $ runExceptT $
     do  (header, constraint) <-
@@ -44,7 +45,7 @@ infer interfaces modul =
 
 
         typeDict <- liftIO (Traverse.traverse T.toSrcType types)
-        return (typeDict, Map.empty)
+        return (typeDict, Map.empty, annotWarns)
 
 
 genConstraints
@@ -78,7 +79,7 @@ genConstraints interfaces modul =
 genPatternWarnings
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> IO (Map.Map String Effect.TypeAnnot, [Warning.Warning])
+    -> IO (Map.Map String Effect.TypeAnnot, [(R.Region, Warning.Warning)])
 genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 
