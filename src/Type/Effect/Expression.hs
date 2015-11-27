@@ -66,17 +66,17 @@ constrain env annotatedExpr@(A.A region expression) tipe =
       E.Binop op leftExpr rightExpr ->
           constrainBinop env region op leftExpr rightExpr tipe
 
-      E.Lambda pattern body ->
-          exists $ \argType ->
-          exists $ \resType ->
-              do  fragment <- Pattern.constrain env pattern argType
-                  bodyCon <- constrain env body resType
-                  let con =
-                        ex (Effect.vars fragment)
-                            (CLet [monoscheme (Effect.typeEnv fragment)]
-                                  (Effect.typeConstraint fragment /\ bodyCon)
-                            )
-                  return $ con /\ CEqual region (argType ==> resType) tipe
+      E.Lambda pattern body -> do
+          argType <- VarAnnot <$> mkVar
+          resType <- VarAnnot <$> mkVar
+          fragment <- Pattern.constrain env pattern argType
+          bodyCon <- constrain env body resType
+          let con =
+                ex (Effect.vars fragment)
+                    (CLet [monoscheme (Effect.typeEnv fragment)]
+                          (Effect.typeConstraint fragment /\ bodyCon)
+                    )
+          return $ con /\ CEqual region (argType ==> resType) tipe
 
       E.App _ _ ->
           let
@@ -134,16 +134,16 @@ constrain env annotatedExpr@(A.A region expression) tipe =
       E.Let defs body ->
           do  bodyCon <- constrain env body tipe
 
-              (Info schemes fqs headers constr) <-
+              (Info vars headers constr) <-
                   Monad.foldM
                       (constrainDef env)
-                      (Info [] [] Map.empty CTrue)
+                      (Info [] Map.empty CTrue)
                       (concatMap expandPattern defs)
 
               let letScheme = --TODO why nested schemes?
-                    [ Scheme fqs (CLet [monoscheme headers] constr) headers ]
+                    [ Scheme vars (CLet [monoscheme headers] constr) headers ]
 
-              return $ CLet schemes (CLet letScheme ( bodyCon))
+              return $ CLet letScheme bodyCon
 
       E.Port impl ->
           case impl of
@@ -498,10 +498,10 @@ expandPattern def@(Canonical.Definition facts lpattern expr maybeType) =
 
 
 -- CONSTRAIN DEFINITIONS
-
+-- We don't need schemes, they're for annotations
 data Info = Info
-    { iSchemes :: [AnnScheme]
-    , iVars :: [AnnVar]
+    {
+      iVars :: [AnnVar]
     , iHeaders :: Map.Map String (A.Located TypeAnnot)
     , iConstr :: AnnotConstr
     }

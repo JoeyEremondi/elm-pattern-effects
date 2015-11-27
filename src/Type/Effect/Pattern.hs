@@ -8,7 +8,6 @@ import qualified Data.List as List
 import qualified AST.Pattern as P
 import qualified AST.Variable as V
 import qualified Reporting.Annotation as A
-import qualified Reporting.Error.Type as Error
 import qualified Type.Effect.Literal as Literal
 --import qualified Type.Environment as Env
 
@@ -22,7 +21,7 @@ constrain
     -> IO AnnFragment
 constrain env (A.A region pattern) tipe =
   let
-    equal patternError leftType rightType =
+    equal leftType rightType =
       CEqual region leftType rightType
 
     rvar v =
@@ -42,7 +41,7 @@ constrain env (A.A region pattern) tipe =
                 { typeEnv = Map.singleton name (rvar variable)
                 , vars = [variable]
                 , typeConstraint =
-                    equal (Error.PVar name) (VarAnnot variable) tipe
+                    equal (VarAnnot variable) tipe
                 }
 
     P.Alias name p ->
@@ -52,7 +51,7 @@ constrain env (A.A region pattern) tipe =
               { typeEnv = Map.insert name (rvar variable) (typeEnv fragment)
               , vars = variable : vars fragment
               , typeConstraint =
-                  equal (Error.PAlias name) (VarAnnot variable) tipe
+                  equal (VarAnnot variable) tipe
                   /\ typeConstraint fragment
               }
 
@@ -68,7 +67,7 @@ constrain env (A.A region pattern) tipe =
                 { vars = cvars ++ vars fragment
                 , typeConstraint =
                     typeConstraint fragment
-                    /\ equal (Error.PData stringName) tipe result
+                    /\ equal tipe result
                 }
 
     P.Record fields ->

@@ -1,4 +1,4 @@
-module Compile (compile) where
+module Compile (compile, compileFile) where
 
 import qualified Data.Map as Map
 
@@ -18,6 +18,14 @@ import qualified Reporting.Warning as Warning
 import qualified Type.Inference as TI
 
 import Control.Monad (forM)
+
+compileFile :: String -> IO String
+compileFile fileName = do
+  source <- readFile fileName
+  let result = compile (Package.Name "elm-lang" "core") True [] Map.empty source
+  case result of
+    (Result.Result _ (Result.Ok _)) -> return "Ok"
+    _ -> return "Error"
 
 compile
     :: Package.Name

@@ -17,11 +17,13 @@ import qualified Data.Map as Map
 
 import qualified Reporting.Region as R
 
+import Debug.Trace (trace)
+
 solve
   :: AnnotConstr
   -> IO ( [(R.Region, Warning.Warning)]
      , TypeAnnot -> IO CanonicalAnnot)
-solve c = do
+solve c = trace ("In solver, constraint " ++ show c ++ "\n\n" ) $ do
   let solverComp = applyUnifications c
       stateComp = runWriterT $ solveSubsetConstraints solverComp
       ioComp = State.evalStateT stateComp $ SolverState Map.empty Map.empty
@@ -101,12 +103,13 @@ areSame :: AnnVar -> AnnVar -> SolverM' a Bool
 areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 
 applyUnifications :: AnnotConstr -> SolverM ()
-applyUnifications con =
+applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n") $
   case con of
     CEqual _ r1 r2 -> do
       _ <- unifyAnnots r1 r2
       return ()
-    CAnd constrs -> forM_ constrs applyUnifications
+    CAnd constrs ->
+      forM_ constrs applyUnifications
     CLet schemes letConstr -> do
       oldEnv <- getEnv
       --TODO do something with vars in the scheme?
@@ -129,7 +132,7 @@ applyUnifications con =
       return ()
     CSaveEnv -> saveLocalEnv
     CTrue -> return ()
-    CSubEffect r a1 a2 -> tell [(r, a1, a2)]
+    CSubEffect r a1 a2 -> trace ("TELLING " ++ show [(r, a1, a2)]) $ tell [(r, a1, a2)]
 
 
     --For our other constraints, we defer solving until after unification is done
@@ -358,6 +361,7 @@ data WConstr =
   | WPatSubEffectOf R.Region Int String Int AnnVar AnnVar
   | WSubEffectOfLit R.Region AnnVar RealAnnot
   | WLitSubEffectOf R.Region RealAnnot AnnVar
+  deriving (Show)
 
 
 unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
@@ -442,11 +446,11 @@ solveSubsetConstraints sm = do
       ((), clist) <- ios
       return (clist, [])
       ) sm
-  wConstraints <- concat <$> forM emittedConstrs  (\(a,b,c) -> makeWConstrs a b c)
+  wConstraints <- trace ("\n\n\nEmitted:\n" ++ show emittedConstrs) $ concat <$> forM emittedConstrs  (\(a,b,c) -> makeWConstrs a b c)
   let constrPairs = zip [1..] wConstraints
   forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ addConstraintEdge i
   --TODO avoid list ops here?
-  workList (Map.fromList constrPairs) [] --TODO emittedConstrs emittedConstrs
+  trace ("\n\n\n" ++ show wConstraints) $ workList (Map.fromList constrPairs) [] --TODO emittedConstrs emittedConstrs
   return ()
 
 --TODO lower bounds for pat and lit cases?

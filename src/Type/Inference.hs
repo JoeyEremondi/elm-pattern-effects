@@ -99,14 +99,16 @@ genPatternWarnings interfaces modul =
       let vars = concatMap (fst . snd) allTypes
       let header = Map.map snd (Map.fromList allTypes)
       --Adds our initial values to our env, basically
-      let environ = T.CLet [ T.Scheme vars [] T.CTrue (Map.map (A.A undefined) header) ]
+      let environ c = Effect.CLet [ Effect.Scheme vars Effect.CTrue (Map.map (A.A undefined) header) ] c
 
       fvar <- Effect.mkVar
 
       constraint <-
           Type.Effect.Expression.constrain env (program (body modul)) (Effect.VarAnnot fvar)
 
-      (warnings, canonFun) <- Type.Effect.Solve.solve constraint
+      putStrLn $ show constraint
+
+      (warnings, canonFun) <- Type.Effect.Solve.solve (environ constraint)
 
       return (header, warnings, canonFun)
 
