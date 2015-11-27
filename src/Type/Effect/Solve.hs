@@ -41,11 +41,11 @@ toCanonicalAnnot a = case a of
           (RealTop, RealAnnot d) | List.length d == 0 ->
             return $ VarAnnot $ _uniqueId ourData
           _ ->
-            return $ wrapReal $ _ub ourData
+            return $ (error "TODO wrapReal")  $ _ub ourData
       Just repr ->
         toCanonicalAnnot repr
-  PatternSet s ->
-    PatternSet <$> mapPatSetM toCanonicalAnnot s
+  SinglePattern s subs ->
+    SinglePattern s <$> forM subs toCanonicalAnnot
   LambdaAnn a b ->
     LambdaAnn <$> toCanonicalAnnot a <*> toCanonicalAnnot b
   TopAnnot ->
@@ -155,8 +155,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                 Just rep2 ->
                   makeWConstrs  r rep2 (VarAnnot vRight)
 
-            PatternSet allPairs -> do
-              subLists <- forM allPairs $ \(ctor, subPats) -> do
+            SinglePattern ctor subPats -> do
                 let numArgs = length subPats
                 let indices = [0 .. numArgs - 1]
                 subVars <- forM subPats $ \_ -> liftIO mkVar
@@ -167,7 +166,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                   subConstrs <- makeWConstrs  r (VarAnnot subVar) subPat
                   return $ (WPatSubEffectOf r numArgs ctor i subVar vRight) : subConstrs
                 return $ concat listsPerTriple
-              return $ concat subLists
+
 
             LambdaAnn arg ret -> do
               --If there are only subset constraints stating that this variable is a lambda
@@ -188,8 +187,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
 
               Nothing -> case aRight of
 
-                PatternSet allPairs -> do
-                  subLists <- forM allPairs $ \(ctor, subPats) -> do
+                SinglePattern ctor subPats -> do
                     let numArgs = length subPats
                     let indices = [0 .. numArgs - 1]
                     subVars <- forM subPats $ \_ -> liftIO mkVar
@@ -200,7 +198,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                       subConstrs <- makeWConstrs  r (VarAnnot subVar) subPat
                       return $ (WSubEffectOfPat r numArgs vLeft ctor i subVar) : subConstrs
                     return $ concat listsPerTriple
-                  return $ concat subLists
+
 
                 LambdaAnn _ _  -> do
                   --If there are only subset constraints stating that this variable is a lambda
@@ -215,7 +213,15 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                   return [WSubEffectOfLit r vLeft RealTop]
 
 
-    (PatternSet d1, PatternSet d2) -> error "TODO how to express this with pattern lists?"
+    (SinglePattern s1 subs1, SinglePattern s2 subs2) -> do
+      case (s1 == s2) of
+        False
+          -> return [WWarning r (s1 ++ " " ++ s2)] --TODO better error
+        True -> do
+          subLists <- forM (zip subs1 subs2) $ \(s1, s2) ->
+            makeWConstrs r s1 s2
+          return $ concat subLists
+
     {-
       do
       listPerCtor <- forM d2 $ \(ctor, subPats) ->
@@ -265,11 +271,9 @@ makeFreshCopy ann = do
       VarAnnot v -> do
         vnew <- liftIO $ mkVar
         return $ (VarAnnot vnew, [(v, vnew)])
-      PatternSet patsList -> do
-        newVarPairs <- forM patsList (\(s, subPats) -> (\x -> (s, x)) <$> forM subPats copyHelper)
-        let allPairs = concatMap ((concatMap snd) . snd) newVarPairs
-        let newPatList = List.map (\(s, pl) -> (s, List.map fst pl)) newVarPairs
-        return (PatternSet newPatList, allPairs)
+      SinglePattern s subPats -> do
+        (newSubPats, newVarLists) <- unzip <$> forM subPats copyHelper
+        return (SinglePattern s newSubPats, concat newVarLists)
       LambdaAnn a1 a2 -> do
         (b1, pairs1) <- copyHelper a1
         (b2, pairs2) <- copyHelper a2
