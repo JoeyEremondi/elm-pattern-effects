@@ -384,13 +384,24 @@ intersectLB (AnnVar (pt, _)) ann = do
         return True
 
 
+data VarPosition = Sub | Super
 
+--All constraints where some type is a supertype of the given var
+constraintEdges :: WConstr -> [(AnnVar, VarPosition)]
+constraintEdges c = case c of
+  WSubEffect _ v1 v2 -> [(v1, Sub), (v2, Super)]
+  WSubEffectOfPat _ _ v1 _ _ v2 -> [(v1, Sub), (v2, Super)]
+  WPatSubEffectOf _ _ _ _ v1 v2 -> [(v1, Sub), (v2, Super)]
+  WLitSubEffectOf _ _ v2 -> [(v2, Super)]
+  WSubEffectOfLit _ v1 _ -> [(v1, Sub)]
 
-
-outgoingEdges :: [AnnotConstr] -> AnnVar -> WorklistM [AnnotConstr]
-outgoingEdges allConstrs v = error "TODO edges"
-
-
+addConstraintEdge :: Int -> (AnnVar, VarPosition) -> WorklistM ()
+addConstraintEdge i (AnnVar (pt, _), Sub) = liftIO $ do
+  desc <- UF.descriptor pt
+  UF.setDescriptor pt $ desc {_superOf = i : (_superOf desc)}
+addConstraintEdge i (AnnVar (pt, _), Super) = liftIO $ do
+  desc <- UF.descriptor pt
+  UF.setDescriptor pt $ desc {_superOf = i : (_subOf desc)}
 
 solveSubsetConstraints :: SolverM () -> WorklistM ()
 solveSubsetConstraints sm = do
@@ -398,7 +409,11 @@ solveSubsetConstraints sm = do
       ((), clist) <- ios
       return (clist, [])
       ) sm
-  workList [] [] --TODO emittedConstrs emittedConstrs
+  wConstraints <- concat <$> forM emittedConstrs  (\(a,b,c) -> makeWConstrs a b c)
+  let constrPairs = zip [1..] wConstraints
+  forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ addConstraintEdge i
+  --TODO avoid list ops here?
+  workList (Map.fromList constrPairs) [] --TODO emittedConstrs emittedConstrs
   return ()
 
 --TODO lower bounds for pat and lit cases?
