@@ -513,15 +513,12 @@ workList allConstrs (c:rest) = case c of
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
     changedWhole <- unionUB r wholeVal $ RealAnnot  [(ctor, nBottoms)]
+
     let lbPartOfWhole =
           case _lb wholeData of
             RealTop -> RealTop
-            RealAnnot dict -> error "TODO sub effect with lists"
-            {-
-              case Map.lookup ctor dict of
-                Nothing -> error "Should have just added this ctor"
-                Just argVals -> argVals List.!! argNum
-                -}
+            RealAnnot pats ->
+              RealAnnot $ List.filter ((== ctor) . fst) pats
 
     changedPart <- intersectLB r argVar lbPartOfWhole
 
@@ -545,12 +542,8 @@ workList allConstrs (c:rest) = case c of
     let lbPartOfWhole =
           case _ub wholeData of
             RealTop -> RealTop
-            RealAnnot dict -> error "TODO sub effect with lists"
-            {-
-              case Map.lookup ctor dict of
-                Nothing -> error "Should have just added this ctor"
-                Just argVals -> argVals List.!! argNum
-                -}
+            RealAnnot pats ->
+              RealAnnot $ List.filter ((== ctor) . fst) pats
 
     changedPart <- unionUB r argVar lbPartOfWhole
 
