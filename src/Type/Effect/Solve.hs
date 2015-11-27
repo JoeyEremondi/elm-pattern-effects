@@ -20,13 +20,34 @@ import qualified Reporting.Region as R
 solve
   :: AnnotConstr
   -> IO ( [(R.Region, Warning.Warning)]
-     , TypeAnnot -> CanonicalAnnot)
+     , TypeAnnot -> IO CanonicalAnnot)
 solve c = do
   let solverComp = applyUnifications c
       stateComp = runWriterT $ solveSubsetConstraints solverComp
       ioComp = State.evalStateT stateComp (error "TODO initialState")
   (_, warnings) <- ioComp
-  return (warnings, error "TODO conversion fn")
+  return (warnings, toCanonicalAnnot)
+
+toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
+toCanonicalAnnot a = case a of
+  VarAnnot (AnnVar (pt, _)) -> do
+    ourData <- UF.descriptor pt
+    case (_annRepr ourData) of
+      Nothing ->
+        --TODO better way? use schemes?
+        case (_lb ourData, _ub ourData) of
+          (RealTop, RealAnnot d) | Map.size d == 0 ->
+            return $ VarAnnot $ _uniqueId ourData
+          _ ->
+            return $ wrapReal $ _ub ourData
+      Just repr ->
+        toCanonicalAnnot repr
+  PatternSet s ->
+    PatternSet <$> (dictMapM $ Map.map (mapM toCanonicalAnnot) s )
+  LambdaAnn a b ->
+    LambdaAnn <$> toCanonicalAnnot a <*> toCanonicalAnnot b
+  TopAnnot ->
+    return TopAnnot
 
 
 --TODO shouldn't this hold schemes, not vars?

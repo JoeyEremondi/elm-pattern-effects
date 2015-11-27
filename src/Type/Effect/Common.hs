@@ -24,6 +24,7 @@ data AnnotData = AnnotData
   , _ub :: RealAnnot
   , _superOf :: [Int]
   , _subOf :: [Int]
+  , _uniqueId :: Int
   }
 
 realBottom = RealAnnot Map.empty

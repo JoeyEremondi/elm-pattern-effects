@@ -44,7 +44,8 @@ infer interfaces modul =
 
         (annotHeader, annotWarns, annotFun) <- liftIO $ genPatternWarnings interfaces modul
 
-        let finalAnnots = Map.map annotFun annotHeader
+        finalAnnots <-
+          Map.fromList <$>  forM (Map.toList annotHeader) (\(s, a) -> ((,) s) <$> (liftIO $ annotFun a))
 
         typeDict <- liftIO (Traverse.traverse T.toSrcType types)
         return (typeDict, finalAnnots, annotWarns)
@@ -83,7 +84,7 @@ genPatternWarnings
     -> Module.CanonicalModule
     -> IO ( Map.Map String Effect.TypeAnnot
           , [(R.Region, Warning.Warning)]
-          , (Effect.TypeAnnot -> Effect.CanonicalAnnot))
+          , (Effect.TypeAnnot -> IO Effect.CanonicalAnnot))
 genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 

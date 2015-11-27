@@ -41,11 +41,11 @@ freshInt = do
 
 mkVar :: IO AnnVar
 mkVar = do
-  newPoint <- UF.fresh $ AnnotData Nothing RealTop realBottom [] []
   i <- freshInt
+  newPoint <- UF.fresh $ AnnotData Nothing RealTop realBottom [] [] i
   return $ AnnVar (newPoint, i)
 
-wrapReal :: RealAnnot -> TypeAnnot
+wrapReal :: RealAnnot -> TypeAnnot' a
 wrapReal realAnn =
   case realAnn of
     RealTop -> TopAnnot
@@ -306,6 +306,3 @@ envGet subDict env key =
 
 ctorNames env =
   Map.keys (_constructor env)
-
-toCanonicalAnnot :: AnnVar -> IO CanonicalAnnot
-toCanonicalAnnot _ = error "TODO toCanonicalAnnot"
