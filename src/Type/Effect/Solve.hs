@@ -125,7 +125,7 @@ applyUnifications con =
     CLet schemes letConstr -> trace "con Let" $ do
       oldEnv <- getEnv
       --TODO do something with vars in the scheme?
-      headers <- Map.unions <$> forM schemes solveScheme
+      headers <- Map.unions <$> forM schemes (solveScheme oldEnv)
       modifyEnv $ \env -> Map.union headers env
       applyUnifications letConstr
       --TODO occurs check?
@@ -278,14 +278,63 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
 
       --Make a new variable for each constructor of the pattern
 
+freeVarsInAnnot a =
+  case a of
+    VarAnnot v -> do
+      mrepr <- getRepr v
+      case mrepr of
+        Nothing -> return [v]
+        Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
+    SinglePattern s subs ->
+     concat <$> forM subs freeVarsInAnnot
+    LambdaAnn a1 a2 ->
+      (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
+    TopAnnot ->
+      return []
 
-solveScheme :: AnnScheme -> SolverM Env
-solveScheme (Scheme quants constr hdr) = do
+freeVarsInConstr :: AnnotConstr -> SolverM [AnnVar]
+freeVarsInConstr c = case c of
+  CAnd constrs -> concat <$> forM constrs freeVarsInConstr
+  CTrue -> return []
+  CEqual _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
+  CSaveEnv -> return []
+  CSubEffect _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
+  CCanBeMatchedBy _ a1 _ -> freeVarsInAnnot a1
+  CInstance _ _ a1 -> freeVarsInAnnot a1
+  CLet schemes constr -> do
+    freeInCon <- freeVarsInConstr constr
+    freeInSchemes <- forM schemes $ \(Scheme quants scon hdr) -> do
+      let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
+      headerVars <- concat <$> forM headerAnnots freeVarsInAnnot
+      (headerVars ++) <$> freeVarsInConstr scon
+    return $ freeInCon ++ (concat freeInSchemes)
+
+freeVarsInEnv :: Env -> SolverM [AnnVar]
+freeVarsInEnv env =
+  (fmap concat) $ forM (Map.elems env) $ \(StoredScheme quants constr var) -> do
+    freeInTy <- freeVarsInAnnot (VarAnnot var)
+    freeInConstr <- freeVarsInConstr constr
+    filterM (varNotInList quants) (freeInTy ++ freeInConstr)
+
+varNotInList :: [AnnVar] -> AnnVar -> SolverM' a Bool
+varNotInList vl v = do
+  boolList <- forM vl (areSame v)
+  return $ not $ List.or boolList
+
+notFreeInEnv env v = do
+  freeInEnv <- freeVarsInEnv env
+  varNotInList freeInEnv v
+
+
+solveScheme :: Env -> AnnScheme -> SolverM Env
+solveScheme oldEnv (Scheme quants constr hdr) = do
   let oldHeader = Map.toList hdr
-  newHeader <- forM oldHeader $ \(nm, (A.A region ann)) -> do
+  newHeader <- forM oldHeader $ \(nm, (A.A _ ann)) -> do
     newVar <- liftIO mkVar
+    allVars <- freeVarsInAnnot ann
+    goodQuants <- filterM (notFreeInEnv oldEnv) allVars
     unifyAnnots (VarAnnot newVar) ann
-    return (nm, StoredScheme quants constr  newVar)
+    return (nm, StoredScheme goodQuants constr  newVar)
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
 
