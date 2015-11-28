@@ -179,7 +179,7 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                 Just rep2 ->
                   makeSubEffectConstrs  r rep2 (VarAnnot vRight)
 
-            SinglePattern ctor subPats -> do
+            SinglePattern ctor subPats -> trace "Single pat suppsed case" $ do
                 let numArgs = length subPats
                 let indices = [0 .. numArgs - 1]
                 subVars <- forM subPats $ \_ -> liftIO mkVar
@@ -189,7 +189,9 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                 listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
                   subConstrs <- makeSubEffectConstrs  r (VarAnnot subVar) subPat
                   return $ (WPatSubEffectOf r numArgs ctor i subVar vRight) : subConstrs
-                return $ concat listsPerTriple
+                --Ensure we have this ctor, even if there are no args
+                let ctorConstr = WLitSubEffectOf r (RealAnnot [(ctor, List.replicate numArgs realBottom)]) vRight
+                return $ ctorConstr : (concat listsPerTriple)
 
 
             LambdaAnn arg ret -> do
@@ -221,7 +223,9 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                     listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
                       subConstrs <- makeSubEffectConstrs  r (VarAnnot subVar) subPat
                       return $ (WSubEffectOfPat r numArgs vLeft ctor i subVar) : subConstrs
-                    return $ concat listsPerTriple
+                    --Ensure we have this ctor, even if there are no args
+                    let ctorConstr = WSubEffectOfLit r vLeft (RealAnnot [(ctor, List.replicate numArgs RealTop)])
+                    return $ ctorConstr : concat listsPerTriple
 
 
                 LambdaAnn _ _  -> do
@@ -432,9 +436,9 @@ elemMismatches region (s1,args1) (s2, args2) =
 
 --Return a warning for every element in a1 that is not matched by any element of a2
 mismatches :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
-mismatches _ _ RealTop = []
-mismatches r RealTop _ = [(r, Warning.MissingCase "_")]
-mismatches region (RealAnnot subs1) (RealAnnot subs2) =
+mismatches _ _ RealTop = trace "MM top" $ []
+mismatches r RealTop _ = trace "MM topfirst" $ [(r, Warning.MissingCase "_")]
+mismatches region (RealAnnot subs1) (RealAnnot subs2) = trace ("Mismatches for " ++ show (subs1, subs2)) $
   let
     for = flip List.map
     failsForAllSubs =
@@ -448,7 +452,7 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
           else
             concat failsForSub1
   in
-    concat failsForAllSubs
+    trace ("Found mismatches " ++ show (length $ concat failsForAllSubs)) $ concat failsForAllSubs
 {-
   concatMap (\(s, subPatsToMatch) ->
       case Map.lookup s d1 of
@@ -465,10 +469,10 @@ getAnnData (AnnVar (pt, _)) =  liftIO $ UF.descriptor pt
 
 --Return true if this union makes a change, false otherwise
 unionUB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
-unionUB r (AnnVar (pt, _)) ann = do
+unionUB r (AnnVar (pt, _)) ann = trace "unionUB" $ do
   annData <- liftIO $ UF.descriptor pt
   let newUB = _ub annData `unionAnn` ann
-  liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
+  trace ("Old, new UB " ++ show (_ub annData, newUB)) $ liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
   --Check if we changed the set at all
   --TODO faster shortcut method
   case (mismatches r (_ub annData) newUB) of
@@ -480,10 +484,10 @@ unionUB r (AnnVar (pt, _)) ann = do
   --TODO emit warning
 
 intersectLB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
-intersectLB r (AnnVar (pt, _)) ann = do
+intersectLB r (AnnVar (pt, _)) ann = trace "interLB" $ do
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
-  liftIO $ UF.setDescriptor pt $ annData {_ub = _ub annData `unionAnn` ann}
+  trace ("Old, new LB " ++ show (_lb annData, newLB)) $ liftIO $ UF.setDescriptor pt $ annData {_lb = newLB}
   case (mismatches r newLB (_lb annData)) of
       [] -> return False
       _ -> do
@@ -492,6 +496,7 @@ intersectLB r (AnnVar (pt, _)) ann = do
 
 
 data VarPosition = Sub | Super
+  deriving (Show)
 
 --All constraints where some type is a supertype of the given var
 constraintEdges :: WConstr -> [(AnnVar, VarPosition)]
@@ -503,13 +508,22 @@ constraintEdges c = case c of
   WSubEffectOfLit _ v1 _ -> [(v1, Sub)]
   WWarning _ _ -> []
 
+allVars  c = case c of
+  WSubEffect _ v1 v2 -> [v1, v2]
+  WSubEffectOfPat _ _ v1 _ _ v2 -> [v1, v2]
+  WPatSubEffectOf _ _ _ _ v1 v2 -> [v1, v2]
+  WLitSubEffectOf _ _ v2 -> [v2]
+  WSubEffectOfLit _ v1 _ -> [v1]
+  WWarning _ _ -> []
+
+
 addConstraintEdge :: Int -> (AnnVar, VarPosition) -> WorklistM ()
 addConstraintEdge i (AnnVar (pt, _), Sub) = liftIO $ do
   desc <- UF.descriptor pt
   UF.setDescriptor pt $ desc {_superOf = i : (_superOf desc)}
 addConstraintEdge i (AnnVar (pt, _), Super) = liftIO $ do
   desc <- UF.descriptor pt
-  UF.setDescriptor pt $ desc {_superOf = i : (_subOf desc)}
+  UF.setDescriptor pt $ desc {_subOf = i : (_subOf desc)}
 
 solveSubsetConstraints :: SolverM () -> WorklistM ()
 solveSubsetConstraints sm = do
@@ -519,20 +533,52 @@ solveSubsetConstraints sm = do
       ) sm
   wConstraints <- trace ("Emitted " ++ show emittedConstrs) $ concat <$> forM emittedConstrs makeWHelper
   let constrPairs = zip [1..] wConstraints
-  forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ addConstraintEdge i
+  trace ("Constraint pairs " ++ show constrPairs) $ forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ \v -> trace ("Adding cedges " ++ show (i,c,v)) addConstraintEdge i v
   --TODO avoid list ops here?
-  trace ("\n\n\n" ++ show wConstraints) $ workList (Map.fromList constrPairs) [] --TODO emittedConstrs emittedConstrs
-  return ()
+  trace ("\n\n\n" ++ show wConstraints) $ workList (Map.fromList constrPairs) wConstraints
+  --One last check: once we've solved our constraints, check the constraint
+  --That all possible values (upperBound) are covered by least possible matches
+  --(lower bound)
+  --TODO notation backwards
+  finalLowerBoundsCheck wConstraints
 
 --TODO lower bounds for pat and lit cases?
 
+finalLowerBoundsCheck :: [WConstr] -> WorklistM ()
+finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
+  liftIO $ putStrLn ("Final bounds check" ++ show c)
+  case c of
+      WSubEffect r v1 v2 -> do
+        data1 <- getAnnData v1
+        data2 <- getAnnData v2
+        tell $ mismatches r (_ub data1) (_lb data1)
+        tell $ mismatches r (_ub data2) (_lb data2)
+      WSubEffectOfPat r _ v1 _ _ v2 -> do
+        data1 <- getAnnData v1
+        data2 <- getAnnData v2
+        tell $ mismatches r (_ub data1) (_lb data1)
+        tell $ mismatches r (_ub data2) (_lb data2)
+      WPatSubEffectOf r _ _ _ v1 v2 -> do
+        data1 <- getAnnData v1
+        data2 <- getAnnData v2
+        tell $ mismatches r (_ub data1) (_lb data1)
+        tell $ mismatches r (_ub data2) (_lb data2)
+      WLitSubEffectOf r _ v2 -> do
+        data2 <- getAnnData v2
+        trace ("Data2 " ++ show (_lb data2, _ub data2)) $ tell $ mismatches r (_ub data2) (_lb data2)
+      WSubEffectOfLit r v1 _ -> do
+        data1 <- getAnnData v1
+        trace ("Data1 " ++ show (_lb data1, _ub data1)) $ tell $ mismatches r (_ub data1) (_lb data1)
+      WWarning r _ -> return ()
+
+
 workList :: (Map.Map Int WConstr) -> [WConstr] -> WorklistM ()
-workList _ [] = return () --When we're finished
-workList allConstrs (c:rest) = case c of
+workList _ [] = trace "Worklist done" $ return () --When we're finished
+workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case c of
   WWarning r s -> do
     tell [(r, Warning.MissingCase s)]
     workList allConstrs rest
-  WSubEffect r v1 v2 -> do
+  WSubEffect r v1 v2 -> trace "WS" $do
     data1 <- getAnnData v1
     data2 <- getAnnData v2
     changed1 <- unionUB r v2 (_ub data1)
@@ -549,7 +595,7 @@ workList allConstrs (c:rest) = case c of
             True -> List.map (allConstrs Map.! ) $ _subOf data1
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
-  WSubEffectOfLit r v1 realAnn -> do
+  WSubEffectOfLit r v1 realAnn -> trace "WSL" $ do
     changed <- intersectLB r v1 realAnn
     ourData <- getAnnData v1
     let needsUpdate =
@@ -558,16 +604,16 @@ workList allConstrs (c:rest) = case c of
             True -> List.map (allConstrs Map.! ) $ _superOf ourData
     workList allConstrs (needsUpdate ++ rest)
 
-  WLitSubEffectOf r realAnn v1 -> do
+  WLitSubEffectOf r realAnn v1 -> trace "WLS" $ do
     changed <- unionUB r v1 realAnn
     ourData <- getAnnData v1
     let needsUpdate =
           case changed of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _subOf ourData
-    workList allConstrs (needsUpdate ++ rest)
+    trace ("WLS subs of our data " ++ show (_subOf ourData, needsUpdate)) $ workList allConstrs (needsUpdate ++ rest)
 
-  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> do
+  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> trace "WSP" $ do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =
@@ -588,12 +634,12 @@ workList allConstrs (c:rest) = case c of
             True -> List.map (allConstrs Map.! ) $ _superOf argData
 
     let needsUpdate2 =
-          case changedPart of
+          case changedWhole of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _subOf wholeData
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
-  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> do
+  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> trace "WPS" $ do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =
@@ -613,7 +659,7 @@ workList allConstrs (c:rest) = case c of
             True -> List.map (allConstrs Map.! ) $ _subOf argData
 
     let needsUpdate2 =
-          case changedPart of
+          case changedWhole of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _superOf wholeData
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
