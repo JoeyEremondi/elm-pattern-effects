@@ -42,13 +42,11 @@ infer interfaces modul =
         let header' = Map.delete "::" header
         let types = Map.map A.drop (Map.difference (TS.sSavedEnv state) header')
 
-        (annotHeader, annotWarns, annotFun) <- liftIO $ genPatternWarnings interfaces modul
+        (exportedAnnots, annotWarns) <- liftIO $ genPatternWarnings interfaces modul
 
-        finalAnnots <-
-          Map.fromList <$>  forM (Map.toList annotHeader) (\(s, a) -> ((,) s) <$> (liftIO $ annotFun a))
 
         typeDict <- liftIO (Traverse.traverse T.toSrcType types)
-        return (typeDict, finalAnnots, annotWarns)
+        return (typeDict, exportedAnnots, annotWarns)
 
 
 genConstraints
@@ -82,9 +80,9 @@ genConstraints interfaces modul =
 genPatternWarnings
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> IO ( Map.Map String Effect.TypeAnnot
+    -> IO ( Map.Map String Effect.CanonicalAnnot
           , [(R.Region, Warning.Warning)]
-          , (Effect.TypeAnnot -> IO Effect.CanonicalAnnot))
+          )
 genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 
@@ -99,7 +97,7 @@ genPatternWarnings interfaces modul =
       let vars = concatMap (fst . snd) allTypes
       let header = Map.map snd (Map.fromList allTypes)
       --Adds our initial values to our env, basically
-      let environ c = Effect.CLet [ Effect.Scheme vars Effect.CTrue (Map.map (A.A undefined) header) ] c
+      let environ c = Effect.CLet [ Effect.Scheme vars Effect.CTrue (Map.map (A.A (error "OtherModule region")) header) ] c
 
       fvar <- Effect.mkVar
 
@@ -108,9 +106,9 @@ genPatternWarnings interfaces modul =
 
       putStrLn $ show constraint
 
-      (warnings, canonFun) <- Type.Effect.Solve.solve (environ constraint)
+      (warnings, exportedAnnots) <- Type.Effect.Solve.solve (environ constraint)
 
-      return (header, warnings, canonFun)
+      return (exportedAnnots, warnings)
 
 
 canonicalizeValues

@@ -23,13 +23,16 @@ import Debug.Trace (trace)
 solve
   :: AnnotConstr
   -> IO ( [(R.Region, Warning.Warning)]
-     , TypeAnnot -> IO CanonicalAnnot)
-solve c = trace ("In solver, constraint " ++ show c ++ "\n\n" ) $ do
+     , Map.Map String CanonicalAnnot)
+solve c = do
   let solverComp = applyUnifications c
       stateComp = runWriterT $ solveSubsetConstraints solverComp
-      ioComp = State.evalStateT stateComp $ SolverState Map.empty Map.empty
-  (_, warnings) <- ioComp
-  return (warnings, toCanonicalAnnot)
+      ioComp = State.runStateT stateComp $ SolverState Map.empty Map.empty
+  (((), warnings), finalState) <- ioComp
+  finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, A.A _ annVar) -> do
+    ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
+    return (s, ourAnnot)
+  return (warnings, Map.fromList finalEnv)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
 toCanonicalAnnot a = case a of
@@ -39,10 +42,12 @@ toCanonicalAnnot a = case a of
       Nothing ->
         --TODO better way? use schemes?
         case (_lb ourData, _ub ourData) of
+          --Completely unconstrained sets
           (RealTop, RealAnnot d) | List.length d == 0 ->
-            return $ VarAnnot $ _uniqueId ourData
+            return $ CanonVar $ _uniqueId ourData
           _ ->
-            return $ (error "TODO wrapReal")  $ _ub ourData
+            --TODO UB or LB? Based on position?
+            return $ CanonLit  $ _ub ourData
       Just repr ->
         toCanonicalAnnot repr
   SinglePattern s subs ->
@@ -52,6 +57,8 @@ toCanonicalAnnot a = case a of
   TopAnnot ->
     return TopAnnot
 
+canonLowerBound :: TypeAnnot -> IO CanonicalAnnot
+canonLowerBound = error "error ecb"
 
 --TODO shouldn't this hold schemes, not vars?
 type Env = Map.Map String (A.Located AnnVar)
@@ -123,7 +130,7 @@ applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n
       env <- getEnv
       freshCopy <-
         case Map.lookup var env of
-          Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve"
+          Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve\nenv:\n" ++ show (Map.keys env)
           Just (A.A _ annVar) -> do
             mrepr <- getRepr annVar
             case mrepr of

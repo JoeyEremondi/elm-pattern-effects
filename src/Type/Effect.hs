@@ -262,14 +262,15 @@ annotationForCtor (_, (_, ctors)) =
 canonicalizeValues
     :: Environment
     -> (ModuleName.Canonical, Module.Interface)
-    -> IO [(String, ([AnnVar], TypeAnnot))]
+    -> IO [(String, ([AnnVar], TypeAnnot), AnnotConstr)]
 canonicalizeValues _env (moduleName, iface)=
   forM (Map.toList (Module.iAnnots iface)) $ \(name,canonAnnot) ->
-        do  (instResult, finalState) <- State.runStateT (fromCanonical canonAnnot) Map.empty
+        do  ((instResult, instConstr), finalState) <- State.runStateT (fromCanonical canonAnnot) Map.empty
             let allVars = Map.elems  finalState
             return
               ( ModuleName.canonicalToString moduleName ++ "." ++ name
               , (allVars, instResult)
+              , instConstr
               )
 
 dictMapM :: (Ord k, Monad m) => Map.Map k (m a) -> m (Map.Map k a)
@@ -279,23 +280,40 @@ dictMapM dict = do
   return $ Map.fromList $ zip klist vlist
 
 
-fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO TypeAnnot
+fromReal :: RealAnnot -> State.StateT (Map.Map Int AnnVar) IO (TypeAnnot, AnnotConstr)
+fromReal RealTop = return (TopAnnot, CTrue)
+fromReal (RealAnnot l) = do
+   let (ctors, subAnns) = List.unzip l
+   pairList <-  forM subAnns $ \annList -> do
+     (newSubAnns, subConstrLists) <- unzip <$> forM annList fromReal
+     return (newSubAnns, subConstrLists)
+   let (newAnns, constrList) = unzip pairList
+   ourResult <- State.liftIO $ VarAnnot <$> mkVar
+   let containedPatterns = zipWith SinglePattern ctors newAnns
+   let ourConstraints =
+          List.map (\p -> CSubEffect (error "fromReal region") p ourResult)
+            containedPatterns
+   return (ourResult , CAnd $ ourConstraints ++ concat constrList)
+
+fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO (TypeAnnot, AnnotConstr)
 fromCanonical canonAnnot = do
   currentMap <- State.get
   case canonAnnot of
 
-    VarAnnot i ->
+    CanonVar i ->
       case (Map.lookup i currentMap) of
         Nothing -> do
           varI <- State.lift $ mkVar
           State.put (Map.insert i varI currentMap)
-          return (VarAnnot varI)
+          return (VarAnnot varI, CTrue)
 
-        Just v -> return $ VarAnnot v
-
-    SinglePattern s subs -> SinglePattern s <$> forM subs fromCanonical
-    LambdaAnn t1 t2 -> LambdaAnn <$> fromCanonical t1 <*>  fromCanonical t2
-    TopAnnot -> return TopAnnot
+        Just v -> return (VarAnnot v, CTrue)
+    CanonLit r -> fromReal r
+    CanonLambda t1 t2 -> do
+      (arg, argCon) <- fromCanonical t1
+      (res, resCon) <- fromCanonical t2
+      return (LambdaAnn arg res, CAnd [argCon, resCon])
+    CanonTop -> return (TopAnnot, CTrue)
 
 freshDataScheme :: Environment -> String -> IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)
 freshDataScheme = envGet _constructor

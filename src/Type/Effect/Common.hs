@@ -49,14 +49,23 @@ mapPatSetM f inL = forM inL $ \(s,annList) -> do
 
 type TypeAnnot = TypeAnnot' AnnVar
 
-type CanonicalAnnot = TypeAnnot' Int
+--type CanonicalAnnot = TypeAnnot' Int
+data CanonicalAnnot =
+    CanonVar Int
+  | CanonLit RealAnnot
+  | CanonLambda (CanonicalAnnot) (CanonicalAnnot)
+  | CanonTop
+  deriving (Show, Generic)
 
 instance (Binary a) => Binary (TypeAnnot' a)
 instance Binary RealAnnot
+instance Binary CanonicalAnnot
 
+{-
 prettyAnn :: CanonicalAnnot -> String
 prettyAnn ann = case ann of
   VarAnnot i -> "_" ++ show i
   SinglePattern s subPats -> show $ (s, map prettyAnn subPats)
   LambdaAnn from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
   TopAnnot -> "T"
+  -}
