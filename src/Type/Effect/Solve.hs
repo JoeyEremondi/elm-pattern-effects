@@ -115,7 +115,7 @@ areSame :: AnnVar -> AnnVar -> SolverM' a Bool
 areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 
 applyUnifications :: AnnotConstr -> SolverM ()
-applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n") $
+applyUnifications con =
   case con of
     CEqual _ r1 r2 -> trace "con Equal" $ do
       _ <- unifyAnnots r1 r2

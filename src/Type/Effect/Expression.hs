@@ -72,7 +72,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
           fragment <- Pattern.constrain env pattern argType
           bodyCon <- constrain env body resType
           let con =
-                ex (Effect.vars fragment)
+                --ex (Effect.vars fragment)
                     (CLet [monoscheme (Effect.typeEnv fragment)]
                           (Effect.typeConstraint fragment /\ bodyCon)
                     )
@@ -172,37 +172,26 @@ constrainApp env region f args tipe =
   do  funcVar <- mkVar
       funcCon <- constrain env f (VarAnnot funcVar)
 
-      (vars, argCons, _, argMatchCons, _, returnVar) <-
-          argConstraints env maybeName region (length args) funcVar 1 args
+      (vars, argCons, decomposeLambdaCons, argMatchCons, returnVar) <-
+          argConstraints env region funcVar args
 
       let returnCon =
             CEqual region (VarAnnot returnVar) tipe
 
       return $ ex (funcVar : vars) $
-        CAnd (funcCon : argCons  ++ argMatchCons ++ [returnCon])
-  where
-    maybeName =
-      case f of
-        A.A _ (E.Var canonicalName) ->
-            Just canonicalName
-
-        _ ->
-          Nothing
+        CAnd (funcCon : argCons  ++ argMatchCons ++ decomposeLambdaCons ++ [returnCon])
 
 
 argConstraints
     :: Effect.Environment
-    -> Maybe V.Canonical
     -> R.Region
-    -> Int
     -> AnnVar
-    -> Int
     -> [Canonical.Expr]
-    -> IO ([AnnVar], [AnnotConstr], [AnnotConstr], [AnnotConstr], Maybe R.Region, AnnVar)
-argConstraints env name region totalArgs overallVar index args =
+    -> IO ([AnnVar], [AnnotConstr], [AnnotConstr], [AnnotConstr], AnnVar)
+argConstraints env region  overallVar args =
   case args of
     [] ->
-      return ([], [], [], [], Nothing, overallVar)
+      return ([], [], [], [], overallVar)
 
     expr@(A.A subregion _) : rest ->
       do  argVar <- mkVar
@@ -210,11 +199,8 @@ argConstraints env name region totalArgs overallVar index args =
           argIndexVar <- mkVar
           localReturnVar <- mkVar
 
-          (vars, argConRest, decomposeLambdaRest, subsetOfMatchedRest, restRegion, returnVar) <-
-              argConstraints env name region totalArgs localReturnVar (index + 1) rest
-
-          let arityRegion =
-                maybe subregion (R.merge subregion) restRegion
+          (vars, argConRest, decomposeLambdaRest, subsetOfMatchedRest, returnVar) <-
+              argConstraints env region  localReturnVar rest
 
           --Decompose our lambda into (to ==> From)
           let decomposeLambdaCon =
@@ -223,20 +209,20 @@ argConstraints env name region totalArgs overallVar index args =
                   (VarAnnot argIndexVar ==> VarAnnot localReturnVar)
                   (VarAnnot overallVar)
 
-          --The constraints from the functon apply to the arguments
-          --TODO enforce subset constraints here?
+          --The argument must represent fewer patterns than the function can match
           let subsetOfMatchedCon =
-                CEqual
+                CSubEffect
                   region
-                  (VarAnnot argIndexVar)
                   (VarAnnot argVar)
+                  (VarAnnot argIndexVar)
+
+
 
           return
             ( argVar : argIndexVar : localReturnVar : vars
             , argCon : argConRest
             , decomposeLambdaCon : decomposeLambdaRest
             , subsetOfMatchedCon : subsetOfMatchedRest
-            , Just arityRegion
             , returnVar
             )
 
