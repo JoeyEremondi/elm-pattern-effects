@@ -35,7 +35,12 @@ solve c = do
   return (warnings, Map.fromList finalEnv)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
-toCanonicalAnnot a = case a of
+toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound
+
+canonLowerBound :: TypeAnnot -> IO CanonicalAnnot
+canonLowerBound = toCanonicalHelper canonLowerBound toCanonicalAnnot
+
+toCanonicalHelper co contra a = case a of
   VarAnnot (AnnVar (pt, _)) -> do
     ourData <- UF.descriptor pt
     case (_annRepr ourData) of
@@ -49,17 +54,16 @@ toCanonicalAnnot a = case a of
             --TODO UB or LB? Based on position?
             return $ CanonLit  $ _ub ourData
       Just repr ->
-        toCanonicalAnnot repr
+        co repr
   SinglePattern s subs -> do
-    canonSubs <- forM subs toCanonicalAnnot
-    return $ CanonLit $ RealAnnot [(s, canonSubs)]
+    canonSubs <- forM subs co
+    return $ CanonPatDict [(s, canonSubs)]
   LambdaAnn a b ->
-    CanonLambda <$> canonLowerBound a <*> toCanonicalAnnot b
+    CanonLambda <$> contra a <*> co b
   TopAnnot ->
-    return TopAnnot
+    return CanonTop
 
-canonLowerBound :: TypeAnnot -> IO CanonicalAnnot
-canonLowerBound = error "error ecb"
+
 
 --TODO shouldn't this hold schemes, not vars?
 type Env = Map.Map String (A.Located AnnVar)

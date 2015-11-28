@@ -87,7 +87,7 @@ genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 
       ctors <- forM (Effect.ctorNames env) $ \name ->
-          do  (_, vars, args, result) <- Effect.freshDataScheme env name
+          do  (_, vars, args, result) <- Effect.freshDataScheme env name 
               return (name, (vars, foldr (Effect.==>) result args))
 
       importedVars <-
