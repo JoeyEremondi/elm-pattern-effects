@@ -370,7 +370,7 @@ constrainIf env region branches finally tipe =
               )
 
         _ ->
-            pairCons region Error.MultiIfBranch varToCon branchInfo
+            error "Multi-if old case?"
 
     varToCon var =
       CEqual region (VarAnnot var) tipe
@@ -392,8 +392,9 @@ constrainCase env region expr branches tipe =
       (branchResultInfo, branchResultConstraints, branchPatternAnnots) <-
           unzip3 <$> mapM branch branches
 
+      let vars = map fst branchResultInfo
       --TODO what is this?
-      (vars, cons) <- pairCons region Error.CaseBranch varToCon branchResultInfo
+      -- (vars, cons) <- pairCons region Error.CaseBranch varToCon branchResultInfo
 
       let matchedSet = Pattern.patternsToAnnot env $ map fst branches
       --The type of the value we split on must contain only the patterns we match on
@@ -405,7 +406,7 @@ constrainCase env region expr branches tipe =
 
       --TODO what is ex doing?
       return $ ex (exprVar : vars) $
-        CAnd (exprCon : joinBranchesConstr  : inPatternsConstr : branchResultConstraints ++ cons )
+        CAnd (exprCon : joinBranchesConstr  : inPatternsConstr : branchResultConstraints )
   where
     branch (pattern, branchExpr@(A.A branchRegion _)) =
         do  branchVar <- mkVar
@@ -418,52 +419,6 @@ constrainCase env region expr branches tipe =
                 , VarAnnot patternVar
                 )
 
-    varToCon var =
-      CEqual region tipe (VarAnnot var)
-
-
--- COLLECT PAIRS
-
-data Pair = Pair
-    { _index :: Int
-    , _var1 :: AnnVar
-    , _var2 :: AnnVar
-    , _region :: R.Region
-    }
-
-
-pairCons
-    :: R.Region
-    -> (Int -> R.Region -> Error.Hint)
-    -> (AnnVar -> AnnotConstr)
-    -> [(AnnVar, R.Region)]
-    -> IO ([AnnVar], [AnnotConstr])
-pairCons region pairHint varToCon items =
-  let
-    pairToCon (Pair index var1 var2 subregion) =
-      CEqual region (VarAnnot var1) (VarAnnot var2)
-  in
-  case collectPairs 2 items of
-    Nothing ->
-        do  var <- mkVar
-            return ([var], [varToCon var])
-
-    Just (pairs, var) ->
-        return (map fst items, map pairToCon pairs ++ [varToCon var])
-
-
-collectPairs :: Int -> [(AnnVar, R.Region)] -> Maybe ([Pair], AnnVar)
-collectPairs index items =
-  case items of
-    [] ->
-        Nothing
-
-    (var,_) : [] ->
-        Just ([], var)
-
-    (var,_) : rest@((var',region) : _) ->
-        do  (pairs, summaryVar) <- collectPairs (index+1) rest
-            return (Pair index var var' region : pairs, summaryVar)
 
 
 -- EXPAND PATTERNS
