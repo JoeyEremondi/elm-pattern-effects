@@ -17,7 +17,6 @@ import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 
 import qualified Reporting.Region as R
-
 import Debug.Trace (trace)
 
 solve
@@ -518,7 +517,7 @@ solveSubsetConstraints sm = do
       ((), clist) <- ios
       return (clist, [])
       ) sm
-  wConstraints <- concat <$> forM emittedConstrs makeWHelper
+  wConstraints <- trace ("Emitted " ++ show emittedConstrs) $ concat <$> forM emittedConstrs makeWHelper
   let constrPairs = zip [1..] wConstraints
   forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ addConstraintEdge i
   --TODO avoid list ops here?

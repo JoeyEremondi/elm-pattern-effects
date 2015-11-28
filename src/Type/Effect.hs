@@ -12,6 +12,7 @@ import qualified AST.Variable as V
 import qualified AST.Module as Module
 import qualified AST.Module.Name as ModuleName
 
+import qualified Reporting.Warning as Warning
 
 import Reporting.Annotation as A
 import qualified Data.Map as Map
@@ -296,6 +297,10 @@ fromReal (RealAnnot l) = do
    return (ourResult , CAnd $ ourConstraints ++ concat constrList)
 
 dummyRegion = R.Region (R.Position 0 0) (R.Position 0 0)
+
+warningString w = case w of
+  Warning.MissingCase s -> "Missing case " ++ show s
+  _ -> ""
 
 fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO (TypeAnnot, AnnotConstr)
 fromCanonical canonAnnot = do

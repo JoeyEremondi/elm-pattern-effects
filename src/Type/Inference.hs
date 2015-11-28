@@ -112,6 +112,8 @@ genPatternWarnings interfaces modul =
 
       (warnings, exportedAnnots) <- Type.Effect.Solve.solve (environ constraint)
 
+      forM warnings (\(r,w) -> putStrLn $ show (r, Effect.warningString w))
+
       return (exportedAnnots, warnings)
 
 
