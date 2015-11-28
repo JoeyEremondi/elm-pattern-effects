@@ -313,6 +313,18 @@ fromCanonical canonAnnot = do
       (arg, argCon) <- fromCanonical t1
       (res, resCon) <- fromCanonical t2
       return (LambdaAnn arg res, CAnd [argCon, resCon])
+
+    CanonPatDict theList -> do
+      ourReturn <- State.liftIO $ VarAnnot <$> mkVar
+      let (ctors, argLists) = List.unzip theList
+      newResult <- forM argLists $ \argList -> do
+        (newArgs, constrList) <- unzip <$> forM argList fromCanonical
+        return (newArgs, constrList)
+      let (newLists, constrs) = unzip newResult
+      let patsWeContain = zipWith SinglePattern ctors newLists
+      let ourConstrs = List.map (\p -> CSubEffect (error "patDict region") p ourReturn) patsWeContain
+      return (ourReturn, CAnd (ourConstrs ++ concat constrs))
+
     CanonTop -> return (TopAnnot, CTrue)
 
 freshDataScheme :: Environment -> String -> IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)

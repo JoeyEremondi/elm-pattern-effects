@@ -53,6 +53,7 @@ type TypeAnnot = TypeAnnot' AnnVar
 data CanonicalAnnot =
     CanonVar Int
   | CanonLit RealAnnot
+  | CanonPatDict [(String, [CanonicalAnnot])]
   | CanonLambda (CanonicalAnnot) (CanonicalAnnot)
   | CanonTop
   deriving (Show, Generic)

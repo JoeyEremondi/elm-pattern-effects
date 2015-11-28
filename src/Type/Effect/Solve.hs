@@ -50,10 +50,11 @@ toCanonicalAnnot a = case a of
             return $ CanonLit  $ _ub ourData
       Just repr ->
         toCanonicalAnnot repr
-  SinglePattern s subs ->
-    SinglePattern s <$> forM subs toCanonicalAnnot
+  SinglePattern s subs -> do
+    canonSubs <- forM subs toCanonicalAnnot
+    return $ CanonLit $ RealAnnot [(s, canonSubs)]
   LambdaAnn a b ->
-    LambdaAnn <$> toCanonicalAnnot a <*> toCanonicalAnnot b
+    CanonLambda <$> canonLowerBound a <*> toCanonicalAnnot b
   TopAnnot ->
     return TopAnnot
 
