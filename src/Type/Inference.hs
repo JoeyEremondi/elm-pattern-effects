@@ -87,17 +87,21 @@ genPatternWarnings interfaces modul =
   do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
 
       ctors <- forM (Effect.ctorNames env) $ \name ->
-          do  (_, vars, args, result) <- Effect.freshDataScheme env name 
+          do  (_, vars, args, result) <- Effect.freshDataScheme env name
               return (name, (vars, foldr (Effect.==>) result args))
 
-      importedVars <-
+      importStuff <-
           mapM (Effect.canonicalizeValues env) (Map.toList interfaces)
+
+      let (importedVars, importConstrs) = unzip $ map (\l -> unzip $ map (\(a,b,c) -> ((a,b),c)) l) importStuff
 
       let allTypes = concat (ctors : importedVars)
       let vars = concatMap (fst . snd) allTypes
       let header = Map.map snd (Map.fromList allTypes)
       --Adds our initial values to our env, basically
-      let environ c = Effect.CLet [ Effect.Scheme vars Effect.CTrue (Map.map (A.A (error "OtherModule region")) header) ] c
+      let innerEnv c = Effect.CLet [ Effect.Scheme vars Effect.CTrue (Map.map (A.A (error "OtherModule region")) header) ] c
+      let environ c = Effect.CLet [Effect.Scheme [] (Effect.CAnd $ concat importConstrs) Map.empty] (innerEnv c)
+
 
       fvar <- Effect.mkVar
 
