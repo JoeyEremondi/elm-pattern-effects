@@ -84,7 +84,9 @@ genPatternWarnings
           , [(R.Region, Warning.Warning)]
           )
 genPatternWarnings interfaces modul =
-  do  env <- Effect.initializeEnv (canonicalizeAdts interfaces modul)
+  do
+      let mname = ModuleName.toString $ ModuleName._module $ Module.name modul
+      env <- Effect.initializeEnv mname (canonicalizeAdts interfaces modul)
 
       ctors <- forM (Effect.ctorNames env) $ \name ->
           do  (_, vars, args, result) <- Effect.freshDataScheme env name

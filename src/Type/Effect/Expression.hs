@@ -93,10 +93,11 @@ constrain env annotatedExpr@(A.A region expression) tipe =
       E.Data name exprs ->
           do  vars <- Monad.forM exprs $ \_ -> mkVar
               let pairs = zip exprs (map VarAnnot vars)
+              let fullName = _moduleName env ++ "." ++ name
               argConstrs <- mapM (\(expr, tp) -> constrain env expr tp) pairs
               let dataTypeConstr =
                     CEqual region tipe $
-                      SinglePattern name $ map snd pairs
+                      SinglePattern fullName $ map snd pairs
               --TODO why need ex here?
               return $ ex vars (CAnd $ dataTypeConstr : argConstrs)
 

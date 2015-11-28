@@ -152,6 +152,7 @@ data Environment = Environment
     { _constructor :: Map.Map String (IO (Int, [AnnVar], [TypeAnnot], TypeAnnot))
     , _types :: (Map.Map String TypeAnnot)
     , _value :: (Map.Map String TypeAnnot)
+    , _moduleName :: String
     }
 
 
@@ -178,14 +179,15 @@ addValues env newValues =
 
 
 
-initializeEnv :: [Module.CanonicalAdt] -> IO Environment
-initializeEnv datatypes =
+initializeEnv :: String -> [Module.CanonicalAdt] -> IO Environment
+initializeEnv mname datatypes =
   do  types <- adtAnnots datatypes
       let env =
             Environment
               { _constructor = Map.empty
               , _value = Map.empty
               , _types = types
+              , _moduleName = mname
               }
       return $ env { _constructor = makeConstructors env datatypes }
 
