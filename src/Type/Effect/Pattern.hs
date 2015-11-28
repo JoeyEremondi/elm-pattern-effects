@@ -93,46 +93,25 @@ constrain env (A.A region pattern) tipe =
 
 isWildcard (A.A _ P.Anything) = True
 isWildcard (A.A _ (P.Var _)) = True
+isWildcard (A.A _ (P.Record _)) = True --TODO remove
 isWildcard _ = False
 
 isTotal patList _ = --TODO check if all cases are exhaustive
   List.any isWildcard patList
 
-patternLitAnnot :: Environment -> [P.CanonicalPattern]  -> RealAnnot
-patternLitAnnot env patList =
+patternToAnnot :: Environment -> P.CanonicalPattern -> (String, [RealAnnot])
+patternToAnnot env (A.A reg pat) = case pat of
+  P.Anything -> error "Should have filtered out top"
+  P.Var _ -> error "Should have filtered out top"
+  P.Record fields -> error "TODO record patterns"
+  P.Alias _ p1 -> patternToAnnot env p1
+  P.Literal l -> (Literal.toCtorString l, [])
+  P.Data s args -> (V.toString s, map (\x -> annotsMatchedByPattern env [x]) args)
+
+
+annotsMatchedByPattern :: Environment -> [P.CanonicalPattern] -> RealAnnot
+annotsMatchedByPattern env patList =
   if (isTotal patList env)
   then RealTop
   else
-    let
-      dictAppend nm ann dict =
-        case (Map.lookup nm dict) of
-          Nothing -> Map.insert nm [ann] dict
-          Just listSoFar -> Map.insert nm (ann:listSoFar) dict
-      dictInit nm dict =
-        case (Map.lookup nm dict) of
-          Nothing -> Map.insert nm [] dict
-          _ -> dict
-
-
-      --Assumes our lists form a rectangular matrix
-      transpose :: [[a]] -> [[a]]
-      transpose [] = []
-      transpose l = (map head l):(transpose $ map tail l)
-
-      extendPatDict (A.A _ pat) dict = case pat of
-        P.Anything -> error "Missed total case"
-        P.Var _ -> error "Missed total case"
-        P.Alias _ subPat -> extendPatDict subPat dict
-        P.Literal lit -> dictInit (Literal.toCtorString lit) dict --We know there are never arguments to a literal
-        P.Data name subPats -> dictAppend (V.toString name) subPats dict
-
-      --Gives us a dict mapping strings to lists of lists patterns
-      --We go through and convert our "list matrix" from horozontal to vertical
-      -- i.e. instead of having a list of lists containing one pattern for each arg,
-      --We have a list which, for each arg, contains a list of possible patterns
-      --TODO does this lose precision?
-      patternTree = List.foldr extendPatDict Map.empty patList
-      tposedPatTree = Map.map transpose patternTree
-
-
-    in RealAnnot $ List.map (\(s,anns) -> (s, List.map (patternLitAnnot env) anns)) (error "TODO pat fix")
+    RealAnnot $ map (patternToAnnot env) patList

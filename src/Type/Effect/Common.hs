@@ -52,6 +52,7 @@ type TypeAnnot = TypeAnnot' AnnVar
 type CanonicalAnnot = TypeAnnot' Int
 
 instance (Binary a) => Binary (TypeAnnot' a)
+instance Binary RealAnnot
 
 prettyAnn :: CanonicalAnnot -> String
 prettyAnn ann = case ann of
