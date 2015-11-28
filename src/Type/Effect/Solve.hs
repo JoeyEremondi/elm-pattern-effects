@@ -280,15 +280,15 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
 
 
 solveScheme :: AnnScheme -> SolverM Env
-solveScheme s = do
-  let oldHeader = Map.toList $ _header s
+solveScheme (Scheme quants constr hdr) = do
+  let oldHeader = Map.toList hdr
   newHeader <- forM oldHeader $ \(nm, (A.A region ann)) -> do
     newVar <- liftIO mkVar
     unifyAnnots (VarAnnot newVar) ann
-    return (nm, A.A region newVar)
+    return (nm, StoredScheme quants constr  newVar)
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
-  applyUnifications $ _constraint s
+
   return $ Map.fromList newHeader
 
 makeFreshCopy :: [AnnVar] -> AnnotConstr -> AnnVar -> SolverM (AnnotConstr, AnnVar)
@@ -340,7 +340,9 @@ makeFreshCopy frees inConstr inVar = do
           False -> return ()
 
   (newCopy, pairList) <- copyConHelper inConstr
-  (newVar, varPairs) <- copyHelper (VarAnnot inVar)
+  newVar <- liftIO $ mkVar
+  (newAnn, varPairs) <- copyHelper (VarAnnot inVar)
+  unifyAnnots (VarAnnot newVar) newAnn
   unifyPairs $ varPairs ++ pairList
   return (newCopy, newVar)
 
