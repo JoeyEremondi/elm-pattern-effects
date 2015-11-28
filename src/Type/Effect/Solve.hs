@@ -27,10 +27,10 @@ solve c = do
   let solverComp = applyUnifications c
       stateComp = runWriterT $ solveSubsetConstraints solverComp
       ioComp = State.runStateT stateComp $ SolverState Map.empty Map.empty
-  (((), warnings), finalState) <- ioComp
-  finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, A.A _ annVar) -> do
+  (((), warnings), finalState) <- ioComp --TODO instantiate scheme? Does Constr ever get applied?
+  finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme frees constr annVar) -> do
     ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
-    return (s, ourAnnot)
+    error "TODO run scheme constr" -- return (s, ourAnnot)
   return (warnings, Map.fromList finalEnv)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
@@ -62,10 +62,10 @@ toCanonicalHelper co contra a = case a of
   TopAnnot ->
     return CanonTop
 
-
+data StoredScheme = StoredScheme [AnnVar] AnnotConstr AnnVar
 
 --TODO shouldn't this hold schemes, not vars?
-type Env = Map.Map String (A.Located AnnVar)
+type Env = Map.Map String StoredScheme
 
 data SolverState =
   SolverState
@@ -135,12 +135,12 @@ applyUnifications con =
       freshCopy <-
         case Map.lookup var env of
           Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve\nenv:\n" ++ show (Map.keys env)
-          Just (A.A _ annVar) -> do
-            mrepr <- getRepr annVar
-            case mrepr of
-              Nothing -> return (VarAnnot annVar) --TODO is this right? error "Can't make fresh copy of blank var"
-              Just repr -> makeFreshCopy repr
-      unifyAnnots freshCopy annot
+          Just (StoredScheme frees constr annVar) -> do
+            (freshConstr, newVar) <- makeFreshCopy frees constr annVar
+            --Unify the type of the variable use with our newly instantiated type
+            unifyAnnots annot (VarAnnot newVar)
+            --Apply our instantiated constraints to that type
+            applyUnifications freshConstr
       return ()
     CSaveEnv -> trace "con Save" $ saveLocalEnv
     CTrue -> trace "con ConTrue" $return ()
@@ -291,14 +291,38 @@ solveScheme s = do
   applyUnifications $ _constraint s
   return $ Map.fromList newHeader
 
-makeFreshCopy :: TypeAnnot -> SolverM TypeAnnot
-makeFreshCopy ann = do
+makeFreshCopy :: [AnnVar] -> AnnotConstr -> AnnVar -> SolverM (AnnotConstr, AnnVar)
+makeFreshCopy frees inConstr inVar = do
   let --TODO check if free or not?
+    isFree v = isFreeHelper frees v
+    isFreeHelper [] _ = return False
+    isFreeHelper (vfree : rest) v = do
+      b <- areSame vfree v
+      case b of
+        True -> return True
+        False ->
+          isFreeHelper rest v
+    copyConHelper :: AnnotConstr -> SolverM (AnnotConstr, [(AnnVar, AnnVar)])
+    copyConHelper = error "copyCon"
+
     copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
     copyHelper a = case a of
       VarAnnot v -> do
-        vnew <- liftIO $ mkVar
-        return $ (VarAnnot vnew, [(v, vnew)])
+        vIsFree <- isFree v
+        case vIsFree of
+          True -> do
+            vnew <- liftIO $ mkVar
+            mOldRepr <- getRepr v
+            repPairs <- case mOldRepr of
+              Nothing ->
+                return []
+              Just rep -> do
+                (newRep, newPairs) <- copyHelper rep
+                setRepr vnew newRep
+                return newPairs
+            return $ (VarAnnot vnew, [(v, vnew)] ++ repPairs)
+          False ->
+            return (VarAnnot v, [])
       SinglePattern s subPats -> do
         (newSubPats, newVarLists) <- unzip <$> forM subPats copyHelper
         return (SinglePattern s newSubPats, concat newVarLists)
@@ -315,9 +339,10 @@ makeFreshCopy ann = do
           True -> union new1 new2
           False -> return ()
 
-  (newCopy, pairList) <- copyHelper ann
-  unifyPairs pairList
-  return newCopy
+  (newCopy, pairList) <- copyConHelper inConstr
+  (newVar, varPairs) <- copyHelper (VarAnnot inVar)
+  unifyPairs $ varPairs ++ pairList
+  return (newCopy, newVar)
 
 
 unifyAnnots :: TypeAnnot -> TypeAnnot -> SolverM TypeAnnot

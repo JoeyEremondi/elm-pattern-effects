@@ -60,7 +60,7 @@ data AnnotConstr =
   | CSaveEnv
   | CEqual R.Region TypeAnnot TypeAnnot
   | CAnd [AnnotConstr]
-  | CLet [AnnScheme] (AnnotConstr)
+  | CLet [AnnScheme] (AnnotConstr) --Solve AnnotConstr with the given schemes added to the env
   | CInstance R.Region String TypeAnnot
   | CSubEffect R.Region TypeAnnot TypeAnnot
   | CCanBeMatchedBy R.Region TypeAnnot RealAnnot
@@ -71,7 +71,7 @@ data AnnotConstr =
 data AnnScheme = Scheme
     { _quantifiers :: [AnnVar]
     , _constraint :: AnnotConstr
-    , _header :: Map.Map String (A.Located TypeAnnot)
+    , _header :: Map.Map String (A.Located TypeAnnot) --Maps the name for this scheme to their innerType reprs
     }
     deriving (Show)
 
