@@ -291,9 +291,11 @@ fromReal (RealAnnot l) = do
    ourResult <- State.liftIO $ VarAnnot <$> mkVar
    let containedPatterns = zipWith SinglePattern ctors newAnns
    let ourConstraints =
-          List.map (\p -> CSubEffect (error "fromReal region") p ourResult)
+          List.map (\p -> CSubEffect dummyRegion p ourResult)
             containedPatterns
    return (ourResult , CAnd $ ourConstraints ++ concat constrList)
+
+dummyRegion = R.Region (R.Position 0 0) (R.Position 0 0)
 
 fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO (TypeAnnot, AnnotConstr)
 fromCanonical canonAnnot = do
@@ -322,7 +324,7 @@ fromCanonical canonAnnot = do
         return (newArgs, constrList)
       let (newLists, constrs) = unzip newResult
       let patsWeContain = zipWith SinglePattern ctors newLists
-      let ourConstrs = List.map (\p -> CSubEffect (error "patDict region") p ourReturn) patsWeContain
+      let ourConstrs = List.map (\p -> CSubEffect dummyRegion p ourReturn) patsWeContain
       return (ourReturn, CAnd (ourConstrs ++ concat constrs))
 
     CanonTop -> return (TopAnnot, CTrue)
