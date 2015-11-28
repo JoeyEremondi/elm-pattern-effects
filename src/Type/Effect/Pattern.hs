@@ -106,11 +106,11 @@ patternToAnnot env (A.A reg pat) = case pat of
   P.Record fields -> error "TODO record patterns"
   P.Alias _ p1 -> patternToAnnot env p1
   P.Literal l -> (Literal.toCtorString l, [])
-  P.Data s args -> (V.toString s, map (\x -> annotsMatchedByPattern env [x]) args)
+  P.Data s args -> (V.toString s, map (\x -> patternsToAnnot env [x]) args)
 
 
-annotsMatchedByPattern :: Environment -> [P.CanonicalPattern] -> RealAnnot
-annotsMatchedByPattern env patList =
+patternsToAnnot :: Environment -> [P.CanonicalPattern] -> RealAnnot
+patternsToAnnot env patList =
   if (isTotal patList env)
   then RealTop
   else

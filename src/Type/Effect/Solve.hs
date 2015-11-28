@@ -77,7 +77,7 @@ saveLocalEnv =
 
 type SolverM' a =  WriterT [a] (State.StateT SolverState IO)
 
-type SolverM = SolverM' (R.Region, TypeAnnot, TypeAnnot)
+type SolverM = SolverM' AnnotConstr
 
 type WorklistM = SolverM' (R.Region, Warning.Warning)
 
@@ -133,17 +133,29 @@ applyUnifications con = trace ("Applying uni to constraint " ++ show con ++"\n\n
       return ()
     CSaveEnv -> trace "con Save" $ saveLocalEnv
     CTrue -> trace "con ConTrue" $return ()
-    CSubEffect r a1 a2 -> trace ("TELLING " ++ show [(r, a1, a2)]) $ tell [(r, a1, a2)]
+    c -> tell [c]
+
+makeWHelper (CSubEffect r left right ) =
+  makeSubEffectConstrs r left right
+makeWHelper (CCanBeMatchedBy r a exact) =
+  makeExactMatchConstrs r a exact
+
+
+makeExactMatchConstrs :: R.Region -> TypeAnnot -> RealAnnot -> SolverM' a [WConstr]
+makeExactMatchConstrs r a exact = do
+  vinter <- liftIO $ mkVar
+  varMatchesAnn <- makeSubEffectConstrs r a (VarAnnot vinter)
+  return $ (WSubEffectOfLit r vinter exact) : varMatchesAnn
 
 
     --For our other constraints, we defer solving until after unification is done
-makeWConstrs :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM' a [WConstr]
-makeWConstrs r aLeft aRight = case (aLeft, aRight) of
+makeSubEffectConstrs :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM' a [WConstr]
+makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
     (_, VarAnnot vRight) -> do
       mreprRight <- getRepr vRight
       case mreprRight of
         Just rep1 ->
-          makeWConstrs r aLeft rep1
+          makeSubEffectConstrs r aLeft rep1
 
         Nothing -> do
           case aLeft of
@@ -154,7 +166,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                   return [WSubEffect r vLeft vRight]
 
                 Just rep2 ->
-                  makeWConstrs  r rep2 (VarAnnot vRight)
+                  makeSubEffectConstrs  r rep2 (VarAnnot vRight)
 
             SinglePattern ctor subPats -> do
                 let numArgs = length subPats
@@ -164,7 +176,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                 --Constrain our new variables to the sub-annotations they're linked to
                 --as well as adding a constraint for our overall variable to that var as a sub-pattern
                 listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
-                  subConstrs <- makeWConstrs  r (VarAnnot subVar) subPat
+                  subConstrs <- makeSubEffectConstrs  r (VarAnnot subVar) subPat
                   return $ (WPatSubEffectOf r numArgs ctor i subVar vRight) : subConstrs
                 return $ concat listsPerTriple
 
@@ -176,7 +188,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
               vret <- liftIO mkVar
               let newRepr = (LambdaAnn (VarAnnot varg) (VarAnnot vret))
               setRepr vRight newRepr
-              makeWConstrs r newRepr aLeft
+              makeSubEffectConstrs r newRepr aLeft
 
             TopAnnot ->
               return [WLitSubEffectOf r RealTop vRight]
@@ -184,7 +196,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
     (VarAnnot vLeft, _) -> do
             mreprLeft <- getRepr vLeft
             case mreprLeft of
-              Just repr -> makeWConstrs r repr aRight
+              Just repr -> makeSubEffectConstrs r repr aRight
 
               Nothing -> case aRight of
 
@@ -196,7 +208,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                     --Constrain our new variables to the sub-annotations they're linked to
                     --as well as adding a constraint for our overall variable to that var as a sub-pattern
                     listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
-                      subConstrs <- makeWConstrs  r (VarAnnot subVar) subPat
+                      subConstrs <- makeSubEffectConstrs  r (VarAnnot subVar) subPat
                       return $ (WSubEffectOfPat r numArgs vLeft ctor i subVar) : subConstrs
                     return $ concat listsPerTriple
 
@@ -208,7 +220,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
                   vret <- liftIO mkVar
                   let newRepr = (LambdaAnn (VarAnnot varg) (VarAnnot vret))
                   setRepr vLeft newRepr
-                  makeWConstrs r newRepr aRight
+                  makeSubEffectConstrs r newRepr aRight
 
                 TopAnnot ->
                   return [WSubEffectOfLit r vLeft RealTop]
@@ -220,7 +232,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
           -> return [WWarning r (s1 ++ " " ++ s2)] --TODO better error
         True -> do
           subLists <- forM (zip subs1 subs2) $ \(s1, s2) ->
-            makeWConstrs r s1 s2
+            makeSubEffectConstrs r s1 s2
           return $ concat subLists
 
     {-
@@ -230,7 +242,7 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
           Nothing -> return [WWarning r ctor]
           Just leftSubPats -> do
             listPerArg <- forM (zip leftSubPats subPats) $ \(left, right) ->
-              makeWConstrs  r left right
+              makeSubEffectConstrs  r left right
             return $ concat listPerArg
       return $ concat listPerCtor
       -}
@@ -239,8 +251,8 @@ makeWConstrs r aLeft aRight = case (aLeft, aRight) of
       --Constrain that the argument variable matches at most our lambda
       --And the return matches at least our lambda
       --Basic covariance and contravariance stuff
-      argList <- makeWConstrs r b1 a1
-      retList <- makeWConstrs r a2 b2
+      argList <- makeSubEffectConstrs r b1 a1
+      retList <- makeSubEffectConstrs r a2 b2
       return $ argList ++ retList
 
     (TopAnnot, TopAnnot) -> return []
@@ -494,7 +506,7 @@ solveSubsetConstraints sm = do
       ((), clist) <- ios
       return (clist, [])
       ) sm
-  wConstraints <- trace ("\n\n\nEmitted:\n" ++ show emittedConstrs) $ concat <$> forM emittedConstrs  (\(a,b,c) -> makeWConstrs a b c)
+  wConstraints <- concat <$> forM emittedConstrs makeWHelper
   let constrPairs = zip [1..] wConstraints
   forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ addConstraintEdge i
   --TODO avoid list ops here?

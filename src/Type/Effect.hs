@@ -62,7 +62,7 @@ data AnnotConstr =
   | CLet [AnnScheme] (AnnotConstr)
   | CInstance R.Region String TypeAnnot
   | CSubEffect R.Region TypeAnnot TypeAnnot
-  | CCanBeMatchedBy TypeAnnot RealAnnot
+  | CCanBeMatchedBy R.Region TypeAnnot RealAnnot
 --  | COnlyMatches R.Region TypeAnnot TypeAnnot
   deriving (Show)
 
