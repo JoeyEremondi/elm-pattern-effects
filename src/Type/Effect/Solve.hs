@@ -28,10 +28,10 @@ solve c = do
       stateComp = runWriterT $ solveSubsetConstraints solverComp
       ioComp = State.runStateT stateComp $ SolverState Map.empty Map.empty
   (((), warnings), finalState) <- ioComp --TODO instantiate scheme? Does Constr ever get applied?
-  finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme frees constr annVar) -> do
-    ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
-    error "TODO run scheme constr" -- return (s, ourAnnot)
-  return (warnings, Map.fromList finalEnv)
+  --finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme frees constr annVar) -> do
+  --  ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
+  --  return  --error "TODO run scheme constr" -- return (s, ourAnnot)
+  return (warnings, Map.empty)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
 toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound
@@ -132,15 +132,15 @@ applyUnifications con =
       modifyEnv $ \_ -> oldEnv
     CInstance _ var annot -> trace "con Inst" $ do
       env <- getEnv
-      freshCopy <-
-        case Map.lookup var env of
+      case Map.lookup var env of
           Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve\nenv:\n" ++ show (Map.keys env)
-          Just (StoredScheme frees constr annVar) -> do
-            (freshConstr, newVar) <- makeFreshCopy frees constr annVar
+          Just (StoredScheme quants constr annVar) -> do
+            (freshConstr, newVar) <- makeFreshCopy quants constr annVar
             --Unify the type of the variable use with our newly instantiated type
             unifyAnnots annot (VarAnnot newVar)
             --Apply our instantiated constraints to that type
             applyUnifications freshConstr
+            liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshConstr
       return ()
     CSaveEnv -> trace "con Save" $ saveLocalEnv
     CTrue -> trace "con ConTrue" $return ()
@@ -327,13 +327,16 @@ notFreeInEnv env v = do
 
 
 solveScheme :: Env -> AnnScheme -> SolverM Env
-solveScheme oldEnv (Scheme quants constr hdr) = do
+solveScheme oldEnv scheme@(Scheme _quants constr hdr) = do
   let oldHeader = Map.toList hdr
+  --Solve the relationships between variables before we quantify
+  applyUnifications constr
   newHeader <- forM oldHeader $ \(nm, (A.A _ ann)) -> do
     newVar <- liftIO mkVar
     allVars <- freeVarsInAnnot ann
     goodQuants <- filterM (notFreeInEnv oldEnv) allVars
     unifyAnnots (VarAnnot newVar) ann
+    liftIO $ putStrLn $ "Quantified scheme " ++ (show scheme) ++ "\nnew constr " ++ show constr
     return (nm, StoredScheme goodQuants constr  newVar)
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
@@ -341,23 +344,52 @@ solveScheme oldEnv (Scheme quants constr hdr) = do
   return $ Map.fromList newHeader
 
 makeFreshCopy :: [AnnVar] -> AnnotConstr -> AnnVar -> SolverM (AnnotConstr, AnnVar)
-makeFreshCopy frees inConstr inVar = do
+makeFreshCopy quants inConstr inVar = do
   let --TODO check if free or not?
-    isFree v = isFreeHelper frees v
-    isFreeHelper [] _ = return False
-    isFreeHelper (vfree : rest) v = do
+    isQuant v = isQuantHelper quants v
+    isQuantHelper [] _ = return False
+    isQuantHelper (vfree : rest) v = do
       b <- areSame vfree v
       case b of
         True -> return True
         False ->
-          isFreeHelper rest v
+          isQuantHelper rest v
+    --We only need to copy our subtyping constraints
     copyConHelper :: AnnotConstr -> SolverM (AnnotConstr, [(AnnVar, AnnVar)])
-    copyConHelper = error "copyCon"
+    copyConHelper c = case c of
+       CAnd constrs -> do
+         (subAnns, subPairs) <- unzip <$> forM constrs copyConHelper
+         return (CAnd subAnns, concat subPairs)
+       CSaveEnv -> return (CSaveEnv, [])
+       CSubEffect r a1 a2 -> do
+         (b1, pairs1) <- copyHelper a1
+         (b2, pairs2) <- copyHelper a2
+         return (CSubEffect r b1 b2, pairs1 ++ pairs2)
+       CCanBeMatchedBy r a1 exact -> do
+         (subAnn, subPairs) <- copyHelper a1
+         return (CCanBeMatchedBy r subAnn exact, subPairs)
+       CLet schemes constr -> do
+         (newSchemes, newPairs) <- unzip <$> forM schemes copySchemeHelper
+         (newConstr, cPairs) <- copyConHelper constr
+         return (CLet newSchemes newConstr, (concat  newPairs) ++ cPairs)
+       --We don't need our unification constraints, we can solve those when we generalize
+       _ ->
+        return (CTrue, [])
+
+    copySchemeHelper (Scheme quants constr hdr) = do
+      --TODO need to do quantifiers?
+      (newConstr, conPairs) <- copyConHelper constr
+      let (hdrStrings, hdrAnns) = unzip $ Map.toList hdr
+      (newHeaderAnns, hdrPairs) <- unzip <$> forM hdrAnns (\(A.A r a) -> do
+         (newAnn, pairList) <- copyHelper a
+         return (A.A r newAnn, pairList))
+      return ( Scheme quants newConstr (Map.fromList $ zip hdrStrings newHeaderAnns)
+             , conPairs ++ concat hdrPairs)
 
     copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
     copyHelper a = case a of
       VarAnnot v -> do
-        vIsFree <- isFree v
+        vIsFree <- isQuant v
         case vIsFree of
           True -> do
             vnew <- liftIO $ mkVar
