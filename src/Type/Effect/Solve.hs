@@ -306,10 +306,16 @@ freeVarsInConstr c = case c of
   CInstance _ _ a1 -> freeVarsInAnnot a1
   CLet schemes constr -> do
     freeInCon <- freeVarsInConstr constr
-    freeInSchemes <- forM schemes $ \(Scheme quants scon hdr) -> do
-      let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
-      headerVars <- concat <$> forM headerAnnots freeVarsInAnnot
-      (headerVars ++) <$> freeVarsInConstr scon
+    freeInSchemes <- forM schemes $ \sch ->
+      case sch of
+        (Scheme quants scon hdr) -> do
+          let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
+          headerVars <- concat <$> forM headerAnnots freeVarsInAnnot
+          (headerVars ++) <$> freeVarsInConstr scon
+        (MonoScheme hdr) -> do
+          let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
+          concat <$> forM headerAnnots freeVarsInAnnot
+
     return $ freeInCon ++ (concat freeInSchemes)
 
 freeVarsInEnv :: Env -> SolverM [AnnVar]
