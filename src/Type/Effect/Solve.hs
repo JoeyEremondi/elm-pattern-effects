@@ -27,11 +27,11 @@ solve c = do
   let solverComp = applyUnifications c
       stateComp = runWriterT $ solveSubsetConstraints solverComp
       ioComp = State.runStateT stateComp $ SolverState Map.empty Map.empty
-  (((), warnings), finalState) <- ioComp --TODO instantiate scheme? Does Constr ever get applied?
-  --finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme frees constr annVar) -> do
-  --  ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
-  --  return  --error "TODO run scheme constr" -- return (s, ourAnnot)
-  return (warnings, Map.empty)
+  (((), warnings), finalState) <- ioComp
+  finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme frees constr annVar) -> do
+    ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
+    return (s, ourAnnot)
+  return (warnings, Map.fromList finalEnv)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
 toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound

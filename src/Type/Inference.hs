@@ -116,6 +116,9 @@ genPatternWarnings interfaces modul =
 
       forM warnings (\(r,w) -> putStrLn $ show (r, Effect.warningString w))
 
+      forM (Map.toList exportedAnnots) $ \(s, ann) ->
+        putStrLn $ s ++ " :: " ++ Effect.prettyAnn ann
+
       return (exportedAnnots, warnings)
 
 

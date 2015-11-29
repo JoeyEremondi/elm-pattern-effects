@@ -62,11 +62,14 @@ instance (Binary a) => Binary (TypeAnnot' a)
 instance Binary RealAnnot
 instance Binary CanonicalAnnot
 
-{-
+prettyReal (RealTop) = "T"
+prettyReal (RealAnnot subPatsSet) = show $ map (\(s,argList) -> (s, map prettyReal argList)) subPatsSet
+
+
 prettyAnn :: CanonicalAnnot -> String
 prettyAnn ann = case ann of
-  VarAnnot i -> "_" ++ show i
-  SinglePattern s subPats -> show $ (s, map prettyAnn subPats)
-  LambdaAnn from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
-  TopAnnot -> "T"
-  -}
+  CanonVar i -> "_" ++ show i
+  CanonLit subPatsSet -> "{" ++ prettyReal subPatsSet ++ "}"
+  CanonLambda from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
+  CanonTop -> "T"
+  CanonPatDict subPatsSet -> show $ map (\(s,argList) -> (s, map prettyAnn argList)) subPatsSet
