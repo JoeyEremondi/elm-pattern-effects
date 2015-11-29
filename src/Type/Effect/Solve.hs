@@ -410,6 +410,15 @@ makeFreshCopy quants inConstr inVar = do
       return ( Scheme quants newConstr (Map.fromList $ zip hdrStrings newHeaderAnns)
              , conPairs ++ concat hdrPairs)
 
+    copySchemeHelper (MonoScheme hdr) = do
+        --TODO need to do quantifiers?
+        let (hdrStrings, hdrAnns) = unzip $ Map.toList hdr
+        (newHeaderAnns, hdrPairs) <- unzip <$> forM hdrAnns (\(A.A r a) -> do
+           (newAnn, pairList) <- copyHelper a
+           return (A.A r newAnn, pairList))
+        return ( MonoScheme (Map.fromList $ zip hdrStrings newHeaderAnns)
+               , concat hdrPairs)
+
     copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
     copyHelper a = case a of
       VarAnnot v -> do
