@@ -69,10 +69,11 @@ data AnnotConstr =
 
 
 data AnnScheme = Scheme
-    { _quantifiers :: [AnnVar]
+    { _quantifiers :: [AnnVar] --Variables we instantiate
     , _constraint :: AnnotConstr
     , _header :: Map.Map String (A.Located TypeAnnot) --Maps the name for this scheme to their innerType reprs
     }
+    | MonoScheme (Map.Map String (A.Located TypeAnnot) )
     deriving (Show)
 
 instance Show Error.Hint where
@@ -140,7 +141,7 @@ exists f =
 
 monoscheme :: Map.Map String (A.Located TypeAnnot) -> AnnScheme
 monoscheme headers =
-  Scheme [] CTrue headers
+  MonoScheme headers
 
 
 toScheme :: AnnFragment -> AnnScheme

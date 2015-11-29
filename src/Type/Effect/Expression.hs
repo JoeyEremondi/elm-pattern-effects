@@ -197,7 +197,7 @@ argConstraints env region  overallVar args =
     expr@(A.A subregion _) : rest ->
       do  argVar <- mkVar
           argCon <- constrain env expr (VarAnnot argVar)
-          argIndexVar <- mkVar
+          --argIndexVar <- mkVar
           localReturnVar <- mkVar
 
           (vars, argConRest, decomposeLambdaRest, subsetOfMatchedRest, returnVar) <-
@@ -207,23 +207,24 @@ argConstraints env region  overallVar args =
           let decomposeLambdaCon =
                 CEqual
                   region
-                  (VarAnnot argIndexVar ==> VarAnnot localReturnVar)
+                  (VarAnnot argVar ==> VarAnnot localReturnVar)
                   (VarAnnot overallVar)
 
           --The argument must represent fewer patterns than the function can match
+          {-
           let subsetOfMatchedCon =
-                CSubEffect
+                CEqual --CSubEffect
                   region
                   (VarAnnot argVar)
-                  (VarAnnot argIndexVar)
+                  (VarAnnot argIndexVar) -}
 
 
 
           return
-            ( argVar : argIndexVar : localReturnVar : vars
+            ( argVar : localReturnVar : vars
             , argCon : argConRest
             , decomposeLambdaCon : decomposeLambdaRest
-            , subsetOfMatchedCon : subsetOfMatchedRest
+            ,  subsetOfMatchedRest
             , returnVar
             )
 

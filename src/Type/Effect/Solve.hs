@@ -34,12 +34,12 @@ solve c = do
   return (warnings, Map.fromList finalEnv)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
-toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound
+toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound _ub
 
 canonLowerBound :: TypeAnnot -> IO CanonicalAnnot
-canonLowerBound = toCanonicalHelper canonLowerBound toCanonicalAnnot
+canonLowerBound = toCanonicalHelper canonLowerBound toCanonicalAnnot _lb
 
-toCanonicalHelper co contra a = case a of
+toCanonicalHelper co contra getCo a = case a of
   VarAnnot (AnnVar (pt, _)) -> do
     ourData <- UF.descriptor pt
     case (_annRepr ourData) of
@@ -51,7 +51,7 @@ toCanonicalHelper co contra a = case a of
             return $ CanonVar $ _uniqueId ourData
           _ ->
             --TODO UB or LB? Based on position?
-            return $ CanonLit  $ _ub ourData
+            return $ CanonLit  $ getCo ourData
       Just repr ->
         co repr
   SinglePattern s subs -> do
@@ -62,7 +62,7 @@ toCanonicalHelper co contra a = case a of
   TopAnnot ->
     return CanonTop
 
-data StoredScheme = StoredScheme [AnnVar] AnnotConstr AnnVar
+data StoredScheme = StoredScheme [AnnVar] AnnotConstr AnnVar | StoredMono AnnVar
 
 --TODO shouldn't this hold schemes, not vars?
 type Env = Map.Map String StoredScheme
@@ -130,17 +130,20 @@ applyUnifications con =
       applyUnifications letConstr
       --TODO occurs check?
       modifyEnv $ \_ -> oldEnv
-    CInstance _ var annot -> trace "con Inst" $ do
+    CInstance r var annot -> trace "con Inst" $ do
       env <- getEnv
       case Map.lookup var env of
           Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve\nenv:\n" ++ show (Map.keys env)
+          Just (StoredMono storedVar) ->
+            applyUnifications $ CEqual r (VarAnnot storedVar) annot
           Just (StoredScheme quants constr annVar) -> do
             (freshConstr, newVar) <- makeFreshCopy quants constr annVar
             --Unify the type of the variable use with our newly instantiated type
             unifyAnnots annot (VarAnnot newVar)
             --Apply our instantiated constraints to that type
             applyUnifications freshConstr
-            liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshConstr
+            liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshConstr ++ " and var " ++ show newVar
+            liftIO $ putStrLn $ "Unified with " ++ show annot
       return ()
     CSaveEnv -> trace "con Save" $ saveLocalEnv
     CTrue -> trace "con ConTrue" $return ()
@@ -311,10 +314,16 @@ freeVarsInConstr c = case c of
 
 freeVarsInEnv :: Env -> SolverM [AnnVar]
 freeVarsInEnv env =
-  (fmap concat) $ forM (Map.elems env) $ \(StoredScheme quants constr var) -> do
-    freeInTy <- freeVarsInAnnot (VarAnnot var)
-    freeInConstr <- freeVarsInConstr constr
-    filterM (varNotInList quants) (freeInTy ++ freeInConstr)
+  (fmap concat) $ forM (Map.elems env) $ \sch ->
+    case sch of
+      (StoredScheme quants constr var) -> do
+        freeInTy <- freeVarsInAnnot (VarAnnot var)
+        freeInConstr <- freeVarsInConstr constr
+        filterM (varNotInList quants) (freeInTy ++ freeInConstr)
+      StoredMono var -> do
+        freeInTy <- freeVarsInAnnot (VarAnnot var)
+        filterM (varNotInList []) (freeInTy)
+
 
 varNotInList :: [AnnVar] -> AnnVar -> SolverM' a Bool
 varNotInList vl v = do
@@ -327,7 +336,7 @@ notFreeInEnv env v = do
 
 
 solveScheme :: Env -> AnnScheme -> SolverM Env
-solveScheme oldEnv scheme@(Scheme _quants constr hdr) = do
+solveScheme oldEnv scheme@(Scheme quants constr hdr) = do
   let oldHeader = Map.toList hdr
   --Solve the relationships between variables before we quantify
   applyUnifications constr
@@ -336,11 +345,20 @@ solveScheme oldEnv scheme@(Scheme _quants constr hdr) = do
     allVars <- freeVarsInAnnot ann
     goodQuants <- filterM (notFreeInEnv oldEnv) allVars
     unifyAnnots (VarAnnot newVar) ann
+    liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
     liftIO $ putStrLn $ "Quantified scheme " ++ (show scheme) ++ "\nnew constr " ++ show constr
     return (nm, StoredScheme goodQuants constr  newVar)
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
-
+  return $ Map.fromList newHeader
+solveScheme oldEnv scheme@(MonoScheme hdr) = do
+  let oldHeader = Map.toList hdr
+  newHeader <- forM oldHeader $ \(nm, A.A _ ann) -> do
+    newVar <- liftIO mkVar
+    unifyAnnots (VarAnnot newVar) ann
+    return (nm, StoredMono newVar)
+  --Now that we have a new header with variables, actually solve the constraint
+  --On our scheme
   return $ Map.fromList newHeader
 
 makeFreshCopy :: [AnnVar] -> AnnotConstr -> AnnVar -> SolverM (AnnotConstr, AnnVar)
@@ -395,7 +413,8 @@ makeFreshCopy quants inConstr inVar = do
             vnew <- liftIO $ mkVar
             mOldRepr <- getRepr v
             repPairs <- case mOldRepr of
-              Nothing ->
+              Nothing -> do
+                liftIO $ putStrLn "Input var had no repr"
                 return []
               Just rep -> do
                 (newRep, newPairs) <- copyHelper rep
@@ -423,6 +442,8 @@ makeFreshCopy quants inConstr inVar = do
   (newCopy, pairList) <- copyConHelper inConstr
   newVar <- liftIO $ mkVar
   (newAnn, varPairs) <- copyHelper (VarAnnot inVar)
+  liftIO $ putStrLn $ "Final copied ann " ++ show newAnn
+  --Unify the var for our new annotation with the annotation itself
   unifyAnnots (VarAnnot newVar) newAnn
   unifyPairs $ varPairs ++ pairList
   return (newCopy, newVar)
