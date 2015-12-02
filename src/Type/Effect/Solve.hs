@@ -24,8 +24,8 @@ solve
   -> IO ( [(R.Region, Warning.Warning)]
      , Map.Map String CanonicalAnnot)
 solve c = do
-  let solverComp = applyUnifications c
-      stateComp = runWriterT $ solveSubsetConstraints solverComp
+  let emittedComp = applyUnifications c
+      stateComp = runWriterT $ solveSubsetConstraints emittedComp
       ioComp = State.runStateT stateComp $ SolverState Map.empty Map.empty
   (((), warnings), finalState) <- ioComp
   finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme frees constr annVar) -> do
@@ -88,9 +88,9 @@ saveLocalEnv =
 
 type SolverM' a =  WriterT [a] (State.StateT SolverState IO)
 
-type SolverM = SolverM' AnnotConstr
-
 type WorklistM = SolverM' (R.Region, Warning.Warning)
+
+type SolverM = WorklistM
 
 type Point = UF.Point AnnotData
 
@@ -114,22 +114,23 @@ union (AnnVar (pt1, _)) (AnnVar (pt2, _)) =
 areSame :: AnnVar -> AnnVar -> SolverM' a Bool
 areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 
-applyUnifications :: AnnotConstr -> SolverM ()
+applyUnifications :: AnnotConstr -> SolverM [AnnotConstr]
 applyUnifications con =
   case con of
     CEqual _ r1 r2 -> trace "con Equal" $ do
       _ <- unifyAnnots r1 r2
-      return ()
+      return []
     CAnd constrs -> trace "con AND" $
-      forM_ constrs applyUnifications
+      concat <$> forM constrs applyUnifications
     CLet schemes letConstr -> trace "con Let" $ do
       oldEnv <- getEnv
       --TODO do something with vars in the scheme?
       headers <- Map.unions <$> forM schemes (solveScheme oldEnv)
       modifyEnv $ \env -> Map.union headers env
-      applyUnifications letConstr
+      letEmitted <- applyUnifications letConstr
       --TODO occurs check?
       modifyEnv $ \_ -> oldEnv
+      return letEmitted
     CInstance r var annot -> trace "con Inst" $ do
       env <- getEnv
       case Map.lookup var env of
@@ -141,13 +142,15 @@ applyUnifications con =
             --Unify the type of the variable use with our newly instantiated type
             unifyAnnots annot (VarAnnot newVar)
             --Apply our instantiated constraints to that type
-            applyUnifications freshConstr
+            instEmitted <- applyUnifications freshConstr
             liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshConstr ++ " and var " ++ show newVar
             liftIO $ putStrLn $ "Unified with " ++ show annot
-      return ()
-    CSaveEnv -> trace "con Save" $ saveLocalEnv
-    CTrue -> trace "con ConTrue" $return ()
-    c -> tell [c]
+            return instEmitted
+    CSaveEnv -> do
+      saveLocalEnv
+      return []
+    CTrue -> return []
+    c -> return [c]
 
 makeWHelper (CSubEffect r left right ) =
   makeSubEffectConstrs r left right
@@ -673,12 +676,9 @@ addConstraintEdge i (AnnVar (pt, _), Super) = liftIO $ do
   desc <- UF.descriptor pt
   UF.setDescriptor pt $ desc {_subOf = i : (_subOf desc)}
 
-solveSubsetConstraints :: SolverM () -> WorklistM ()
-solveSubsetConstraints sm = do
-  emittedConstrs <- mapWriterT (\ios -> do
-      ((), clist) <- ios
-      return (clist, [])
-      ) sm
+solveSubsetConstraints :: SolverM [AnnotConstr] -> WorklistM ()
+solveSubsetConstraints emittedComp = do
+  emittedConstrs <- emittedComp
   wConstraints <- trace ("Emitted " ++ show emittedConstrs) $ concat <$> forM emittedConstrs makeWHelper
   let constrPairs = zip [1..] wConstraints
   trace ("Constraint pairs " ++ show constrPairs) $ forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ \v -> trace ("Adding cedges " ++ show (i,c,v)) addConstraintEdge i v
