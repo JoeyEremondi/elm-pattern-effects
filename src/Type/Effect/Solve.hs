@@ -308,7 +308,7 @@ freeVarsInConstr c = case c of
     freeInCon <- freeVarsInConstr constr
     freeInSchemes <- forM schemes $ \sch ->
       case sch of
-        (Scheme quants scon hdr) -> do
+        (Scheme scon hdr) -> do
           let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
           headerVars <- concat <$> forM headerAnnots freeVarsInAnnot
           (headerVars ++) <$> freeVarsInConstr scon
@@ -342,7 +342,7 @@ notFreeInEnv env v = do
 
 
 solveScheme :: Env -> AnnScheme -> SolverM Env
-solveScheme oldEnv scheme@(Scheme quants constr hdr) = do
+solveScheme oldEnv scheme@(Scheme constr hdr) = do
   let oldHeader = Map.toList hdr
   --Solve the relationships between variables before we quantify
   applyUnifications constr
@@ -404,14 +404,14 @@ makeFreshCopy quants inConstr inVar = do
        _ ->
         return (CTrue, [])
 
-    copySchemeHelper (Scheme quants constr hdr) = do
+    copySchemeHelper (Scheme constr hdr) = do
       --TODO need to do quantifiers?
       (newConstr, conPairs) <- copyConHelper constr
       let (hdrStrings, hdrAnns) = unzip $ Map.toList hdr
       (newHeaderAnns, hdrPairs) <- unzip <$> forM hdrAnns (\(A.A r a) -> do
          (newAnn, pairList) <- copyHelper a
          return (A.A r newAnn, pairList))
-      return ( Scheme quants newConstr (Map.fromList $ zip hdrStrings newHeaderAnns)
+      return ( Scheme  newConstr (Map.fromList $ zip hdrStrings newHeaderAnns)
              , conPairs ++ concat hdrPairs)
 
     copySchemeHelper (MonoScheme hdr) = do

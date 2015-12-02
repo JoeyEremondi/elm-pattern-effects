@@ -69,8 +69,8 @@ data AnnotConstr =
 
 
 data AnnScheme = Scheme
-    { _quantifiers :: [AnnVar] --Variables we instantiate
-    , _constraint :: AnnotConstr
+    { -- _quantifiers :: [AnnVar] --Variables we instantiate
+    _constraint :: AnnotConstr
     , _header :: Map.Map String (A.Located TypeAnnot) --Maps the name for this scheme to their innerType reprs
     }
     | MonoScheme (Map.Map String (A.Located TypeAnnot) )

@@ -100,11 +100,11 @@ genPatternWarnings interfaces modul =
       let (importedVars, importConstrs) = unzip $ map (\l -> unzip $ map (\(a,b,c) -> ((a,b),c)) l) importStuff
 
       let allTypes = concat (ctors : importedVars)
-      let vars = concatMap (fst . snd) allTypes
+      --let vars = concatMap (fst . snd) allTypes
       let header = Map.map snd (Map.fromList allTypes)
       --Adds our initial values to our env, basically
-      let innerEnv c = Effect.CLet [ Effect.Scheme vars Effect.CTrue (Map.map (A.A (error "OtherModule region")) header) ] c
-      let environ c = Effect.CLet [Effect.Scheme [] (Effect.CAnd $ concat importConstrs) Map.empty] (innerEnv c)
+      let envHeader = Map.map (A.A (error "OtherModule region")) header
+      let environ c = Effect.CLet [Effect.Scheme (Effect.CAnd $ concat importConstrs) envHeader] c
 
       putStrLn $ "Header from CTORS: " ++ show header
 

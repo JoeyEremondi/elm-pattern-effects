@@ -133,9 +133,10 @@ constrain env annotatedExpr@(A.A region expression) tipe =
               -}
 
       E.Let defs body ->
-          do  bodyCon <- constrain env body tipe
-
-              (Info vars headers constr) <-
+          do  --putStrLn "Constraining let body"
+              bodyCon <- constrain env body tipe
+              --putStrLn "Constraining let defs"
+              (Info _vars headers constr) <-
                   Monad.foldM
                       (constrainDef env)
                       (Info [] Map.empty CTrue)
@@ -143,7 +144,9 @@ constrain env annotatedExpr@(A.A region expression) tipe =
               --We solve our def constraints with our defs in a monoscheme
               --But we generalize them in the body
               let letScheme =
-                    [ Scheme vars (CLet [monoscheme headers] constr) headers ]
+                    [ Scheme (CLet [monoscheme headers] constr) headers ]
+
+              --putStrLn $ "Let scheme " ++ show (CLet letScheme bodyCon) ++ "for headers " ++ show headers ++ "\n"
 
               return $ CLet letScheme bodyCon
 
@@ -403,6 +406,7 @@ constrainCase env region expr branches tipe =
             patternVar <- mkVar
             fragment <- Pattern.constrain env pattern (VarAnnot patternVar)
             branchCon <- constrain env branchExpr (VarAnnot branchVar)
+            putStrLn $ "\nConstrained branch with cond " ++ (show branchCon) ++ "\n"
             return
                 ( (branchVar, branchRegion)
                 , CLet [monoscheme $ typeEnv fragment] branchCon /\ typeConstraint fragment
@@ -454,7 +458,7 @@ data Info = Info
 
 
 constrainDef :: Effect.Environment -> Info -> Canonical.Def -> IO Info
-constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr maybeTipe) =
+constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr _) =
   case pattern of
     P.Var name ->
         do  -- Some mistake may be happening here. Currently, qs is always [].
