@@ -121,9 +121,9 @@ infixl 8 /\
 
 
 -- ex qs constraint == exists qs. constraint
-ex :: [AnnVar] -> AnnotConstr -> AnnotConstr
-ex fqs constraint =
-    CLet [Scheme fqs constraint Map.empty] CTrue
+--ex :: [AnnVar] -> AnnotConstr -> AnnotConstr
+--ex fqs constraint =
+--    CLet [Scheme fqs constraint Map.empty] CTrue
 
 
 {-
@@ -134,19 +134,23 @@ fl rqs constraint =
 -}
 
 
-exists :: (TypeAnnot -> IO AnnotConstr) -> IO AnnotConstr
-exists f =
-  do  v <- mkVar
-      ex [v] <$> f (VarAnnot v)
+--exists :: (TypeAnnot -> IO AnnotConstr) -> IO AnnotConstr
+--exists f =
+--  do  v <- mkVar
+--      ex [v] <$> f (VarAnnot v)
 
 monoscheme :: Map.Map String (A.Located TypeAnnot) -> AnnScheme
 monoscheme headers =
   MonoScheme headers
 
 
-toScheme :: AnnFragment -> AnnScheme
-toScheme fragment =
-    Scheme (vars fragment) (typeConstraint fragment) (typeEnv fragment)
+--toScheme :: AnnFragment -> AnnScheme
+--toScheme fragment =
+--    Scheme (vars fragment) (typeConstraint fragment) (typeEnv fragment)
+
+--toMono :: AnnFragment -> AnnScheme
+--toMono fragment =
+--    MonoScheme (typeEnv fragment)
 
 
 data Environment = Environment
@@ -221,6 +225,7 @@ makeConstructors
     :: Environment
     -> [Module.CanonicalAdt]
     -> Map.Map String (IO (Int, [AnnVar], [TypeAnnot], TypeAnnot))
+
 makeConstructors env datatypes =
     Map.fromList builtins
   where
@@ -239,10 +244,10 @@ makeConstructors env datatypes =
 
     builtins :: [ (String, IO (Int, [AnnVar], [TypeAnnot], TypeAnnot)) ]
     builtins =
-        [ ("[]", inst 1 $ \ [t] -> ([], list t))
-        , ("::", inst 1 $ \ [t] -> ([t, list t], list t))
-        ] ++ List.map tupleCtor [0..9]
-          ++ concatMap annotationForCtor datatypes
+        --[ ("[]", inst 1 $ \ [t] -> ([], list t))
+        --, ("::", inst 1 $ \ [t] -> ([t, list t], list t))
+        --] ++ List.map tupleCtor [0..9] ++
+           concatMap annotationForCtor datatypes
 
 
 annotationForCtor

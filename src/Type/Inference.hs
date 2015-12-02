@@ -22,6 +22,8 @@ import qualified Type.Effect as Effect
 import qualified Type.Effect.Expression
 import qualified Type.Effect.Solve
 
+import Text.PrettyPrint as P
+
 import System.IO.Unsafe
     -- Maybe possible to switch over to ST instead of IO.
     -- I don't think that'd be worthwhile though.
@@ -104,6 +106,7 @@ genPatternWarnings interfaces modul =
       let innerEnv c = Effect.CLet [ Effect.Scheme vars Effect.CTrue (Map.map (A.A (error "OtherModule region")) header) ] c
       let environ c = Effect.CLet [Effect.Scheme [] (Effect.CAnd $ concat importConstrs) Map.empty] (innerEnv c)
 
+      putStrLn $ "Header from CTORS: " ++ show header
 
       fvar <- Effect.mkVar
 

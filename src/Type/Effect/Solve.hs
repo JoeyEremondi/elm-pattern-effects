@@ -351,8 +351,8 @@ solveScheme oldEnv scheme@(Scheme quants constr hdr) = do
     allVars <- freeVarsInAnnot ann
     goodQuants <- filterM (notFreeInEnv oldEnv) allVars
     unifyAnnots (VarAnnot newVar) ann
-    liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
-    liftIO $ putStrLn $ "Quantified scheme " ++ (show scheme) ++ "\nnew constr " ++ show constr
+    --liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
+    --liftIO $ putStrLn $ "Quantified scheme " ++ (show scheme) ++ "\nnew constr " ++ show constr
     return (nm, StoredScheme goodQuants constr  newVar)
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
@@ -385,6 +385,10 @@ makeFreshCopy quants inConstr inVar = do
          (subAnns, subPairs) <- unzip <$> forM constrs copyConHelper
          return (CAnd subAnns, concat subPairs)
        CSaveEnv -> return (CSaveEnv, [])
+       CInstance r nm ann -> do
+         (newVarInst, newVarPairs) <- copyHelper ann
+         return (CInstance r nm newVarInst, newVarPairs)
+
        CSubEffect r a1 a2 -> do
          (b1, pairs1) <- copyHelper a1
          (b2, pairs2) <- copyHelper a2

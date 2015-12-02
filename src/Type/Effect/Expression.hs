@@ -99,7 +99,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                     CEqual region tipe $
                       SinglePattern fullName $ map snd pairs
               --TODO why need ex here?
-              return $ ex vars (CAnd $ dataTypeConstr : argConstrs)
+              return (CAnd $ dataTypeConstr : argConstrs)
 
       {-
       E.Access expr label ->
@@ -179,7 +179,7 @@ constrainApp env region f args tipe =
       let returnCon =
             CEqual region (VarAnnot returnVar) tipe
 
-      return $ ex (funcVar : vars) $
+      return $ --ex (funcVar : vars) $
         CAnd (funcCon : argCons  ++ argMatchCons ++ decomposeLambdaCons ++ [returnCon])
 
 
@@ -258,7 +258,8 @@ constrainBinop env region op leftExpr@(A.A leftRegion _) rightExpr@(A.A rightReg
       --TODO enforce subset constraints here?
 
       return $
-        ex [leftVar,rightVar,leftVar',rightVar',answerVar] $ CAnd $
+        --ex [leftVar,rightVar,leftVar',rightVar',answerVar] $
+        CAnd $
           [ leftCon
           , rightCon
           , CInstance region (V.toString op) opType
@@ -325,7 +326,8 @@ constrainIf env region branches finally tipe =
       (vars,cons) <- branchCons tipe branchInfo
 
       --TODO what is ex doing here?
-      return $ ex (condVars ++ vars) (CAnd (condCons ++ branchExprCons ++ cons))
+      return $ --ex (condVars ++ vars)
+        (CAnd (condCons ++ branchExprCons ++ cons))
   where
     bool =
       Effect.getType env "Bool"
@@ -393,7 +395,7 @@ constrainCase env region expr branches tipe =
             CAnd $ map (\branchVar -> CSubEffect region (VarAnnot branchVar) tipe) $ vars
 
       --TODO what is ex doing?
-      return $ ex (exprVar : vars) $
+      return $ --ex (exprVar : vars) $
         CAnd (exprCon : joinBranchesConstr  : inPatternsConstr : branchResultConstraints )
   where
     branch (pattern, branchExpr@(A.A branchRegion _)) =
@@ -403,7 +405,7 @@ constrainCase env region expr branches tipe =
             branchCon <- constrain env branchExpr (VarAnnot branchVar)
             return
                 ( (branchVar, branchRegion)
-                , CLet [Effect.toScheme fragment] branchCon
+                , CLet [monoscheme $ typeEnv fragment] branchCon /\ typeConstraint fragment
                 , VarAnnot patternVar
                 )
 
@@ -456,6 +458,7 @@ constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr m
   case pattern of
     P.Var name ->
         do  -- Some mistake may be happening here. Currently, qs is always [].
+            putStrLn $ "Constraining def of " ++ show name
             rhsVar <- mkVar
 
             let tipe = VarAnnot rhsVar

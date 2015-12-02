@@ -1,0 +1,21 @@
+CLet
+  [Scheme {_quantifiers = [102], _constraint =
+    CLet [MonoScheme (fromList [("S",VarAnnot 102)])]
+    (CAnd [
+      CAnd [
+        CLet [MonoScheme (fromList [("a",VarAnnot 105)])]
+          (CAnd [
+            CEqual (Region {start = Position {line = 5, column = 1}, end = Position {line = 5, column = 21}}) (VarAnnot 105) (VarAnnot 103)
+            ,CAnd [
+              CEqual (Region {start = Position {line = 5, column = 1}, end = Position {line = 5, column = 21}}) (VarAnnot 104) (SinglePattern "Test.S" [VarAnnot 106])
+              ,CInstance (Region {start = Position {line = 5, column = 1}, end = Position {line = 5, column = 21}}) "a" (VarAnnot 106)]])
+        ,CEqual (Region {start = Position {line = 5, column = 1}, end = Position {line = 5, column = 21}}) (LambdaAnn (VarAnnot 103) (VarAnnot 104)) (VarAnnot 102)]
+      ,CTrue]),
+      _header = fromList [("S",VarAnnot 102)]}]
+  (CLet [Scheme {_quantifiers = [101], _constraint =
+    CLet [MonoScheme (fromList [("Z",VarAnnot 101)])] (
+      CAnd [
+        CAnd [
+          CEqual (Region {start = Position {line = 5, column = 1}, end = Position {line = 5, column = 21}}) (VarAnnot 101) (SinglePattern "Test.Z" [])],CTrue]
+      ), _header = fromList [("Z",VarAnnot 101)]}]
+  CSaveEnv)
