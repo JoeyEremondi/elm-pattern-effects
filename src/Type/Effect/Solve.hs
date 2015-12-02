@@ -3,8 +3,8 @@ module Type.Effect.Solve where
 import Type.Effect
 import Control.Monad.Writer
 import qualified  Control.Monad.State as State
-import Control.Monad.Trans
-import Control.Monad (forM, forM_, filterM)
+--import Control.Monad.Trans
+--import Control.Monad (forM, forM_, filterM)
 
 import qualified Data.List as List
 
@@ -24,11 +24,11 @@ solve
   -> IO ( [(R.Region, Warning.Warning)]
      , Map.Map String CanonicalAnnot)
 solve c = do
-  let emittedComp = applyUnifications c
-      stateComp = runWriterT $ solveSubsetConstraints emittedComp
+  let
+      stateComp = runWriterT $ solveSubsetConstraints c
       ioComp = State.runStateT stateComp $ SolverState Map.empty Map.empty
   (((), warnings), finalState) <- ioComp
-  finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme frees constr annVar) -> do
+  finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme quants constrList annVar) -> do
     ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
     return (s, ourAnnot)
   return (warnings, Map.fromList finalEnv)
@@ -125,20 +125,26 @@ applyUnifications con =
     CEqual _ r1 r2 -> trace "con Equal" $ do
       _ <- unifyAnnots r1 r2
       return []
-    CAnd constrs -> trace "con AND" $
-      concat <$> forM constrs applyUnifications
+    CAnd constrs -> trace "con AND" $ do
+      andConstraints <- forM constrs applyUnifications
+      liftIO $ putStrLn $ "AND emitting " ++ show andConstraints
+      return $ concat andConstraints
     CLet schemes letConstr -> trace "con Let" $ do
       oldEnv <- getEnv
       --TODO do something with vars in the scheme?
-      headers <- Map.unions <$> forM schemes (solveScheme oldEnv)
+      schemeSolutions <- forM schemes (solveScheme oldEnv)
+      let (schemeEmitted, headerList) = unzip schemeSolutions
+      let headers =  Map.unions headerList
       modifyEnv $ \env -> Map.union headers env
       letEmitted <- applyUnifications letConstr
       --TODO occurs check?
       modifyEnv $ \_ -> oldEnv
-      return letEmitted
+      liftIO $ putStrLn $ "Let emitting " ++ show letEmitted ++ " with headers " ++ (show $ Map.keys headers)
+      return $ letEmitted ++ (concat schemeEmitted)
     CInstance r var annot -> trace "con Inst" $ do
       env <- getEnv
-      case Map.lookup var env of
+      emittedFromFresh <-
+        case Map.lookup var env of
           Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve\nenv:\n" ++ show (Map.keys env)
           Just (StoredMono storedVar) ->
             applyUnifications $ CEqual r (VarAnnot storedVar) annot
@@ -150,14 +156,16 @@ applyUnifications con =
             liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshEmitted ++ " and var " ++ show newVar
             liftIO $ putStrLn $ "Unified with " ++ show annot
             return freshEmitted
+      liftIO $ putStrLn $ "Instance emitting " ++ show emittedFromFresh
+      return emittedFromFresh
     CSaveEnv -> do
       saveLocalEnv
       return []
     CTrue -> return []
     CSubEffect r a b ->
-      return [ESubEffect r a b]
+      trace ("Emitting " ++ show (ESubEffect r a b)) $ return [ESubEffect r a b]
     CCanBeMatchedBy r a b ->
-      return [ECanBeMatchedBy r a b]
+      trace ("Emitting " ++ show (ECanBeMatchedBy r a b)) $ return [ECanBeMatchedBy r a b]
 
 makeWHelper (ESubEffect r left right ) =
   makeSubEffectConstrs r left right
@@ -207,7 +215,7 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                 return $ ctorConstr : (concat listsPerTriple)
 
 
-            LambdaAnn arg ret -> do
+            LambdaAnn _ _ -> do
               --If there are only subset constraints stating that this variable is a lambda
               --We unify it now to be a lambda
               varg <- liftIO mkVar
@@ -298,35 +306,18 @@ freeVarsInAnnot a =
       case mrepr of
         Nothing -> return [v]
         Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
-    SinglePattern s subs ->
+    SinglePattern _s subs ->
      concat <$> forM subs freeVarsInAnnot
     LambdaAnn a1 a2 ->
       (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
     TopAnnot ->
       return []
 
---freeVarsInConstr :: AnnotConstr -> SolverM [AnnVar]
+freeVarsInConstr :: EmittedConstr -> SolverM [AnnVar]
 freeVarsInConstr c = case c of
-  --CAnd constrs -> concat <$> forM constrs freeVarsInConstr
-  --CTrue -> return []
-  --CEqual _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
-  --CSaveEnv -> return []
   ESubEffect _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
   ECanBeMatchedBy _ a1 _ -> freeVarsInAnnot a1
-  --CInstance _ _ a1 -> freeVarsInAnnot a1
-  {-CLet schemes constr -> do
-    freeInCon <- freeVarsInConstr constr
-    freeInSchemes <- forM schemes $ \sch ->
-      case sch of
-        (Scheme scon hdr) -> do
-          let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
-          headerVars <- concat <$> forM headerAnnots freeVarsInAnnot
-          (headerVars ++) <$> freeVarsInConstr scon
-        (MonoScheme hdr) -> do
-          let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
-          concat <$> forM headerAnnots freeVarsInAnnot
 
-    return $ freeInCon ++ (concat freeInSchemes) -}
 
 freeVarsInEnv :: Env -> SolverM [AnnVar]
 freeVarsInEnv env =
@@ -351,22 +342,23 @@ notFreeInEnv env v = do
   varNotInList freeInEnv v
 
 
-solveScheme :: Env -> AnnScheme -> SolverM Env
+solveScheme :: Env -> AnnScheme -> SolverM ([EmittedConstr], Env)
 solveScheme oldEnv (Scheme constr hdr) = do
   let oldHeader = Map.toList hdr
   --Solve the relationships between variables before we quantify
   schemeEmitted <- applyUnifications constr
-  newHeader <- forM oldHeader $ \(nm, (A.A _ ann)) -> do
+  newSchemeHeaders <- forM oldHeader $ \(nm, (A.A _ ann)) -> do
     newVar <- liftIO mkVar
     allVars <- freeVarsInAnnot ann
     goodQuants <- filterM (notFreeInEnv oldEnv) allVars
     unifyAnnots (VarAnnot newVar) ann
     --liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
     --liftIO $ putStrLn $ "Quantified scheme " ++ (show scheme) ++ "\nnew constr " ++ show constr
-    return (nm, StoredScheme goodQuants schemeEmitted  newVar)
+    return (schemeEmitted, (nm, StoredScheme goodQuants schemeEmitted  newVar))
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
-  return $ Map.fromList newHeader
+  let (allSchemesEmitted, newHeader) = unzip newSchemeHeaders
+  return (concat allSchemesEmitted, Map.fromList newHeader)
 solveScheme _ (MonoScheme hdr) = do
   let oldHeader = Map.toList hdr
   newHeader <- forM oldHeader $ \(nm, A.A _ ann) -> do
@@ -375,7 +367,7 @@ solveScheme _ (MonoScheme hdr) = do
     return (nm, StoredMono newVar)
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
-  return $ Map.fromList newHeader
+  return $ ([], Map.fromList newHeader)
 
 makeFreshCopy :: [AnnVar] -> [EmittedConstr] -> AnnVar -> SolverM ([EmittedConstr], AnnVar)
 makeFreshCopy quants inConstrList inVar = do
@@ -647,9 +639,9 @@ addConstraintEdge i (AnnVar (pt, _), Super) = liftIO $ do
   desc <- UF.descriptor pt
   UF.setDescriptor pt $ desc {_subOf = i : (_subOf desc)}
 
-solveSubsetConstraints :: SolverM [EmittedConstr] -> WorklistM ()
-solveSubsetConstraints emittedComp = do
-  emittedConstrs <- emittedComp
+solveSubsetConstraints :: AnnotConstr -> WorklistM ()
+solveSubsetConstraints inCon = do
+  emittedConstrs <- applyUnifications inCon
   wConstraints <- trace ("Emitted " ++ show emittedConstrs) $ concat <$> forM emittedConstrs makeWHelper
   let constrPairs = zip [1..] wConstraints
   trace ("Constraint pairs " ++ show constrPairs) $ forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ \v -> trace ("Adding cedges " ++ show (i,c,v)) addConstraintEdge i v
