@@ -62,7 +62,7 @@ toCanonicalHelper co contra getCo a = case a of
   TopAnnot ->
     return CanonTop
 
-data StoredScheme = StoredScheme [AnnVar] AnnotConstr AnnVar | StoredMono AnnVar
+data StoredScheme = StoredScheme [AnnVar] [EmittedConstr] AnnVar | StoredMono AnnVar
 
 --TODO shouldn't this hold schemes, not vars?
 type Env = Map.Map String StoredScheme
@@ -72,6 +72,11 @@ data SolverState =
   { sEnv :: Env
   , sSavedEnv :: Env
   }
+
+data EmittedConstr =
+    ESubEffect R.Region TypeAnnot TypeAnnot
+  | ECanBeMatchedBy R.Region TypeAnnot RealAnnot
+  deriving (Show)
 
 getEnv :: SolverM' a Env
 getEnv =
@@ -114,7 +119,7 @@ union (AnnVar (pt1, _)) (AnnVar (pt2, _)) =
 areSame :: AnnVar -> AnnVar -> SolverM' a Bool
 areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 
-applyUnifications :: AnnotConstr -> SolverM [AnnotConstr]
+applyUnifications :: AnnotConstr -> SolverM [EmittedConstr]
 applyUnifications con =
   case con of
     CEqual _ r1 r2 -> trace "con Equal" $ do
@@ -138,23 +143,25 @@ applyUnifications con =
           Just (StoredMono storedVar) ->
             applyUnifications $ CEqual r (VarAnnot storedVar) annot
           Just (StoredScheme quants constr annVar) -> do
-            (freshConstr, newVar) <- makeFreshCopy quants constr annVar
+            (freshEmitted, newVar) <- makeFreshCopy quants constr annVar
             --Unify the type of the variable use with our newly instantiated type
             unifyAnnots annot (VarAnnot newVar)
             --Apply our instantiated constraints to that type
-            instEmitted <- applyUnifications freshConstr
-            liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshConstr ++ " and var " ++ show newVar
+            liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshEmitted ++ " and var " ++ show newVar
             liftIO $ putStrLn $ "Unified with " ++ show annot
-            return instEmitted
+            return freshEmitted
     CSaveEnv -> do
       saveLocalEnv
       return []
     CTrue -> return []
-    c -> return [c]
+    CSubEffect r a b ->
+      return [ESubEffect r a b]
+    CCanBeMatchedBy r a b ->
+      return [ECanBeMatchedBy r a b]
 
-makeWHelper (CSubEffect r left right ) =
+makeWHelper (ESubEffect r left right ) =
   makeSubEffectConstrs r left right
-makeWHelper (CCanBeMatchedBy r a exact) =
+makeWHelper (ECanBeMatchedBy r a exact) =
   makeExactMatchConstrs r a exact
 
 
@@ -298,16 +305,16 @@ freeVarsInAnnot a =
     TopAnnot ->
       return []
 
-freeVarsInConstr :: AnnotConstr -> SolverM [AnnVar]
+--freeVarsInConstr :: AnnotConstr -> SolverM [AnnVar]
 freeVarsInConstr c = case c of
-  CAnd constrs -> concat <$> forM constrs freeVarsInConstr
-  CTrue -> return []
-  CEqual _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
-  CSaveEnv -> return []
-  CSubEffect _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
-  CCanBeMatchedBy _ a1 _ -> freeVarsInAnnot a1
-  CInstance _ _ a1 -> freeVarsInAnnot a1
-  CLet schemes constr -> do
+  --CAnd constrs -> concat <$> forM constrs freeVarsInConstr
+  --CTrue -> return []
+  --CEqual _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
+  --CSaveEnv -> return []
+  ESubEffect _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
+  ECanBeMatchedBy _ a1 _ -> freeVarsInAnnot a1
+  --CInstance _ _ a1 -> freeVarsInAnnot a1
+  {-CLet schemes constr -> do
     freeInCon <- freeVarsInConstr constr
     freeInSchemes <- forM schemes $ \sch ->
       case sch of
@@ -319,15 +326,15 @@ freeVarsInConstr c = case c of
           let headerAnnots = List.map (\(A.A _ a) -> a) $ Map.elems hdr
           concat <$> forM headerAnnots freeVarsInAnnot
 
-    return $ freeInCon ++ (concat freeInSchemes)
+    return $ freeInCon ++ (concat freeInSchemes) -}
 
 freeVarsInEnv :: Env -> SolverM [AnnVar]
 freeVarsInEnv env =
   (fmap concat) $ forM (Map.elems env) $ \sch ->
     case sch of
-      (StoredScheme quants constr var) -> do
+      (StoredScheme quants constrList var) -> do
         freeInTy <- freeVarsInAnnot (VarAnnot var)
-        freeInConstr <- freeVarsInConstr constr
+        freeInConstr <- concat <$> forM constrList freeVarsInConstr
         filterM (varNotInList quants) (freeInTy ++ freeInConstr)
       StoredMono var -> do
         freeInTy <- freeVarsInAnnot (VarAnnot var)
@@ -345,10 +352,10 @@ notFreeInEnv env v = do
 
 
 solveScheme :: Env -> AnnScheme -> SolverM Env
-solveScheme oldEnv scheme@(Scheme constr hdr) = do
+solveScheme oldEnv (Scheme constr hdr) = do
   let oldHeader = Map.toList hdr
   --Solve the relationships between variables before we quantify
-  applyUnifications constr
+  schemeEmitted <- applyUnifications constr
   newHeader <- forM oldHeader $ \(nm, (A.A _ ann)) -> do
     newVar <- liftIO mkVar
     allVars <- freeVarsInAnnot ann
@@ -356,11 +363,11 @@ solveScheme oldEnv scheme@(Scheme constr hdr) = do
     unifyAnnots (VarAnnot newVar) ann
     --liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
     --liftIO $ putStrLn $ "Quantified scheme " ++ (show scheme) ++ "\nnew constr " ++ show constr
-    return (nm, StoredScheme goodQuants constr  newVar)
+    return (nm, StoredScheme goodQuants schemeEmitted  newVar)
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
   return $ Map.fromList newHeader
-solveScheme oldEnv scheme@(MonoScheme hdr) = do
+solveScheme _ (MonoScheme hdr) = do
   let oldHeader = Map.toList hdr
   newHeader <- forM oldHeader $ \(nm, A.A _ ann) -> do
     newVar <- liftIO mkVar
@@ -370,8 +377,8 @@ solveScheme oldEnv scheme@(MonoScheme hdr) = do
   --On our scheme
   return $ Map.fromList newHeader
 
-makeFreshCopy :: [AnnVar] -> AnnotConstr -> AnnVar -> SolverM (AnnotConstr, AnnVar)
-makeFreshCopy quants inConstr inVar = do
+makeFreshCopy :: [AnnVar] -> [EmittedConstr] -> AnnVar -> SolverM ([EmittedConstr], AnnVar)
+makeFreshCopy quants inConstrList inVar = do
   let --TODO check if free or not?
     isQuant v = isQuantHelper quants v
     isQuantHelper [] _ = return False
@@ -381,51 +388,15 @@ makeFreshCopy quants inConstr inVar = do
         True -> return True
         False ->
           isQuantHelper rest v
-    --We only need to copy our subtyping constraints
-    copyConHelper :: AnnotConstr -> SolverM (AnnotConstr, [(AnnVar, AnnVar)])
     copyConHelper c = case c of
-       CAnd constrs -> do
-         (subAnns, subPairs) <- unzip <$> forM constrs copyConHelper
-         return (CAnd subAnns, concat subPairs)
-       CSaveEnv -> return (CSaveEnv, [])
-       CInstance r nm ann -> do
-         (newVarInst, newVarPairs) <- copyHelper ann
-         return (CInstance r nm newVarInst, newVarPairs)
-
-       CSubEffect r a1 a2 -> do
-         (b1, pairs1) <- copyHelper a1
-         (b2, pairs2) <- copyHelper a2
-         return (CSubEffect r b1 b2, pairs1 ++ pairs2)
-       CCanBeMatchedBy r a1 exact -> do
-         (subAnn, subPairs) <- copyHelper a1
-         return (CCanBeMatchedBy r subAnn exact, subPairs)
-       CLet schemes constr -> do
-         (newSchemes, newPairs) <- unzip <$> forM schemes copySchemeHelper
-         (newConstr, cPairs) <- copyConHelper constr
-         return (CLet newSchemes newConstr, (concat  newPairs) ++ cPairs)
-       --We don't need our unification constraints, we can solve those when we generalize
-       _ ->
-        return (CTrue, [])
-
-    copySchemeHelper (Scheme constr hdr) = do
-      --TODO need to do quantifiers?
-      (newConstr, conPairs) <- copyConHelper constr
-      let (hdrStrings, hdrAnns) = unzip $ Map.toList hdr
-      (newHeaderAnns, hdrPairs) <- unzip <$> forM hdrAnns (\(A.A r a) -> do
-         (newAnn, pairList) <- copyHelper a
-         return (A.A r newAnn, pairList))
-      return ( Scheme  newConstr (Map.fromList $ zip hdrStrings newHeaderAnns)
-             , conPairs ++ concat hdrPairs)
-
-    copySchemeHelper (MonoScheme hdr) = do
-        --TODO need to do quantifiers?
-        let (hdrStrings, hdrAnns) = unzip $ Map.toList hdr
-        (newHeaderAnns, hdrPairs) <- unzip <$> forM hdrAnns (\(A.A r a) -> do
-           (newAnn, pairList) <- copyHelper a
-           return (A.A r newAnn, pairList))
-        return ( MonoScheme (Map.fromList $ zip hdrStrings newHeaderAnns)
-               , concat hdrPairs)
-
+      ECanBeMatchedBy r a1 exact -> do
+        (subAnn, subPairs) <- copyHelper a1
+        return (ECanBeMatchedBy r subAnn exact, subPairs)
+      ESubEffect r a1 a2 -> do
+        (b1, pairs1) <- copyHelper a1
+        (b2, pairs2) <- copyHelper a2
+        return (ESubEffect r b1 b2, pairs1 ++ pairs2)
+    --We only need to copy our subtyping constraints
     copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
     copyHelper a = case a of
       VarAnnot v -> do
@@ -461,14 +432,14 @@ makeFreshCopy quants inConstr inVar = do
           True -> union new1 new2
           False -> return ()
 
-  (newCopy, pairList) <- copyConHelper inConstr
+  (newConstrs, pairList) <- unzip <$> forM inConstrList copyConHelper
   newVar <- liftIO $ mkVar
   (newAnn, varPairs) <- copyHelper (VarAnnot inVar)
   liftIO $ putStrLn $ "Final copied ann " ++ show newAnn
   --Unify the var for our new annotation with the annotation itself
   unifyAnnots (VarAnnot newVar) newAnn
-  unifyPairs $ varPairs ++ pairList
-  return (newCopy, newVar)
+  unifyPairs $ varPairs ++ (concat pairList)
+  return (newConstrs, newVar)
 
 
 unifyAnnots :: TypeAnnot -> TypeAnnot -> SolverM TypeAnnot
@@ -676,7 +647,7 @@ addConstraintEdge i (AnnVar (pt, _), Super) = liftIO $ do
   desc <- UF.descriptor pt
   UF.setDescriptor pt $ desc {_subOf = i : (_subOf desc)}
 
-solveSubsetConstraints :: SolverM [AnnotConstr] -> WorklistM ()
+solveSubsetConstraints :: SolverM [EmittedConstr] -> WorklistM ()
 solveSubsetConstraints emittedComp = do
   emittedConstrs <- emittedComp
   wConstraints <- trace ("Emitted " ++ show emittedConstrs) $ concat <$> forM emittedConstrs makeWHelper
