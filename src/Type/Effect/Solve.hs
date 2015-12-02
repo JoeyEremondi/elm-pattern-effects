@@ -724,7 +724,7 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
             True -> List.map (allConstrs Map.! ) $ _subOf ourData
     trace ("WLS subs of our data " ++ show (_subOf ourData, needsUpdate)) $ workList allConstrs (needsUpdate ++ rest)
 
-  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> trace "WSP" $ do
+  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> trace "WSP" $ do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =
@@ -750,19 +750,19 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
             True -> List.map (allConstrs Map.! ) $ _subOf wholeData
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
-  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> trace "WPS" $ do
+  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> trace "WPS" $ do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
     changedWhole <- intersectLB r wholeVal $ RealAnnot [(ctor, nBottoms)]
-    let lbPartOfWhole =
+    let wholeMatchingCtor =
           case _ub wholeData of
             RealTop -> RealTop
             RealAnnot pats ->
               RealAnnot $ List.filter ((== ctor) . fst) pats
 
-    changedPart <- unionUB r argVar lbPartOfWhole
+    changedPart <- unionUB r argVar wholeMatchingCtor
 
     let needsUpdate1 =
           case changedPart of
