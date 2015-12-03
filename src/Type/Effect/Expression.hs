@@ -133,7 +133,7 @@ constrain env annotatedExpr@(A.A region expression) tipe =
               -}
 
       E.Let defs body ->
-          do  
+          do
               bodyCon <- constrain env body tipe
               (Info _vars headers constr) <-
                   Monad.foldM
@@ -397,8 +397,12 @@ constrainCase env region expr branches tipe =
       let inPatternsConstr = CCanBeMatchedBy region (VarAnnot exprVar) matchedSet -- TODO join patterns
 
       --The annotation of the case statement must contain each possible branch result annotation
+      --For each reachable branch
       let joinBranchesConstr = --TODO which region
-            CAnd $ map (\branchVar -> CSubEffect region (VarAnnot branchVar) tipe) $ vars
+            CAnd $ zipWith
+              (\branchVar pat ->
+                CMatchesImplies region (VarAnnot exprVar, Pattern.patternsToAnnot env [pat]) (VarAnnot branchVar, tipe))
+              vars (map fst branches)
 
       --TODO what is ex doing?
       return $ --ex (exprVar : vars) $

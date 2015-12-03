@@ -41,6 +41,7 @@ toCanonicalConstr :: EmittedConstr -> IO CanonicalConstr
 toCanonicalConstr c = case c of
   ESubEffect r a1 a2 -> CanonSubtype <$> toCanonicalAnnot a1 <*> toCanonicalAnnot a2
   ECanBeMatchedBy r a1 real -> CanonSubtype <$> toCanonicalAnnot a1 <*> return (CanonLit real)
+  EMatchesImplies _ _ _ -> error "TODO ematchesImplies canon"
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
 toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound _ub
@@ -83,6 +84,7 @@ data SolverState =
 data EmittedConstr =
     ESubEffect R.Region TypeAnnot TypeAnnot
   | ECanBeMatchedBy R.Region TypeAnnot RealAnnot
+  | EMatchesImplies R.Region (TypeAnnot, RealAnnot) (TypeAnnot, TypeAnnot)
   deriving (Show)
 
 getEnv :: SolverM' a Env
@@ -168,14 +170,27 @@ applyUnifications con =
       return [ESubEffect r a b]
     CCanBeMatchedBy r a b ->
       return [ECanBeMatchedBy r a b]
+    CMatchesImplies r pair1 pair2 ->
+      return [EMatchesImplies r pair1 pair2]
 
+
+--makeWHelper :: EmittedConstr -> SolverM [WConstr]
 makeWHelper (ESubEffect r left right ) =
   makeSubEffectConstrs r left right
 makeWHelper (ECanBeMatchedBy r a exact) = do
   vinter <- liftIO $ mkVar
   varMatchesAnn <- makeSubEffectConstrs r a (VarAnnot vinter)
   return $ (WSubEffectOfLit r vinter exact) : varMatchesAnn
-
+makeWHelper (EMatchesImplies r (a1, real) (a2, a3)) = do
+  vinter1 <- liftIO $ mkVar
+  vinter2 <- liftIO $ mkVar
+  vinter3 <- liftIO $ mkVar
+  varMatchesAnn1 <- makeSubEffectConstrs r a1 (VarAnnot vinter1)
+  varMatchesAnn2 <- makeSubEffectConstrs r a2 (VarAnnot vinter2)
+  varMatchesAnn3 <- makeSubEffectConstrs r a3 (VarAnnot vinter3)
+  let combinedConstrs = varMatchesAnn1 ++ varMatchesAnn2 ++ varMatchesAnn3
+  let implConstr = WSimpleImplies r vinter1 real $ WSubEffect r vinter2 vinter3
+  return  $ implConstr : combinedConstrs
 
 
     --For our other constraints, we defer solving until after unification is done
@@ -329,6 +344,7 @@ freeVarsInConstr :: EmittedConstr -> SolverM [AnnVar]
 freeVarsInConstr c = case c of
   ESubEffect _ a1 a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
   ECanBeMatchedBy _ a1 _ -> freeVarsInAnnot a1
+  EMatchesImplies _ (a1, _) (a2, a3) -> concat <$> forM [a1, a2, a3] (freeVarsInAnnot)
 
 
 freeVarsInEnv :: Env -> SolverM [AnnVar]
@@ -400,6 +416,11 @@ makeFreshCopy quants inConstrList inVar = do
         (b1, pairs1) <- copyHelper a1
         (b2, pairs2) <- copyHelper a2
         return (ESubEffect r b1 b2, pairs1 ++ pairs2)
+      EMatchesImplies r (a1, real) (a2, a3) -> do
+        (sub1, pairs1) <- copyHelper a1
+        (sub2, pairs2) <- copyHelper a2
+        (sub3, pairs3) <- copyHelper a3
+        return (EMatchesImplies r (sub1, real) (sub2, sub3), pairs1 ++ pairs2 ++ pairs3)
     --We only need to copy our subtyping constraints
     copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
     copyHelper a = case a of
@@ -534,6 +555,7 @@ data WConstr' v =
   | WPatSubEffectOf R.Region Int String Int v v
   | WSubEffectOfLit R.Region v RealAnnot
   | WLitSubEffectOf R.Region RealAnnot v
+  | WSimpleImplies R.Region v RealAnnot WConstr
   deriving (Show)
 
 type WConstr = WConstr' AnnVar
@@ -614,6 +636,11 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
 getAnnData :: AnnVar -> SolverM' a (AnnotData)
 getAnnData (AnnVar (pt, _)) =  liftIO $ UF.descriptor pt
 
+canMatchAll :: RealAnnot -> RealAnnot -> Bool
+canMatchAll r1 r2 = case mismatches (error "matchall region") r2 r1 of
+  [] -> True
+  _ -> False
+
 
 --Return true if this union makes a change, false otherwise
 unionUB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
@@ -623,11 +650,8 @@ unionUB r (AnnVar (pt, _)) ann = do
   liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
   --Check if we changed the set at all
   --TODO faster shortcut method
-  case (mismatches r newUB (_ub annData)) of
-    [] -> return False
-    _ -> do
-      --tell $ mismatches r newUB (_lb annData)
-      return True
+  return $ not $ (_ub annData) `canMatchAll` newUB
+
 
   --TODO emit warning
 
@@ -636,12 +660,7 @@ intersectLB r (AnnVar (pt, _)) ann =  do
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
   liftIO $ UF.setDescriptor pt $ annData {_lb = newLB}
-  case (mismatches r (_lb annData) newLB) of
-      [] -> return False
-      _ -> do
-        --tell $ mismatches r (_ub annData) newLB
-        return True
-
+  return $ not $ newLB `canMatchAll` (_lb annData)
 
 data VarPosition = Sub | Super
   deriving (Show)
@@ -654,6 +673,7 @@ constraintEdges c = case c of
   WPatSubEffectOf _ _ _ _ v1 v2 -> [(v1, Super), (v2, Sub)]
   WLitSubEffectOf _ _ v2 -> [(v2, Super)]
   WSubEffectOfLit _ v1 _ -> [(v1, Sub)]
+  WSimpleImplies _ v1 _ subConstr -> [(v1, Sub)] ++ constraintEdges subConstr
 
 allVars  c = case c of
   WSubEffect _ v1 v2 -> [v1, v2]
@@ -661,6 +681,7 @@ allVars  c = case c of
   WPatSubEffectOf _ _ _ _ v1 v2 -> [v1, v2]
   WLitSubEffectOf _ _ v2 -> [v2]
   WSubEffectOfLit _ v1 _ -> [v1]
+  WSimpleImplies _ v1 _ subConstr -> [v1] ++ allVars subConstr
 
 
 addConstraintEdge :: Int -> (AnnVar, VarPosition) -> WorklistM ()
@@ -712,6 +733,13 @@ finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
       WSubEffectOfLit r v1 _ -> do
         data1 <- getAnnData v1
         tell $ mismatches r (_ub data1) (_lb data1)
+      WSimpleImplies _ v real subCon -> do
+        ourUB <- _ub <$> getAnnData v
+        --Check if our implication condition is true, and if it is solve the sub-constraint
+        case ourUB `canMatchAll` real of
+          True -> finalLowerBoundsCheck [subCon]
+          False -> return ()
+
 
 
 workList :: (Map.Map Int WConstr) -> [WConstr] -> WorklistM ()
@@ -802,3 +830,12 @@ workList allConstrs (c:rest) = case c of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _superOf wholeData
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+
+  WSimpleImplies _ v real subConstr -> do
+    ourUB <- _ub <$> getAnnData v
+    --Check if our implication condition is true, and if it is solve the sub-constraint
+    let condsToAdd =
+          case ourUB `canMatchAll` real of
+            True -> [subConstr]
+            False -> []
+    workList allConstrs (condsToAdd ++ rest)
