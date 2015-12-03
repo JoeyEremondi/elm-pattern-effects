@@ -51,16 +51,11 @@ canonLowerBound = toCanonicalHelper canonLowerBound toCanonicalAnnot _lb
 toCanonicalHelper co contra getCo a = case a of
   VarAnnot (AnnVar (pt, _)) -> do
     ourData <- UF.descriptor pt
+
+    ourData <- UF.descriptor pt
     case (_annRepr ourData) of
       Nothing ->
-        --TODO better way? use schemes?
-        case (_lb ourData, _ub ourData) of
-          --Completely unconstrained sets
-          (RealTop, RealAnnot d) | List.length d == 0 ->
-            return $ CanonVar $ _uniqueId ourData
-          _ ->
-            --TODO UB or LB? Based on position?
-            return $ CanonLit  $ getCo ourData
+        return $ CanonVar $ _uniqueId ourData
       Just repr ->
         co repr
   SinglePattern s subs -> do

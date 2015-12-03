@@ -7,6 +7,7 @@ import Data.Binary
 import GHC.Generics (Generic)
 import Control.Monad (forM)
 import qualified Data.Set as Set
+import qualified Data.List as List
 
 
 
@@ -69,18 +70,26 @@ instance Binary CanonicalAnnot
 instance Binary CanonicalConstr
 
 prettyReal (RealTop) = "T"
-prettyReal (RealAnnot subPatsSet) = show $ Set.map (\(s,argList) -> (s, map prettyReal argList)) subPatsSet
+prettyReal (RealAnnot subPatsSet) =
+  "{"
+  ++ (List.intercalate ", " $ Set.toList $ Set.map (\(s,argList) ->
+      s ++ "(" ++  (List.intercalate ", " $ map prettyReal argList) ++ ")" ) subPatsSet)
+  ++ "}"
 
 
 prettyAnn :: CanonicalAnnot -> String
 prettyAnn ann = case ann of
   CanonVar i -> "_" ++ show i
   CanonLit subPatsSet -> "{" ++ prettyReal subPatsSet ++ "}"
-  CanonLambda from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
+  CanonLambda from to -> prettyAnn from ++ " -> " ++ prettyAnn to
   CanonTop -> "T"
-  CanonPatDict subPatsSet -> show $ Set.map (\(s,argList) -> (s, map prettyAnn argList)) subPatsSet
+  CanonPatDict subPatsSet ->
+    "{" ++
+    (List.intercalate ", " $ Set.toList $ Set.map (\(s,argList) ->
+      s ++ "(" ++ (List.intercalate ", " $ map prettyAnn argList) ++ ")" ) subPatsSet)
+    ++ "}"
 
 
 prettyConstr :: CanonicalConstr -> String
 prettyConstr c = case c of
-  CanonSubtype a1 a2 -> prettyAnn a1 ++ " <= " ++ prettyAnn a2
+  CanonSubtype a1 a2 -> prettyAnn a1 ++ " < " ++ prettyAnn a2
