@@ -10,8 +10,8 @@ State of the implementation:
 - [x] Worklist algorithm to solve constraints
 - [x] Instantiation and Generalization
 - [ ] Transfer annotations and constraints across modules
-- [ ] Fix bugs in Constructor types
-- [ ] Proper types for recursive values
+- [x] Fix bugs in Constructor types
+- [x] Proper types for recursive values
 - [ ]  Implication constraints
 - [ ]  Track Control-flow along with patterns
 - [ ]  Change complete pattern matches to Top
