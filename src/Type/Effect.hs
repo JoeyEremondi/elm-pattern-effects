@@ -310,7 +310,7 @@ fromReal (RealAnnot l) = do
 dummyRegion = R.Region (R.Position 0 0) (R.Position 0 0)
 
 warningString w = case w of
-  Warning.MissingCase s -> "Missing case " ++ show s
+  Warning.MissingCase s1 s2 -> "Missing case " ++ prettyReal s1 ++ " not matched by " ++ prettyReal s2
   _ -> ""
 
 fromCanonicalTriple (canonAnnot, _, _) = fromCanonical canonAnnot

@@ -13,6 +13,8 @@ import qualified Reporting.Error.Helpers as Help
 import qualified Reporting.Report as Report
 import qualified Reporting.Render.Type as RenderType
 
+import qualified Type.Effect.Common as Effect
+
 
 
 -- ALL POSSIBLE WARNINGS
@@ -21,7 +23,7 @@ import qualified Reporting.Render.Type as RenderType
 data Warning
     = UnusedImport ModuleName.Raw
     | MissingTypeAnnotation String Type.Canonical
-    | MissingCase String
+    | MissingCase Effect.RealAnnot Effect.RealAnnot
 
 
 
@@ -49,11 +51,11 @@ toReport localizer warning =
               ]
           )
 
-    MissingCase theCase ->
+    MissingCase theCase onesShouldMatch ->
         Report.report
           "unmatched case"
           Nothing
-          ("The pattern " ++ theCase ++ " is not matched")
+          ("The pattern " ++ Effect.prettyReal theCase ++ " is not matched by " ++ Effect.prettyReal onesShouldMatch)
           (text "TODO put a helpful hint here")
 
 

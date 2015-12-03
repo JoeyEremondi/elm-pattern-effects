@@ -53,6 +53,10 @@ toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound _ub
 canonLowerBound :: TypeAnnot -> IO CanonicalAnnot
 canonLowerBound = toCanonicalHelper canonLowerBound toCanonicalAnnot _lb
 
+emitWarnings x = do
+  forM x $ \_ -> liftIO $ putStrLn $ "Emitting warning"
+  tell x
+
 toCanonicalHelper co contra getCo a = case a of
   VarAnnot (AnnVar (pt, _)) -> do
     ourData <- UF.descriptor pt
@@ -292,7 +296,9 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
       case (s1 == s2) of
         False
           -> do
-               tell [(r, Warning.MissingCase (s1 ++ " " ++ s2))] --TODO better error
+               emitWarnings [(r,
+                  Warning.MissingCase
+                    (RealAnnot $ Set.singleton (s1, [])) (RealAnnot $ Set.singleton (s2, [])) )] --TODO better error
                return []
 
         True -> do
@@ -595,18 +601,18 @@ intersectAnn (RealAnnot dict1) (RealAnnot dict2) =
   in
     RealAnnot $ Set.fromList $ Maybe.catMaybes [intersectPairs p1 p2 | p1 <- l1, p2 <- l2 ]
 
-
+--Return a waring if the single pattern (S, p1 ... pn) is not matched by (S', p1' ... pn')
 elemMismatches :: R.Region -> (String, [RealAnnot]) -> (String, [RealAnnot]) -> [(R.Region, Warning.Warning)]
-elemMismatches region (s1,args1) (s2, args2) =
+elemMismatches region pr1@(s1,args1) pr2@(s2, args2) =
   if (s1 == s2) then
     concat $ zipWith (mismatches region) args1 args2
   else
-    [(region, Warning.MissingCase s1)]
+    [(region, Warning.MissingCase (RealAnnot $ Set.singleton pr1) (RealAnnot $ Set.singleton pr2))]
 
 --Return a warning for every element in a1 that is not matched by any element of a2
 mismatches :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
 mismatches _ _ RealTop = []
-mismatches r RealTop _ =  [(r, Warning.MissingCase "_")]
+mismatches r RealTop x = trace ("Top mismatch " ++ show x) $ [(r, Warning.MissingCase RealTop x)]
 mismatches region (RealAnnot subs1) (RealAnnot subs2) =
   let
     forSet s f = Set.map f s
@@ -614,18 +620,21 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
     ctors1 = Set.map fst subs1
     ctors2 = Set.map fst subs2
     ctorFails = Set.toList $ Set.difference ctors1 ctors2
-    ctorWarnings = for ctorFails $ \ctor -> (region, Warning.MissingCase ctor)
+    ctorsCanMatch = RealAnnot $ Set.map (\(ctor, _) -> (ctor, [])) subs2
+    ctorWarnings = for ctorFails $ \ctor -> (region, Warning.MissingCase (RealAnnot $ Set.singleton (ctor, [])) ctorsCanMatch)
     failsForAllSubs =
       for (Set.toList subs1) $ \sub1 ->
         let
           failsForSub1 = for (Set.toList subs2) $ \sub2 ->
             elemMismatches region sub1 sub2
         in
+          --Check if there were any elements in subs2 that matched subs1
           if (List.any List.null failsForSub1) then
             []
           else
-            concat failsForSub1
-  in
+            [(region, Warning.MissingCase (RealAnnot $ Set.singleton sub1) (RealAnnot subs2))]
+            --concat failsForSub1
+  in trace ("Mismatches for " ++ show (subs1, subs2) ++ ":\n  " ++ show (length ctorWarnings, length failsForAllSubs) ) $
     ctorWarnings ++ concat failsForAllSubs
 {-
   concatMap (\(s, subPatsToMatch) ->
@@ -700,6 +709,7 @@ solveSubsetConstraints :: AnnotConstr -> WorklistM ()
 solveSubsetConstraints inCon = do
   emittedConstrs <- applyUnifications inCon
   wConstraints <-  concat <$> forM emittedConstrs makeWHelper
+
   let constrPairs = zip [1..] wConstraints
   forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ \v ->
     addConstraintEdge i v
@@ -710,33 +720,35 @@ solveSubsetConstraints inCon = do
   --(lower bound)
   --TODO notation backwards
   finalLowerBoundsCheck wConstraints
+  liftIO $ putStrLn $ "WConstraints: " ++ show wConstraints
 
 --TODO lower bounds for pat and lit cases?
 
 finalLowerBoundsCheck :: [WConstr] -> WorklistM ()
 finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
+  liftIO $ putStrLn $ "\nFinal bounds check on " ++ show c
   case c of
       WSubEffect r v1 v2 -> do
         data1 <- getAnnData v1
         data2 <- getAnnData v2
-        tell $ mismatches r (_ub data1) (_lb data1)
-        tell $ mismatches r (_ub data2) (_lb data2)
+        emitWarnings $ mismatches r (_ub data1) (_lb data1)
+        emitWarnings $ mismatches r (_ub data2) (_lb data2)
       WSubEffectOfPat r _ v1 _ _ v2 -> do
         data1 <- getAnnData v1
         data2 <- getAnnData v2
-        tell $ mismatches r (_ub data1) (_lb data1)
-        tell $ mismatches r (_ub data2) (_lb data2)
+        emitWarnings $ mismatches r (_ub data1) (_lb data1)
+        emitWarnings $ mismatches r (_ub data2) (_lb data2)
       WPatSubEffectOf r _ _ _ v1 v2 -> do
         data1 <- getAnnData v1
         data2 <- getAnnData v2
-        tell $ mismatches r (_ub data1) (_lb data1)
-        tell $ mismatches r (_ub data2) (_lb data2)
+        emitWarnings $ mismatches r (_ub data1) (_lb data1)
+        emitWarnings $ mismatches r (_ub data2) (_lb data2)
       WLitSubEffectOf r _ v2 -> do
         data2 <- getAnnData v2
-        tell $ mismatches r (_ub data2) (_lb data2)
+        emitWarnings $ mismatches r (_ub data2) (_lb data2)
       WSubEffectOfLit r v1 _ -> do
         data1 <- getAnnData v1
-        tell $ mismatches r (_ub data1) (_lb data1)
+        emitWarnings $ mismatches r (_ub data1) (_lb data1)
       WSimpleImplies _ v real subCon -> do
         ourUB <- _ub <$> getAnnData v
         --Check if our implication condition is true, and if it is solve the sub-constraint
