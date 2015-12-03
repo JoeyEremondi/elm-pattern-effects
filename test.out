@@ -1,0 +1,2155 @@
+Preprocessing library elm-compiler-0.16...
+GHCi, version 7.10.2: http://www.haskell.org/ghc/  :? for help
+[ 1 of 91] Compiling Generate.JavaScript.Helpers ( src/Generate/JavaScript/Helpers.hs, interpreted )
+[ 2 of 91] Compiling Paths_elm_compiler ( dist/build/autogen/Paths_elm_compiler.hs, interpreted )
+[ 3 of 91] Compiling AST.Literal      ( src/AST/Literal.hs, interpreted )
+[ 4 of 91] Compiling Reporting.Region ( src/Reporting/Region.hs, interpreted )
+[ 5 of 91] Compiling Reporting.Render.Code ( src/Reporting/Render/Code.hs, interpreted )
+[ 6 of 91] Compiling AST.Helpers      ( src/AST/Helpers.hs, interpreted )
+[ 7 of 91] Compiling Reporting.Report ( src/Reporting/Report.hs, interpreted )
+[ 8 of 91] Compiling Reporting.Annotation ( src/Reporting/Annotation.hs, interpreted )
+[ 9 of 91] Compiling Elm.Package      ( src/Elm/Package.hs, interpreted )
+[10 of 91] Compiling Elm.Compiler.Version ( src/Elm/Compiler/Version.hs, interpreted )
+[11 of 91] Compiling Reporting.Error.Helpers ( src/Reporting/Error/Helpers.hs, interpreted )
+[12 of 91] Compiling Reporting.Error.Docs ( src/Reporting/Error/Docs.hs, interpreted )
+[13 of 91] Compiling AST.Module.Name  ( src/AST/Module/Name.hs, interpreted )
+[14 of 91] Compiling AST.Variable     ( src/AST/Variable.hs, interpreted )
+[15 of 91] Compiling AST.Type         ( src/AST/Type.hs, interpreted )
+[16 of 91] Compiling Reporting.Render.Type ( src/Reporting/Render/Type.hs, interpreted )
+[17 of 91] Compiling Reporting.Result ( src/Reporting/Result.hs, interpreted )
+[18 of 91] Compiling Reporting.Error.Syntax ( src/Reporting/Error/Syntax.hs, interpreted )
+
+src/Reporting/Error/Syntax.hs:194:1: Warning:
+    Pattern match(es) are non-exhaustive
+    In an equation for ‘unboundTypeVars’:
+        Patterns not matched: _ _ _ []
+[19 of 91] Compiling AST.Pattern      ( src/AST/Pattern.hs, interpreted )
+[20 of 91] Compiling AST.Expression.General ( src/AST/Expression/General.hs, interpreted )
+[21 of 91] Compiling AST.Expression.Source ( src/AST/Expression/Source.hs, interpreted )
+[22 of 91] Compiling AST.Expression.Valid ( src/AST/Expression/Valid.hs, interpreted )
+[23 of 91] Compiling AST.Expression.Canonical ( src/AST/Expression/Canonical.hs, interpreted )
+[24 of 91] Compiling AST.Declaration  ( src/AST/Declaration.hs, interpreted )
+[25 of 91] Compiling Parse.Helpers    ( src/Parse/Helpers.hs, interpreted )
+[26 of 91] Compiling Parse.Type       ( src/Parse/Type.hs, interpreted )
+[27 of 91] Compiling Elm.Compiler.Type ( src/Elm/Compiler/Type.hs, interpreted )
+[28 of 91] Compiling Elm.Compiler.Type.Extract ( src/Elm/Compiler/Type/Extract.hs, interpreted )
+[29 of 91] Compiling Docs.AST         ( src/Docs/AST.hs, interpreted )
+[30 of 91] Compiling Parse.Literal    ( src/Parse/Literal.hs, interpreted )
+[31 of 91] Compiling Docs.Centralize  ( src/Docs/Centralize.hs, interpreted )
+[32 of 91] Compiling Optimize.DecisionTree ( src/Optimize/DecisionTree.hs, interpreted )
+
+src/Optimize/DecisionTree.hs:436:43: Warning:
+    This binding for ‘path’ shadows the existing binding
+      bound at src/Optimize/DecisionTree.hs:434:9
+
+src/Optimize/DecisionTree.hs:436:49: Warning:
+    This binding for ‘weight’ shadows the existing binding
+      bound at src/Optimize/DecisionTree.hs:434:14
+
+src/Optimize/DecisionTree.hs:434:1: Warning:
+    Pattern match(es) are non-exhaustive
+    In an equation for ‘bests’: Patterns not matched: []
+[33 of 91] Compiling Canonicalize.Sort ( src/Canonicalize/Sort.hs, interpreted )
+[34 of 91] Compiling Generate.JavaScript.Port ( src/Generate/JavaScript/Port.hs, interpreted )
+[35 of 91] Compiling Nitpick.Pattern  ( src/Nitpick/Pattern.hs, interpreted )
+[36 of 91] Compiling Reporting.Error.Pattern ( src/Reporting/Error/Pattern.hs, interpreted )
+[37 of 91] Compiling Reporting.Error.Type ( src/Reporting/Error/Type.hs, interpreted )
+[38 of 91] Compiling Parse.Binop      ( src/Parse/Binop.hs, interpreted )
+[39 of 91] Compiling Parse.Pattern    ( src/Parse/Pattern.hs, interpreted )
+[40 of 91] Compiling Parse.Expression ( src/Parse/Expression.hs, interpreted )
+[41 of 91] Compiling Elm.Utils        ( src/Elm/Utils.hs, interpreted )
+[42 of 91] Compiling Docs.Check       ( src/Docs/Check.hs, interpreted )
+[43 of 91] Compiling Validate         ( src/Validate.hs, interpreted )
+[44 of 91] Compiling Parse.Declaration ( src/Parse/Declaration.hs, interpreted )
+[45 of 91] Compiling Type.Type        ( src/Type/Type.hs, interpreted )
+[46 of 91] Compiling Type.Fragment    ( src/Type/Fragment.hs, interpreted )
+[47 of 91] Compiling Type.State       ( src/Type/State.hs, interpreted )
+[48 of 91] Compiling Type.Unify       ( src/Type/Unify.hs, interpreted )
+[49 of 91] Compiling Type.Solve       ( src/Type/Solve.hs, interpreted )
+[50 of 91] Compiling AST.Expression.Optimized ( src/AST/Expression/Optimized.hs, interpreted )
+[51 of 91] Compiling Optimize.Case    ( src/Optimize/Case.hs, interpreted )
+[52 of 91] Compiling Reporting.Error.Canonicalize ( src/Reporting/Error/Canonicalize.hs, interpreted )
+[53 of 91] Compiling Reporting.Error  ( src/Reporting/Error.hs, interpreted )
+[54 of 91] Compiling Canonicalize.Declaration ( src/Canonicalize/Declaration.hs, interpreted )
+[55 of 91] Compiling Canonicalize.Environment ( src/Canonicalize/Environment.hs, interpreted )
+[56 of 91] Compiling Canonicalize.Result ( src/Canonicalize/Result.hs, interpreted )
+[57 of 91] Compiling Canonicalize.Port ( src/Canonicalize/Port.hs, interpreted )
+[58 of 91] Compiling Canonicalize.Variable ( src/Canonicalize/Variable.hs, interpreted )
+[59 of 91] Compiling Canonicalize.Type ( src/Canonicalize/Type.hs, interpreted )
+[60 of 91] Compiling Generate.JavaScript.Variable ( src/Generate/JavaScript/Variable.hs, interpreted )
+[61 of 91] Compiling Generate.JavaScript.BuiltIn ( src/Generate/JavaScript/BuiltIn.hs, interpreted )
+[62 of 91] Compiling Generate.JavaScript.Literal ( src/Generate/JavaScript/Literal.hs, interpreted )
+[63 of 91] Compiling Generate.JavaScript.Expression ( src/Generate/JavaScript/Expression.hs, interpreted )
+
+src/Generate/JavaScript/Expression.hs:83:8: Warning:
+    Defined but not used: ‘home’
+[64 of 91] Compiling Optimize.Environment ( src/Optimize/Environment.hs, interpreted )
+[65 of 91] Compiling Optimize.Inline  ( src/Optimize/Inline.hs, interpreted )
+[66 of 91] Compiling Type.Effect.Common ( src/Type/Effect/Common.hs, interpreted )
+[67 of 91] Compiling Reporting.Warning ( src/Reporting/Warning.hs, interpreted )
+[68 of 91] Compiling Nitpick.TopLevelTypes ( src/Nitpick/TopLevelTypes.hs, interpreted )
+[69 of 91] Compiling AST.Module       ( src/AST/Module.hs, interpreted )
+[70 of 91] Compiling Generate.JavaScript ( src/Generate/JavaScript.hs, interpreted )
+[71 of 91] Compiling Parse.Module     ( src/Parse/Module.hs, interpreted )
+[72 of 91] Compiling Elm.Compiler.Imports ( src/Elm/Compiler/Imports.hs, interpreted )
+[73 of 91] Compiling Elm.Compiler.Module ( src/Elm/Compiler/Module.hs, interpreted )
+[74 of 91] Compiling Elm.Docs         ( src/Elm/Docs.hs, interpreted )
+[75 of 91] Compiling Parse.Parse      ( src/Parse/Parse.hs, interpreted )
+[76 of 91] Compiling Optimize         ( src/Optimize.hs, interpreted )
+[77 of 91] Compiling Type.Effect      ( src/Type/Effect.hs, interpreted )
+
+src/Type/Effect.hs:241:5: Warning: Defined but not used: ‘list’
+
+src/Type/Effect.hs:241:10: Warning: Defined but not used: ‘t’
+
+src/Type/Effect.hs:245:5: Warning: Defined but not used: ‘inst’
+
+src/Type/Effect.hs:250:5: Warning:
+    Defined but not used: ‘tupleCtor’
+[78 of 91] Compiling Type.Effect.Solve ( src/Type/Effect/Solve.hs, interpreted )
+
+src/Type/Effect/Solve.hs:42:14: Warning: Defined but not used: ‘r’
+
+src/Type/Effect/Solve.hs:43:19: Warning: Defined but not used: ‘r’
+
+src/Type/Effect/Solve.hs:60:29: Warning:
+    Defined but not used: ‘getCo’
+
+src/Type/Effect/Solve.hs:62:5: Warning:
+    Defined but not used: ‘ourData’
+
+src/Type/Effect/Solve.hs:476:3: Warning:
+    Defined but not used: ‘instRepr’
+
+src/Type/Effect/Solve.hs:618:5: Warning:
+    Defined but not used: ‘forSet’
+
+src/Type/Effect/Solve.hs:663:9: Warning: Defined but not used: ‘r’
+
+src/Type/Effect/Solve.hs:675:13: Warning: Defined but not used: ‘r’
+
+src/Type/Effect/Solve.hs:756:26: Warning:
+    Defined but not used: ‘real’
+
+src/Type/Effect/Solve.hs:260:26: Warning:
+    Pattern match(es) are non-exhaustive
+    In a case alternative: Patterns not matched: VarAnnot _
+[79 of 91] Compiling Type.Effect.Literal ( src/Type/Effect/Literal.hs, interpreted )
+
+src/Type/Effect/Literal.hs:4:1: Warning:
+    The qualified import of ‘Data.Map’ is redundant
+      except perhaps to import instances from ‘Data.Map’
+    To import instances alone, use: import Data.Map()
+[80 of 91] Compiling Type.Effect.Pattern ( src/Type/Effect/Pattern.hs, interpreted )
+
+src/Type/Effect/Pattern.hs:83:17: Warning:
+    Defined but not used: ‘unannotatedTenv’
+
+src/Type/Effect/Pattern.hs:107:33: Warning:
+    Defined but not used: ‘reg’
+
+src/Type/Effect/Pattern.hs:110:12: Warning:
+    Defined but not used: ‘fields’
+[81 of 91] Compiling Type.Effect.Expression ( src/Type/Effect/Expression.hs, interpreted )
+
+src/Type/Effect/Expression.hs:7:1: Warning:
+    The qualified import of ‘Data.List’ is redundant
+      except perhaps to import instances from ‘Data.List’
+    To import instances alone, use: import Data.List()
+
+src/Type/Effect/Expression.hs:12:1: Warning:
+    The qualified import of ‘AST.Type’ is redundant
+      except perhaps to import instances from ‘AST.Type’
+    To import instances alone, use: import AST.Type()
+
+src/Type/Effect/Expression.hs:16:1: Warning:
+    The qualified import of ‘Reporting.Error.Type’ is redundant
+      except perhaps to import instances from ‘Reporting.Error.Type’
+    To import instances alone, use: import Reporting.Error.Type()
+
+src/Type/Effect/Expression.hs:22:1: Warning:
+    The qualified import of ‘Type.Type’ is redundant
+      except perhaps to import instances from ‘Type.Type’
+    To import instances alone, use: import Type.Type()
+
+src/Type/Effect/Expression.hs:51:15: Warning:
+    Defined but not used: ‘lowExpr’
+
+src/Type/Effect/Expression.hs:51:23: Warning:
+    Defined but not used: ‘highExpr’
+
+src/Type/Effect/Expression.hs:94:15: Warning:
+    This binding for ‘vars’ shadows the existing binding
+      imported from ‘Type.Effect’ at src/Type/Effect/Expression.hs:24:1-28
+      (and originally defined at src/Type/Effect.hs:96:7-10)
+
+src/Type/Effect/Expression.hs:182:8: Warning:
+    This binding for ‘vars’ shadows the existing binding
+      imported from ‘Type.Effect’ at src/Type/Effect/Expression.hs:24:1-28
+      (and originally defined at src/Type/Effect.hs:96:7-10)
+
+src/Type/Effect/Expression.hs:182:8: Warning:
+    Defined but not used: ‘vars’
+
+src/Type/Effect/Expression.hs:203:15: Warning:
+    Defined but not used: ‘subregion’
+
+src/Type/Effect/Expression.hs:209:12: Warning:
+    This binding for ‘vars’ shadows the existing binding
+      imported from ‘Type.Effect’ at src/Type/Effect/Expression.hs:24:1-28
+      (and originally defined at src/Type/Effect.hs:96:7-10)
+
+src/Type/Effect/Expression.hs:250:44: Warning:
+    Defined but not used: ‘leftRegion’
+
+src/Type/Effect/Expression.hs:250:73: Warning:
+    Defined but not used: ‘rightRegion’
+
+src/Type/Effect/Expression.hs:291:6: Warning:
+    Defined but not used: ‘expr’
+
+src/Type/Effect/Expression.hs:326:8: Warning:
+    Defined but not used: ‘condVars’
+
+src/Type/Effect/Expression.hs:332:8: Warning:
+    This binding for ‘vars’ shadows the existing binding
+      imported from ‘Type.Effect’ at src/Type/Effect/Expression.hs:24:1-28
+      (and originally defined at src/Type/Effect.hs:96:7-10)
+
+src/Type/Effect/Expression.hs:332:8: Warning:
+    Defined but not used: ‘vars’
+
+src/Type/Effect/Expression.hs:388:51: Warning:
+    Defined but not used: ‘branchPatternAnnots’
+
+src/Type/Effect/Expression.hs:391:11: Warning:
+    This binding for ‘vars’ shadows the existing binding
+      imported from ‘Type.Effect’ at src/Type/Effect/Expression.hs:24:1-28
+      (and originally defined at src/Type/Effect.hs:96:7-10)
+
+src/Type/Effect/Expression.hs:437:9: Warning:
+    This binding for ‘vars’ shadows the existing binding
+      imported from ‘Type.Effect’ at src/Type/Effect/Expression.hs:24:1-28
+      (and originally defined at src/Type/Effect.hs:96:7-10)
+[82 of 91] Compiling Canonicalize.Setup ( src/Canonicalize/Setup.hs, interpreted )
+[83 of 91] Compiling Canonicalize     ( src/Canonicalize.hs, interpreted )
+
+src/Canonicalize.hs:106:9: Warning:
+    Fields of ‘Body’ not initialised: annots
+    In the expression:
+      Body
+        {program = let expr = Decls.toExpr (Module.name modul) decls
+                   in Sort.definitions (dummyLet expr),
+         types = Map.empty,
+         datatypes = Map.fromList
+                       [(name, (vars, ctors)) | D.Datatype name vars ctors <- nakedDecls],
+         fixities = [(assoc, level, op) |
+                       D.Fixity assoc level op <- nakedDecls],
+         aliases = Map.fromList
+                     [(name, (tvs, alias)) | D.TypeAlias name tvs alias <- nakedDecls],
+         ports = [E.portName impl |
+                    D.Port (D.CanonicalPort impl) <- nakedDecls]}
+    In the expression:
+      let nakedDecls = map A.drop decls
+      in
+        Body
+          {program = let expr = ... in Sort.definitions (dummyLet expr),
+           types = Map.empty,
+           datatypes = Map.fromList
+                         [(name, (vars, ctors)) | D.Datatype name vars ctors <- nakedDecls],
+           fixities = [(assoc, level, op) |
+                         D.Fixity assoc level op <- nakedDecls],
+           aliases = Map.fromList
+                       [(name, (tvs, alias)) | D.TypeAlias name tvs alias <- nakedDecls],
+           ports = [E.portName impl |
+                      D.Port (D.CanonicalPort impl) <- nakedDecls]}
+    In an equation for ‘body’:
+        body decls
+          = let nakedDecls = map A.drop decls
+            in
+              Body
+                {program = let ... in Sort.definitions (dummyLet expr),
+                 types = Map.empty,
+                 datatypes = Map.fromList
+                               [(name, (vars, ctors)) | D.Datatype name vars ctors <- nakedDecls],
+                 fixities = [(assoc, level, op) |
+                               D.Fixity assoc level op <- nakedDecls],
+                 aliases = Map.fromList
+                             [(name, (tvs, alias)) | D.TypeAlias name tvs alias <- nakedDecls],
+                 ports = [E.portName impl |
+                            D.Port (D.CanonicalPort impl) <- nakedDecls]}
+[84 of 91] Compiling Nitpick.PatternMatches ( src/Nitpick/PatternMatches.hs, interpreted )
+
+src/Nitpick/PatternMatches.hs:103:1: Warning:
+    Defined but not used: ‘lookupOtherTags’
+
+src/Nitpick/PatternMatches.hs:124:1: Warning:
+    Defined but not used: ‘checkExpression’
+
+src/Nitpick/PatternMatches.hs:208:1: Warning:
+    Defined but not used: ‘checkPatterns’
+
+src/Nitpick/PatternMatches.hs:219:1: Warning:
+    Defined but not used: ‘checkPatternsHelp’
+
+src/Nitpick/PatternMatches.hs:238:1: Warning:
+    Defined but not used: ‘filterPatterns’
+
+src/Nitpick/PatternMatches.hs:260:1: Warning:
+    Defined but not used: ‘intersection’
+
+src/Nitpick/PatternMatches.hs:317:1: Warning:
+    Defined but not used: ‘complement’
+
+src/Nitpick/PatternMatches.hs:342:1: Warning:
+    Defined but not used: ‘complementData’
+
+src/Nitpick/PatternMatches.hs:360:1: Warning:
+    Defined but not used: ‘tagToPattern’
+
+src/Nitpick/PatternMatches.hs:368:1: Warning:
+    Defined but not used: ‘makeArgComplements’
+[85 of 91] Compiling Type.Environment ( src/Type/Environment.hs, interpreted )
+[86 of 91] Compiling Type.Constrain.Literal ( src/Type/Constrain/Literal.hs, interpreted )
+[87 of 91] Compiling Type.Constrain.Pattern ( src/Type/Constrain/Pattern.hs, interpreted )
+[88 of 91] Compiling Type.Constrain.Expression ( src/Type/Constrain/Expression.hs, interpreted )
+[89 of 91] Compiling Type.Inference   ( src/Type/Inference.hs, interpreted )
+
+src/Type/Inference.hs:25:1: Warning:
+    The import of ‘Text.PrettyPrint’ is redundant
+      except perhaps to import instances from ‘Text.PrettyPrint’
+    To import instances alone, use: import Text.PrettyPrint()
+[90 of 91] Compiling Compile          ( src/Compile.hs, interpreted )
+[91 of 91] Compiling Elm.Compiler     ( src/Elm/Compiler.hs, interpreted )
+Ok, modules loaded: Elm.Compiler, AST.Module, AST.Module.Name, Compile, Docs.Check, Elm.Compiler.Version, Elm.Compiler.Module, Elm.Docs, Elm.Package, Generate.JavaScript, Parse.Module, Parse.Parse, Reporting.Annotation, Reporting.Error, Reporting.Render.Type, Reporting.Report, Reporting.Result, Reporting.Warning, Elm.Compiler.Imports, Elm.Compiler.Type, Elm.Compiler.Type.Extract, AST.Helpers, AST.Type, AST.Variable, Parse.Helpers, Parse.Type, Docs.AST, Elm.Utils, AST.Expression.Source, AST.Pattern, Parse.Expression, AST.Declaration, AST.Expression.General, AST.Expression.Valid, AST.Expression.Canonical, Reporting.Region, AST.Literal, AST.Expression.Optimized, Optimize, Optimize.DecisionTree, Type.Effect, Type.Effect.Common, Canonicalize, Docs.Centralize, Reporting.Error.Canonicalize, Reporting.Error.Helpers, Canonicalize.Declaration, Canonicalize.Environment, Canonicalize.Port, Canonicalize.Result, Canonicalize.Setup, Canonicalize.Sort, Canonicalize.Type, Canonicalize.Variable, Nitpick.PatternMatches, Nitpick.TopLevelTypes, Type.Inference, Reporting.Error.Docs, Paths_elm_compiler, Generate.JavaScript.Expression, Generate.JavaScript.Helpers, Generate.JavaScript.Variable, Generate.JavaScript.BuiltIn, Generate.JavaScript.Literal, Generate.JavaScript.Port, Nitpick.Pattern, Reporting.Error.Pattern, Reporting.Error.Type, Optimize.Case, Optimize.Environment, Optimize.Inline, Parse.Binop, Parse.Declaration, Parse.Literal, Parse.Pattern, Reporting.Error.Syntax, Validate, Reporting.Render.Code, Type.Constrain.Expression, Type.Constrain.Literal, Type.Constrain.Pattern, Type.Environment, Type.Fragment, Type.Type, Type.Effect.Solve, Type.Effect.Expression, Type.Effect.Literal, Type.Effect.Pattern, Type.Solve, Type.State, Type.Unify.
+Data for 148 (LB, UB) (T,{})
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 148 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 148 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 151 (LB, UB) (T,{})
+Data for 148 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 151 (LB, UB) (T,{1()})
+Mismatches for ({1()},{}):
+  (1,1)
+Data for 151 (LB, UB) (T,{1()})
+Mismatches for ({1()},{1()}):
+  (0,1)
+Data for 151 (LB, UB) (T,{1()})
+Data for 148 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 152 (LB, UB) (T,{})
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 152 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 152 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 152 (LB, UB) (T,{Test.Cons({}, {})})
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 153 (LB, UB) (T,{})
+Data for 152 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 153 (LB, UB) (T,{2()})
+Mismatches for ({2()},{}):
+  (1,1)
+Data for 153 (LB, UB) (T,{2()})
+Mismatches for ({2()},{2()}):
+  (0,1)
+Data for 153 (LB, UB) (T,{2()})
+Data for 152 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,4)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,4)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 154 (LB, UB) (T,{})
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 154 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 154 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Data for 154 (LB, UB) (T,{Test.Nil()})
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{2()}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,5)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{2()}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,5)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 149 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 149 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Data for 116 (LB, UB) (T,{})
+Data for 150 (LB, UB) (T,{})
+Setting LB of 116 toT
+Mismatches for ({},{}):
+  (0,0)
+Data for 155 (LB, UB) (T,{})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 155 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 155 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 158 (LB, UB) (T,{})
+Data for 155 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 158 (LB, UB) (T,{1()})
+Mismatches for ({1()},{}):
+  (1,1)
+Data for 158 (LB, UB) (T,{1()})
+Mismatches for ({1()},{1()}):
+  (0,1)
+Data for 158 (LB, UB) (T,{1()})
+Data for 155 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 159 (LB, UB) (T,{})
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 159 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 159 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 159 (LB, UB) (T,{Test.Cons({}, {})})
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 160 (LB, UB) (T,{})
+Data for 159 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 160 (LB, UB) (T,{2()})
+Mismatches for ({2()},{}):
+  (1,1)
+Data for 160 (LB, UB) (T,{2()})
+Mismatches for ({2()},{2()}):
+  (0,1)
+Data for 160 (LB, UB) (T,{2()})
+Data for 159 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,4)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,4)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 161 (LB, UB) (T,{})
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 161 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 161 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Data for 161 (LB, UB) (T,{Test.Nil()})
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{2()}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,5)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{2()}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,5)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 156 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 156 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 162 (LB, UB) (T,{})
+Data for 156 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 111 (LB, UB) (T,{})
+Data for 162 (LB, UB) (T,{})
+Setting LB of 111 toT
+Mismatches for ({},{}):
+  (0,0)
+Data for 163 (LB, UB) (T,{})
+Data for 156 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 163 (LB, UB) (T,T)
+Top mismatch {}
+Data for 163 (LB, UB) (T,T)
+Data for 163 (LB, UB) (T,T)
+Data for 156 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, T), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Top mismatch {}
+Data for 156 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, T), Test.Cons({}, {})},{Test.Cons({}, T), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Top mismatch {}
+Mismatches for ({},{}):
+  (0,0)
+Data for 118 (LB, UB) (T,{})
+Data for 157 (LB, UB) (T,{})
+Setting LB of 118 toT
+Mismatches for ({},{}):
+  (0,0)
+Setting LB of 164 to{Test.Cons(T, T), Test.Nil()}
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Top mismatch {Test.Cons(T, T), Test.Nil()}
+Data for 166 (LB, UB) (T,{})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 165 (LB, UB) (T,{})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Setting LB of 164 to{Test.Cons(T, T), Test.Nil()}
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({}, {})})
+Mismatches for ({Test.Cons(T, T), Test.Nil()},{Test.Cons(T, T), Test.Nil()}):
+  (0,2)
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 165 (LB, UB) (T,{})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 165 (LB, UB) (T,{1()})
+Mismatches for ({1()},{}):
+  (1,1)
+Data for 165 (LB, UB) (T,{1()})
+Mismatches for ({1()},{1()}):
+  (0,1)
+Data for 165 (LB, UB) (T,{1()})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 166 (LB, UB) (T,{})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 166 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 166 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 166 (LB, UB) (T,{Test.Cons({}, {})})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 167 (LB, UB) (T,{})
+Data for 166 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 167 (LB, UB) (T,{2()})
+Mismatches for ({2()},{}):
+  (1,1)
+Data for 167 (LB, UB) (T,{2()})
+Mismatches for ({2()},{2()}):
+  (0,1)
+Data for 167 (LB, UB) (T,{2()})
+Data for 166 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,4)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,4)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 168 (LB, UB) (T,{})
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 168 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 168 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Data for 168 (LB, UB) (T,{Test.Nil()})
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{2()}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,5)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{2()}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{1()}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})}):
+  (0,5)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{}):
+  (1,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,3)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{}):
+  (1,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({Test.Cons({2()}, {}), Test.Cons({}, {})},{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{}):
+  (1,1)
+Mismatches for ({2()},{2()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{}):
+  (1,1)
+Mismatches for ({1()},{1()}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Data for 169 (LB, UB) (T,{})
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 47 (LB, UB) (T,{})
+Data for 169 (LB, UB) (T,{})
+Setting LB of 47 toT
+Mismatches for ({},{}):
+  (0,0)
+Data for 170 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{}):
+  (1,1)
+Data for 170 (LB, UB) (T,{Test.Nil()})
+Mismatches for ({Test.Nil()},{Test.Nil()}):
+  (0,1)
+Data for 45 (LB, UB) (T,{})
+Data for 171 (LB, UB) (T,{})
+Setting LB of 45 toT
+Mismatches for ({},{}):
+  (0,0)
+Data for 172 (LB, UB) (T,{})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 47 (LB, UB) (T,{})
+Data for 172 (LB, UB) (T,{})
+Setting LB of 47 toT
+Mismatches for ({},{}):
+  (0,0)
+Data for 173 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{}):
+  (1,1)
+Data for 173 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 175 (LB, UB) (T,{})
+Data for 173 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 111 (LB, UB) (T,{})
+Data for 175 (LB, UB) (T,{})
+Setting LB of 111 toT
+Mismatches for ({},{}):
+  (0,0)
+Data for 176 (LB, UB) (T,{})
+Data for 173 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,1)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Data for 176 (LB, UB) (T,T)
+Top mismatch {}
+Data for 176 (LB, UB) (T,T)
+Data for 176 (LB, UB) (T,T)
+Data for 173 (LB, UB) (T,{Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, T), Test.Cons({}, {})},{Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Top mismatch {}
+Data for 173 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({}, T), Test.Cons({}, {})},{Test.Cons({}, T), Test.Cons({}, {})}):
+  (0,2)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Mismatches for ({},{}):
+  (0,0)
+Top mismatch {}
+Mismatches for ({},{}):
+  (0,0)
+Data for 45 (LB, UB) (T,{})
+Data for 174 (LB, UB) (T,{})
+Setting LB of 45 toT
+Mismatches for ({},{}):
+  (0,0)
+Setting LB of 177 to{Test.Cons(T, T), Test.Nil()}
+Data for 177 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Top mismatch {Test.Cons(T, T), Test.Nil()}
+Setting LB of 177 to{Test.Cons(T, T), Test.Nil()}
+Data for 177 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Mismatches for ({Test.Cons(T, T), Test.Nil()},{Test.Cons(T, T), Test.Nil()}):
+  (0,2)
+Data for 47 (LB, UB) (T,{})
+Data for 177 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Setting LB of 47 to{Test.Cons(T, T), Test.Nil()}
+Mismatches for ({},{}):
+  (0,0)
+Top mismatch {Test.Cons(T, T), Test.Nil()}
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 148 {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 149 150)
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Checking imp RHS
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 149 150
+Data for 149 (LB, UB) (T,{Test.Nil()})
+Data for 150 (LB, UB) (T,{})
+Done imp RHS
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 148
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 151 148
+Data for 151 (LB, UB) (T,{1()})
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} 151
+Data for 151 (LB, UB) (T,{1()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 152 148
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for 148 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 152
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 153 152
+Data for 153 (LB, UB) (T,{2()})
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} 153
+Data for 153 (LB, UB) (T,{2()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 154 152
+Data for 154 (LB, UB) (T,{Test.Nil()})
+Data for 152 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 154
+Data for 154 (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 149
+Data for 149 (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 116 150
+Data for 116 (LB, UB) (T,{})
+Data for 150 (LB, UB) (T,{})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 155 {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 156 157)
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Checking imp RHS
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 156 157
+Data for 156 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for 157 (LB, UB) (T,{})
+Done imp RHS
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 155
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 158 155
+Data for 158 (LB, UB) (T,{1()})
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} 158
+Data for 158 (LB, UB) (T,{1()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 159 155
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for 155 (LB, UB) (T,{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 159
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 160 159
+Data for 160 (LB, UB) (T,{2()})
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} 160
+Data for 160 (LB, UB) (T,{2()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 161 159
+Data for 161 (LB, UB) (T,{Test.Nil()})
+Data for 159 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 161
+Data for 161 (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 156
+Data for 156 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 162 156
+Data for 162 (LB, UB) (T,{})
+Data for 156 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 111 162
+Data for 111 (LB, UB) (T,{})
+Data for 162 (LB, UB) (T,{})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 163 156
+Data for 163 (LB, UB) (T,T)
+Data for 156 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T 163
+Data for 163 (LB, UB) (T,T)
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 118 157
+Data for 118 (LB, UB) (T,{})
+Data for 157 (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 164 {Test.Cons(T, T), Test.Nil()}
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons(T, T), Test.Nil()}):
+  (0,5)
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 164
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons(T, T), Test.Nil()}):
+  (0,5)
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 165 164
+Data for 165 (LB, UB) (T,{1()})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons(T, T), Test.Nil()}):
+  (0,5)
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} 165
+Data for 165 (LB, UB) (T,{1()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 166 164
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for 164 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Mismatches for ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons(T, T), Test.Nil()}):
+  (0,5)
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 166
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 167 166
+Data for 167 (LB, UB) (T,{2()})
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} 167
+Data for 167 (LB, UB) (T,{2()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 168 166
+Data for 168 (LB, UB) (T,{Test.Nil()})
+Data for 166 (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 168
+Data for 168 (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 169 {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 170 171)
+Data for 169 (LB, UB) (T,{})
+Checking imp RHS
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 170 171
+Data for 170 (LB, UB) (T,{Test.Nil()})
+Data for 171 (LB, UB) (T,{})
+Done imp RHS
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 47 169
+Data for 47 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for 169 (LB, UB) (T,{})
+Mismatches for ({},{Test.Cons(T, T), Test.Nil()}):
+  (0,0)
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 170
+Data for 170 (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 45 171
+Data for 45 (LB, UB) (T,{})
+Data for 171 (LB, UB) (T,{})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 172 {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 173 174)
+Data for 172 (LB, UB) (T,{})
+Checking imp RHS
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 173 174
+Data for 173 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for 174 (LB, UB) (T,{})
+Done imp RHS
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 47 172
+Data for 47 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for 172 (LB, UB) (T,{})
+Mismatches for ({},{Test.Cons(T, T), Test.Nil()}):
+  (0,0)
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 173
+Data for 173 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 175 173
+Data for 175 (LB, UB) (T,{})
+Data for 173 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 111 175
+Data for 111 (LB, UB) (T,{})
+Data for 175 (LB, UB) (T,{})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 176 173
+Data for 176 (LB, UB) (T,T)
+Data for 173 (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T 176
+Data for 176 (LB, UB) (T,T)
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 45 174
+Data for 45 (LB, UB) (T,{})
+Data for 174 (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 177 {Test.Cons(T, T), Test.Nil()}
+Data for 177 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Mismatches for ({},{Test.Cons(T, T), Test.Nil()}):
+  (0,0)
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 47 177
+Data for 47 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for 177 (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Mismatches for ({},{Test.Cons(T, T), Test.Nil()}):
+  (0,0)
+Mismatches for ({},{Test.Cons(T, T), Test.Nil()}):
+  (0,0)
+WConstraints: [WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 148 {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 149 150),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 148,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 151 148,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} 151,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 152 148,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 152,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 153 152,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} 153,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 154 152,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 154,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 149,WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 116 150,WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 155 {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 156 157),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 155,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 158 155,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} 158,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 159 155,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 159,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 160 159,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} 160,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 161 159,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 161,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 156,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 162 156,WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 111 162,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 163 156,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T 163,WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 118 157,WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 164 {Test.Cons(T, T), Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 164,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 165 164,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} 165,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 166 164,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 166,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 167 166,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} 167,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 168 166,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 168,WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 169 {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 170 171),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 47 169,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} 170,WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 45 171,WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 172 {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 173 174),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 47 172,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} 173,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 175 173,WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 111 175,WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 176 173,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T 176,WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 45 174,WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 177 {Test.Cons(T, T), Test.Nil()},WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 47 177]
+Cons :: ∀ 71 78 73 79 76 78 79 .
+	(_78 -> _79 -> {Test.Cons(_78, _79)})
+Nil :: ∀ 69 .
+	{Test.Nil()}
+Test.Cons :: ∀ 18 19 18 19 .
+	(_18 -> _19 -> {Test.Cons(_18, _19)})
+Test.Nil :: {Test.Nil()}
+cons :: ∀ 88 93 90 94 92 93 94 .
+	(_93 -> _94 -> {Test.Cons(_93, _94)})
+map :: ∀ 40 64 52 57 42 47 45 .
+	(({Test.Nil()} < _47) => ({Test.Nil()} < _45), ({Test.Cons({}, {})} < _47) => ({Test.Cons(_57, T)} < _45), _47 < {{Test.Cons(T, T), Test.Nil()}}) =>
+		((_52 -> _57) -> _47 -> _45)
+mapTest :: ∀ 21 .
+	(({Test.Nil()} < {Test.Cons({1()}, {Test.Cons({2()}, {Test.Nil()})})}) => ({Test.Nil()} < _21), ({Test.Cons({}, {})} < {Test.Cons({1()}, {Test.Cons({2()}, {Test.Nil()})})}) => ({Test.Cons(_57, T)} < _21), {Test.Cons({1()}, {Test.Cons({2()}, {Test.Nil()})})} < {{Test.Cons(T, T), Test.Nil()}}) =>
+		_21
+"Ok"
+Leaving GHCi.

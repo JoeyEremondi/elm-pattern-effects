@@ -33,8 +33,10 @@ realBottom = RealAnnot Set.empty
 data RealAnnot =
   RealAnnot (Set.Set (String, [RealAnnot]))
   | RealTop
-  deriving (Eq, Ord, Show, Generic)
+  deriving (Eq, Ord, Generic)
 
+instance Show RealAnnot where
+  show = prettyReal
 
 data TypeAnnot' v =
   VarAnnot v
@@ -105,5 +107,5 @@ prettyConstr c = case c of
 prettyEntry (s, (ann, vars, constrs )) =
     s ++ " :: " ++
     (if null vars then "" else "∀ " ++ (List.intercalate " " $ map show vars) ++ " .\n\t")
-    ++ (if null constrs then "" else "(" ++ (List.intercalate ", " $ map prettyConstr constrs) ++ ") =>\n\t\t" )
+    ++ (if null constrs then "" else "(" ++ (List.intercalate ",\n\t" $ map prettyConstr constrs) ++ ") =>\n\t\t" )
     ++ prettyAnn ann

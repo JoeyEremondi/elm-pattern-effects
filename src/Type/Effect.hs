@@ -44,7 +44,14 @@ freshInt = do
 mkVar :: IO AnnVar
 mkVar = do
   i <- freshInt
-  newPoint <- UF.fresh $ AnnotData Nothing RealTop realBottom [] [] i
+  newPoint <- UF.fresh $ AnnotData
+    { _annRepr = Nothing
+    , _lb = RealTop
+    , _ub = realBottom
+    , _superOf = []
+    , _subOf = []
+    , _uniqueId = i
+    }
   return $ AnnVar (newPoint, i)
 
 {-

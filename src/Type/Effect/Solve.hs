@@ -612,7 +612,7 @@ elemMismatches region pr1@(s1,args1) pr2@(s2, args2) =
 --Return a warning for every element in a1 that is not matched by any element of a2
 mismatches :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
 mismatches _ _ RealTop = []
-mismatches r RealTop x = trace ("Top mismatch " ++ show x) $ [(r, Warning.MissingCase RealTop x)]
+mismatches r RealTop x = [(r, Warning.MissingCase RealTop x)]
 mismatches region (RealAnnot subs1) (RealAnnot subs2) =
   let
     forSet s f = Set.map f s
@@ -634,7 +634,7 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
           else
             [(region, Warning.MissingCase (RealAnnot $ Set.singleton sub1) (RealAnnot subs2))]
             --concat failsForSub1
-  in trace ("Mismatches for " ++ show (subs1, subs2) ++ ":\n  " ++ show (length ctorWarnings, length failsForAllSubs) ) $
+  in --trace ("Mismatches for " ++ show (RealAnnot subs1, RealAnnot subs2) ++ ":\n  " ++ show (length ctorWarnings, length failsForAllSubs) ) $
     ctorWarnings ++ concat failsForAllSubs
 {-
   concatMap (\(s, subPatsToMatch) ->
@@ -647,7 +647,10 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
 
 
 getAnnData :: AnnVar -> SolverM' a (AnnotData)
-getAnnData (AnnVar (pt, _)) =  liftIO $ UF.descriptor pt
+getAnnData v@(AnnVar (pt, _)) = do
+   ret <- liftIO $ UF.descriptor pt
+   --liftIO $ putStrLn $ "Data for " ++ show v ++ " (LB, UB) " ++ show (_lb ret, _ub ret)
+   return ret
 
 canMatchAll :: RealAnnot -> RealAnnot -> Bool
 canMatchAll r1 r2 = case mismatches (error "matchall region") r2 r1 of
@@ -669,7 +672,8 @@ unionUB r (AnnVar (pt, _)) ann = do
   --TODO emit warning
 
 intersectLB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
-intersectLB r (AnnVar (pt, _)) ann =  do
+intersectLB r (AnnVar (pt, vn)) ann =  do
+  --liftIO $ putStrLn $ "Setting LB of " ++ show vn ++ " to" ++ show ann
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
   liftIO $ UF.setDescriptor pt $ annData {_lb = newLB}
@@ -720,13 +724,13 @@ solveSubsetConstraints inCon = do
   --(lower bound)
   --TODO notation backwards
   finalLowerBoundsCheck wConstraints
-  liftIO $ putStrLn $ "WConstraints: " ++ show wConstraints
+  --liftIO $ putStrLn $ "WConstraints: " ++ show wConstraints
 
 --TODO lower bounds for pat and lit cases?
 
 finalLowerBoundsCheck :: [WConstr] -> WorklistM ()
 finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
-  liftIO $ putStrLn $ "\nFinal bounds check on " ++ show c
+  --liftIO $ putStrLn $ "\nFinal bounds check on " ++ show c
   case c of
       WSubEffect r v1 v2 -> do
         data1 <- getAnnData v1
@@ -749,12 +753,12 @@ finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
       WSubEffectOfLit r v1 _ -> do
         data1 <- getAnnData v1
         emitWarnings $ mismatches r (_ub data1) (_lb data1)
-      WSimpleImplies _ v real subCon -> do
-        ourUB <- _ub <$> getAnnData v
-        --Check if our implication condition is true, and if it is solve the sub-constraint
-        case ourUB `canMatchAll` real of
-          True -> finalLowerBoundsCheck [subCon]
-          False -> return ()
+      WSimpleImplies r v real subCon -> do
+        data1 <- getAnnData v
+        emitWarnings $ mismatches r (_ub data1) (_lb data1)
+        --liftIO $ putStrLn "Checking imp RHS"
+        finalLowerBoundsCheck [subCon]
+        --liftIO $ putStrLn "Done imp RHS"
 
 
 
@@ -802,7 +806,7 @@ workList allConstrs (c:rest) = case c of
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
     changedWhole <- unionUB r wholeVal $ RealAnnot $ Set.singleton (ctor, nBottoms)
-
+    {-
     let lbPartOfWhole =
           case _lb wholeData of
             RealTop -> RealTop
@@ -810,17 +814,18 @@ workList allConstrs (c:rest) = case c of
               RealAnnot $ Set.filter ((== ctor) . fst) pats
 
     changedPart <- intersectLB r argVar lbPartOfWhole
+    -} --TODO need to constrain part?
 
-    let needsUpdate1 =
+    {-let needsUpdate1 =
           case changedPart of
             False -> []
-            True -> List.map (allConstrs Map.! ) $ _superOf argData
+            True -> List.map (allConstrs Map.! ) $ _superOf argData-}
 
     let needsUpdate2 =
           case changedWhole of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _subOf wholeData
-    workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+    workList allConstrs (needsUpdate2 ++ {-needsUpdate1 ++-} rest)
 
   WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> do
     argData <- getAnnData argVar
@@ -828,24 +833,24 @@ workList allConstrs (c:rest) = case c of
     let nBottoms =
           (List.replicate argNum RealTop) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) RealTop)
     changedWhole <- intersectLB r wholeVal $ RealAnnot $ Set.singleton (ctor, nBottoms)
-    let wholeMatchingCtor =
+    {-let wholeMatchingCtor =
           case _ub wholeData of
             RealTop -> RealTop
             RealAnnot pats ->
               RealAnnot $ Set.filter ((== ctor) . fst) pats
 
-    changedPart <- unionUB r argVar wholeMatchingCtor
+    changedPart <- unionUB r argVar wholeMatchingCtor-}
 
-    let needsUpdate1 =
+    {-let needsUpdate1 =
           case changedPart of
             False -> []
-            True -> List.map (allConstrs Map.! ) $ _subOf argData
+            True -> List.map (allConstrs Map.! ) $ _subOf argData-}
 
     let needsUpdate2 =
           case changedWhole of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _superOf wholeData
-    workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
+    workList allConstrs ({-needsUpdate1 ++-} needsUpdate2 ++ rest)
 
   WSimpleImplies _ v real subConstr -> do
     ourUB <- _ub <$> getAnnData v
