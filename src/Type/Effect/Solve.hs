@@ -7,6 +7,7 @@ import qualified  Control.Monad.State as State
 --import Control.Monad (forM, forM_, filterM)
 
 import qualified Data.List as List
+import qualified Data.Set as Set
 
 import Reporting.Annotation as A
 import Reporting.Warning as Warning
@@ -560,18 +561,22 @@ mismatches r RealTop _ = trace "MM topfirst" $ [(r, Warning.MissingCase "_")]
 mismatches region (RealAnnot subs1) (RealAnnot subs2) = trace ("Mismatches for " ++ show (subs1, subs2)) $
   let
     for = flip List.map
+    ctors1 = Set.fromList $ List.map fst subs1
+    ctors2 = Set.fromList $ List.map fst subs2
+    ctorFails = Set.toList $ Set.difference ctors1 ctors2
+    ctorWarnings = for ctorFails $ \ctor -> (region, Warning.MissingCase ctor)
     failsForAllSubs =
       for subs1 $ \sub1 ->
         let
           failsForSub1 = for subs2 $ \sub2 ->
             elemMismatches region sub1 sub2
-        in
+        in trace ("Fails for " ++ show (subs1, subs2) ++ " are " ++ show (length failsForSub1)) $
           if (List.any List.null failsForSub1) then
             []
           else
             concat failsForSub1
   in
-    trace ("Found mismatches " ++ show (length $ concat failsForAllSubs)) $ concat failsForAllSubs
+    trace ("Found mismatches " ++ show (length $ concat failsForAllSubs)) $ ctorWarnings ++ concat failsForAllSubs
 {-
   concatMap (\(s, subPatsToMatch) ->
       case Map.lookup s d1 of
@@ -594,10 +599,10 @@ unionUB r (AnnVar (pt, _)) ann = trace "unionUB" $ do
   trace ("Old, new UB " ++ show (_ub annData, newUB)) $ liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
   --Check if we changed the set at all
   --TODO faster shortcut method
-  case (mismatches r (_ub annData) newUB) of
+  case (mismatches r newUB (_ub annData)) of
     [] -> return False
     _ -> do
-      tell $ mismatches r newUB (_lb annData)
+      --tell $ mismatches r newUB (_lb annData)
       return True
 
   --TODO emit warning
@@ -607,10 +612,10 @@ intersectLB r (AnnVar (pt, _)) ann = trace "interLB" $ do
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
   trace ("Old, new LB " ++ show (_lb annData, newLB)) $ liftIO $ UF.setDescriptor pt $ annData {_lb = newLB}
-  case (mismatches r newLB (_lb annData)) of
+  case (mismatches r (_lb annData) newLB) of
       [] -> return False
       _ -> do
-        tell $ mismatches r (_ub annData) newLB
+        --tell $ mismatches r (_ub annData) newLB
         return True
 
 
@@ -723,6 +728,7 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
   WLitSubEffectOf r realAnn v1 -> trace "WLS" $ do
     changed <- unionUB r v1 realAnn
     ourData <- getAnnData v1
+    liftIO $ putStrLn $ "WLS changed " ++ show changed
     let needsUpdate =
           case changed of
             False -> []
