@@ -57,7 +57,7 @@ toCanonicalHelper co contra getCo a = case a of
         co repr
   SinglePattern s subs -> do
     canonSubs <- forM subs co
-    return $ CanonPatDict [(s, canonSubs)]
+    return $ CanonPatDict $ Set.singleton (s, canonSubs)
   LambdaAnn a b ->
     CanonLambda <$> contra a <*> co b
   TopAnnot ->
@@ -213,7 +213,7 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                   --liftIO $ putStrLn $ "Single pat subs" ++ show (i, subVar, subConstrs)
                   return $ (WPatSubEffectOf r numArgs ctor i subVar vRight) : subConstrs
                 --Ensure we have this ctor, even if there are no args
-                let ctorConstr = WLitSubEffectOf r (RealAnnot [(ctor, List.replicate numArgs realBottom)]) vRight
+                let ctorConstr = WLitSubEffectOf r (RealAnnot $ Set.singleton(ctor, List.replicate numArgs realBottom)) vRight
                 return $ ctorConstr : (concat listsPerTriple)
 
 
@@ -249,7 +249,7 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                       --Specify that the i'th arg of our left side is a subEffect of our variable
                       return $ (WSubEffectOfPat r numArgs vLeft ctor i subVar) : subConstrs
                     --Ensure we have this ctor, even if there are no args
-                    let ctorConstr = WSubEffectOfLit r vLeft (RealAnnot [(ctor, List.replicate numArgs RealTop)])
+                    let ctorConstr = WSubEffectOfLit r vLeft (RealAnnot $ Set.singleton (ctor, List.replicate numArgs RealTop))
                     return $ ctorConstr : concat listsPerTriple
 
 
@@ -524,7 +524,7 @@ unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
 unionAnn RealTop _ = RealTop
 unionAnn _ RealTop = RealTop
 unionAnn (RealAnnot dict1) (RealAnnot dict2) =
-  RealAnnot $  dict1 ++ dict2
+  RealAnnot $  Set.union dict1 dict2
 
 
 intersectPairs :: (String, [RealAnnot]) -> (String, [RealAnnot]) -> Maybe (String, [RealAnnot])
@@ -544,7 +544,11 @@ intersectAnn x RealTop = x
 intersectAnn (RealAnnot dict1) (RealAnnot dict2) =
   --Take the pairwise intersection of all elements then union them
   --TODO do this faster?
-  RealAnnot $ Maybe.catMaybes [intersectPairs p1 p2 | p1 <- dict1, p2 <- dict2 ]
+  let
+    l1 = Set.toList dict1
+    l2 = Set.toList dict2
+  in
+    RealAnnot $ Set.fromList $ Maybe.catMaybes [intersectPairs p1 p2 | p1 <- l1, p2 <- l2 ]
 
 
 elemMismatches :: R.Region -> (String, [RealAnnot]) -> (String, [RealAnnot]) -> [(R.Region, Warning.Warning)]
@@ -560,15 +564,16 @@ mismatches _ _ RealTop = trace "MM top" $ []
 mismatches r RealTop _ = trace "MM topfirst" $ [(r, Warning.MissingCase "_")]
 mismatches region (RealAnnot subs1) (RealAnnot subs2) = trace ("Mismatches for " ++ show (subs1, subs2)) $
   let
+    forSet s f = Set.map f s
     for = flip List.map
-    ctors1 = Set.fromList $ List.map fst subs1
-    ctors2 = Set.fromList $ List.map fst subs2
+    ctors1 = Set.map fst subs1
+    ctors2 = Set.map fst subs2
     ctorFails = Set.toList $ Set.difference ctors1 ctors2
     ctorWarnings = for ctorFails $ \ctor -> (region, Warning.MissingCase ctor)
     failsForAllSubs =
-      for subs1 $ \sub1 ->
+      for (Set.toList subs1) $ \sub1 ->
         let
-          failsForSub1 = for subs2 $ \sub2 ->
+          failsForSub1 = for (Set.toList subs2) $ \sub2 ->
             elemMismatches region sub1 sub2
         in trace ("Fails for " ++ show (subs1, subs2) ++ " are " ++ show (length failsForSub1)) $
           if (List.any List.null failsForSub1) then
@@ -741,13 +746,13 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
     liftIO $ putStrLn $ "WPS nBottoms " ++ show nBottoms
-    changedWhole <- unionUB r wholeVal $ RealAnnot  [(ctor, nBottoms)]
+    changedWhole <- unionUB r wholeVal $ RealAnnot $ Set.singleton (ctor, nBottoms)
 
     let lbPartOfWhole =
           case _lb wholeData of
             RealTop -> RealTop
             RealAnnot pats ->
-              RealAnnot $ List.filter ((== ctor) . fst) pats
+              RealAnnot $ Set.filter ((== ctor) . fst) pats
 
     changedPart <- intersectLB r argVar lbPartOfWhole
 
@@ -767,12 +772,12 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum RealTop) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) RealTop)
-    changedWhole <- intersectLB r wholeVal $ RealAnnot [(ctor, nBottoms)]
+    changedWhole <- intersectLB r wholeVal $ RealAnnot $ Set.singleton (ctor, nBottoms)
     let wholeMatchingCtor =
           case _ub wholeData of
             RealTop -> RealTop
             RealAnnot pats ->
-              RealAnnot $ List.filter ((== ctor) . fst) pats
+              RealAnnot $ Set.filter ((== ctor) . fst) pats
 
     changedPart <- unionUB r argVar wholeMatchingCtor
 

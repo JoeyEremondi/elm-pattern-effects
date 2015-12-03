@@ -7,6 +7,7 @@ import Data.Binary
 import GHC.Generics (Generic)
 import qualified Data.List as List
 import Control.Monad (forM)
+import qualified Data.Set as Set
 
 
 
@@ -27,12 +28,12 @@ data AnnotData = AnnotData
   , _uniqueId :: Int
   }
 
-realBottom = RealAnnot []
+realBottom = RealAnnot Set.empty
 
 data RealAnnot =
-  RealAnnot [(String, [RealAnnot])]
+  RealAnnot (Set.Set (String, [RealAnnot]))
   | RealTop
-  deriving (Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 
 data TypeAnnot' v =
@@ -40,7 +41,7 @@ data TypeAnnot' v =
   | SinglePattern String [TypeAnnot' v]
   | LambdaAnn (TypeAnnot' v) (TypeAnnot' v)
   | TopAnnot
-  deriving (Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 mapPatSetM :: (Monad m) => (TypeAnnot' v -> m b) -> [(String, [TypeAnnot' v])] -> m [(String, [b])]
 mapPatSetM f inL = forM inL $ \(s,annList) -> do
@@ -53,7 +54,7 @@ type TypeAnnot = TypeAnnot' AnnVar
 data CanonicalAnnot =
     CanonVar Int
   | CanonLit RealAnnot
-  | CanonPatDict [(String, [CanonicalAnnot])]
+  | CanonPatDict (Set.Set (String, [CanonicalAnnot]))
   | CanonLambda (CanonicalAnnot) (CanonicalAnnot)
   | CanonTop
   deriving (Show, Generic)
@@ -63,7 +64,7 @@ instance Binary RealAnnot
 instance Binary CanonicalAnnot
 
 prettyReal (RealTop) = "T"
-prettyReal (RealAnnot subPatsSet) = show $ map (\(s,argList) -> (s, map prettyReal argList)) subPatsSet
+prettyReal (RealAnnot subPatsSet) = show $ Set.map (\(s,argList) -> (s, map prettyReal argList)) subPatsSet
 
 
 prettyAnn :: CanonicalAnnot -> String
@@ -72,4 +73,4 @@ prettyAnn ann = case ann of
   CanonLit subPatsSet -> "{" ++ prettyReal subPatsSet ++ "}"
   CanonLambda from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
   CanonTop -> "T"
-  CanonPatDict subPatsSet -> show $ map (\(s,argList) -> (s, map prettyAnn argList)) subPatsSet
+  CanonPatDict subPatsSet -> show $ Set.map (\(s,argList) -> (s, map prettyAnn argList)) subPatsSet

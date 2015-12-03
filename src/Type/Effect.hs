@@ -18,6 +18,7 @@ import Reporting.Annotation as A
 import qualified Data.Map as Map
 
 import qualified Data.List as List
+import qualified Data.Set as Set
 import qualified Reporting.Error.Type as Error
 import qualified Reporting.Region as R
 
@@ -292,7 +293,8 @@ dictMapM dict = do
 fromReal :: RealAnnot -> State.StateT (Map.Map Int AnnVar) IO (TypeAnnot, AnnotConstr)
 fromReal RealTop = return (TopAnnot, CTrue)
 fromReal (RealAnnot l) = do
-   let (ctors, subAnns) = List.unzip l
+   --TODO set-way to do this?
+   let (ctors, subAnns) = List.unzip $ Set.toList l
    pairList <-  forM subAnns $ \annList -> do
      (newSubAnns, subConstrLists) <- unzip <$> forM annList fromReal
      return (newSubAnns, subConstrLists)
@@ -331,7 +333,7 @@ fromCanonical canonAnnot = do
 
     CanonPatDict theList -> do
       ourReturn <- State.liftIO $ VarAnnot <$> mkVar
-      let (ctors, argLists) = List.unzip theList
+      let (ctors, argLists) = List.unzip $ Set.toList theList
       newResult <- forM argLists $ \argList -> do
         (newArgs, constrList) <- unzip <$> forM argList fromCanonical
         return (newArgs, constrList)

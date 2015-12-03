@@ -4,6 +4,7 @@ import Control.Arrow (second)
 import qualified Control.Monad as Monad
 import qualified Data.Map as Map
 import qualified Data.List as List
+import qualified Data.Set as Set
 
 import qualified AST.Pattern as P
 import qualified AST.Variable as V
@@ -114,4 +115,5 @@ patternsToAnnot env patList =
   if (isTotal patList env)
   then RealTop
   else
-    RealAnnot $ map (patternToAnnot env) patList
+    --TODO faster way, always sets?
+    RealAnnot $ Set.fromList $ List.map (patternToAnnot env) patList
