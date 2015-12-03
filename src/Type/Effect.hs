@@ -81,7 +81,7 @@ instance Show Error.Hint where
   show _ = ""
 
 instance Show (Annotated R.Region TypeAnnot) where
-  show (A.A r a) = show a
+  show (A.A _ a) = show a
 
 data AnnFragment = Fragment
     { typeEnv :: Map.Map String (A.Located TypeAnnot)

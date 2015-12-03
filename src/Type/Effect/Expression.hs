@@ -141,10 +141,14 @@ constrain env annotatedExpr@(A.A region expression) tipe =
                       (constrainDef env)
                       (Info [] Map.empty CTrue)
                       (concatMap expandPattern defs)
+
               --We solve our def constraints with our defs in a monoscheme
               --But we generalize them in the body
-              let letScheme =
-                    [ Scheme (CLet [monoscheme headers] constr) headers ]
+              --They get special annotations to avoid infinite recursion
+              let
+                recursiveHeaders = Map.map (\(A.A r _) -> A.A r ReturnsTop) headers
+                letScheme =
+                    [ Scheme (CLet [monoscheme recursiveHeaders] constr) headers ]
 
               --putStrLn $ "Let scheme " ++ show (CLet letScheme bodyCon) ++ "for headers " ++ show headers ++ "\n"
 

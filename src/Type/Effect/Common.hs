@@ -5,7 +5,6 @@ module Type.Effect.Common where
 import qualified Data.UnionFind.IO as UF
 import Data.Binary
 import GHC.Generics (Generic)
-import qualified Data.List as List
 import Control.Monad (forM)
 import qualified Data.Set as Set
 
@@ -41,6 +40,7 @@ data TypeAnnot' v =
   | SinglePattern String [TypeAnnot' v]
   | LambdaAnn (TypeAnnot' v) (TypeAnnot' v)
   | TopAnnot
+  | ReturnsTop --Special case for recursive calls
   deriving (Eq, Ord, Show, Generic)
 
 mapPatSetM :: (Monad m) => (TypeAnnot' v -> m b) -> [(String, [TypeAnnot' v])] -> m [(String, [b])]

@@ -62,6 +62,9 @@ toCanonicalHelper co contra getCo a = case a of
     CanonLambda <$> contra a <*> co b
   TopAnnot ->
     return CanonTop
+  ReturnsTop ->
+    --TODO find out if has function type?
+    return CanonTop
 
 data StoredScheme = StoredScheme [AnnVar] [EmittedConstr] AnnVar | StoredMono AnnVar
 
@@ -228,6 +231,8 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
 
             TopAnnot ->
               return [WLitSubEffectOf r RealTop vRight]
+            ReturnsTop -> --If subeffect of var, is not in function position, so is top
+              return [WLitSubEffectOf r RealTop vRight]
 
     (VarAnnot vLeft, _) -> do
             mreprLeft <- getRepr vLeft
@@ -263,6 +268,9 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                   makeSubEffectConstrs r newRepr aRight
 
                 TopAnnot ->
+                  return [WSubEffectOfLit r vLeft RealTop]
+
+                ReturnsTop ->
                   return [WSubEffectOfLit r vLeft RealTop]
 
 
@@ -315,6 +323,8 @@ freeVarsInAnnot a =
     LambdaAnn a1 a2 ->
       (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
     TopAnnot ->
+      return []
+    ReturnsTop ->
       return []
 
 freeVarsInConstr :: EmittedConstr -> SolverM [AnnVar]
@@ -420,6 +430,7 @@ makeFreshCopy quants inConstrList inVar = do
         (b2, pairs2) <- copyHelper a2
         return (LambdaAnn b1 b2, pairs1 ++ pairs2)
       TopAnnot -> return (TopAnnot, [])
+      ReturnsTop -> return (ReturnsTop, [])
 
     unifyPairs pairList =
       forM_ pairList $ \(old1, new1) -> forM_ pairList $ \(old2, new2) -> do
@@ -502,6 +513,18 @@ unifyAnnots r1 r2 =
         unifyAnnots a1 TopAnnot
         unifyAnnots a2 TopAnnot
         return $ LambdaAnn TopAnnot TopAnnot
+
+    (LambdaAnn a1 a2, ReturnsTop) -> do
+      unifyAnnots a2 ReturnsTop
+      return $ LambdaAnn a1 ReturnsTop
+    (ReturnsTop, LambdaAnn a1 a2) -> do
+        unifyAnnots a2 ReturnsTop
+        return $ LambdaAnn a1 ReturnsTop
+    (ReturnsTop, TopAnnot) ->
+      return TopAnnot
+    (TopAnnot, ReturnsTop) ->
+      return TopAnnot
+
     _ -> error $ "Invalid unify " ++ show r1 ++ " " ++ show r2
 
 
