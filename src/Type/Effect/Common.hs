@@ -8,13 +8,16 @@ import GHC.Generics (Generic)
 import Control.Monad (forM)
 import qualified Data.Set as Set
 import qualified Data.List as List
+import System.IO.Unsafe
 
 
 
 newtype AnnVar = AnnVar (UF.Point AnnotData, Int)
 
 instance Show AnnVar where
-  show (AnnVar (_, i)) = show i
+  show (AnnVar (pt, i)) = unsafePerformIO $ do --TODO make safe
+    annData <- UF.descriptor pt
+    return (show (i, "id=" ++ show (_uniqueId annData)))
 
 --During unification, we store a (possibly empty) representation of
 --our type so far, and our currently calculated lower and upper bounds,
