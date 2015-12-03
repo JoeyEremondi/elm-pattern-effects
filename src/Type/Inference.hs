@@ -106,18 +106,14 @@ genPatternWarnings interfaces modul =
       let envHeader = Map.map (A.A (error "OtherModule region")) header
       let environ c = Effect.CLet [Effect.Scheme (Effect.CAnd $ concat importConstrs) envHeader] c
 
-      putStrLn $ "Header from CTORS: " ++ show header
-
       fvar <- Effect.mkVar
 
       constraint <-
           Type.Effect.Expression.constrain env (program (body modul)) (Effect.VarAnnot fvar)
 
-      putStrLn $ show constraint
-
       (warnings, exportedAnnots) <- Type.Effect.Solve.solve (environ constraint)
 
-      forM warnings (\(r,w) -> putStrLn $ show (r, Effect.warningString w))
+      forM warnings (\(r,w) -> putStrLn $ show ("WARNING!!!!!", r, Effect.warningString w))
 
       forM (Map.toList exportedAnnots) $ \(s, ann) ->
         putStrLn $ s ++ " :: " ++ Effect.prettyAnn ann

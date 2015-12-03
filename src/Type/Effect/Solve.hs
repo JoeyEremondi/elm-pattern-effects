@@ -126,14 +126,13 @@ areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 applyUnifications :: AnnotConstr -> SolverM [EmittedConstr]
 applyUnifications con =
   case con of
-    CEqual _ r1 r2 -> trace "con Equal" $ do
+    CEqual _ r1 r2 -> do
       _ <- unifyAnnots r1 r2
       return []
-    CAnd constrs -> trace "con AND" $ do
+    CAnd constrs -> do
       andConstraints <- forM constrs applyUnifications
-      liftIO $ putStrLn $ "AND emitting " ++ show andConstraints
       return $ concat andConstraints
-    CLet schemes letConstr -> trace "con Let" $ do
+    CLet schemes letConstr -> do
       oldEnv <- getEnv
       --TODO do something with vars in the scheme?
       schemeSolutions <- forM schemes (solveScheme oldEnv)
@@ -143,9 +142,8 @@ applyUnifications con =
       letEmitted <- applyUnifications letConstr
       --TODO occurs check?
       modifyEnv $ \_ -> oldEnv
-      liftIO $ putStrLn $ "Let emitting " ++ show letEmitted ++ " with headers " ++ (show $ Map.keys headers)
       return $ letEmitted ++ (concat schemeEmitted)
-    CInstance r var annot -> trace "con Inst" $ do
+    CInstance r var annot -> do
       env <- getEnv
       emittedFromFresh <-
         case Map.lookup var env of
@@ -157,19 +155,16 @@ applyUnifications con =
             --Unify the type of the variable use with our newly instantiated type
             unifyAnnots annot (VarAnnot newVar)
             --Apply our instantiated constraints to that type
-            liftIO $ putStrLn $ "Made instance of " ++ show var ++ " with constr " ++ show freshEmitted ++ " and var " ++ show newVar
-            liftIO $ putStrLn $ "Unified with " ++ show annot
             return freshEmitted
-      liftIO $ putStrLn $ "Instance emitting " ++ show emittedFromFresh
       return emittedFromFresh
     CSaveEnv -> do
       saveLocalEnv
       return []
     CTrue -> return []
     CSubEffect r a b ->
-      trace ("Emitting " ++ show (ESubEffect r a b)) $ return [ESubEffect r a b]
+      return [ESubEffect r a b]
     CCanBeMatchedBy r a b ->
-      trace ("Emitting " ++ show (ECanBeMatchedBy r a b)) $ return [ECanBeMatchedBy r a b]
+      return [ECanBeMatchedBy r a b]
 
 makeWHelper (ESubEffect r left right ) =
   makeSubEffectConstrs r left right
@@ -195,15 +190,12 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
               mreprLeft <- getRepr vLeft
               case mreprLeft of
                 Nothing -> do
-                  liftIO $ putStrLn $ "Vars " ++ show (vLeft, vRight) ++ "sub no repr"
                   return [WSubEffect r vLeft vRight]
 
                 Just repLeft -> do
-                  liftIO $ putStrLn $ "Vars " ++ show (repLeft, vRight) ++ "left repr"
                   makeSubEffectConstrs  r repLeft (VarAnnot vRight)
 
             SinglePattern ctor subPats -> do
-                liftIO $ putStrLn $ "Single pat suppsed case" ++ show (ctor, subPats, vRight)
                 let numArgs = length subPats
                 let indices = [0 .. numArgs - 1]
                 subVars <- forM subPats $ \_ -> liftIO mkVar
@@ -413,7 +405,6 @@ makeFreshCopy quants inConstrList inVar = do
             mOldRepr <- getRepr v
             repPairs <- case mOldRepr of
               Nothing -> do
-                liftIO $ putStrLn "Input var had no repr"
                 return []
               Just rep -> do
                 (newRep, newPairs) <- copyHelper rep
@@ -442,12 +433,10 @@ makeFreshCopy quants inConstrList inVar = do
   (newConstrs, pairList) <- unzip <$> forM inConstrList copyConHelper
   newVar <- liftIO $ mkVar
   (newAnn, varPairs) <- copyHelper (VarAnnot inVar)
-  liftIO $ putStrLn $ "Final copied ann " ++ show newAnn
   --Unify the var for our new annotation with the annotation itself
   unifyAnnots (VarAnnot newVar) newAnn
   unifyPairs $ varPairs ++ (concat pairList)
   instRepr <- getRepr newVar
-  liftIO $ putStrLn $ "Repr of inst var " ++ show instRepr
   return (newConstrs, newVar)
 
 
@@ -583,9 +572,9 @@ elemMismatches region (s1,args1) (s2, args2) =
 
 --Return a warning for every element in a1 that is not matched by any element of a2
 mismatches :: R.Region -> RealAnnot -> RealAnnot -> [(R.Region, Warning.Warning)]
-mismatches _ _ RealTop = trace "MM top" $ []
-mismatches r RealTop _ = trace "MM topfirst" $ [(r, Warning.MissingCase "_")]
-mismatches region (RealAnnot subs1) (RealAnnot subs2) = trace ("Mismatches for " ++ show (subs1, subs2)) $
+mismatches _ _ RealTop = []
+mismatches r RealTop _ =  [(r, Warning.MissingCase "_")]
+mismatches region (RealAnnot subs1) (RealAnnot subs2) =
   let
     forSet s f = Set.map f s
     for = flip List.map
@@ -598,13 +587,13 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) = trace ("Mismatches for "
         let
           failsForSub1 = for (Set.toList subs2) $ \sub2 ->
             elemMismatches region sub1 sub2
-        in trace ("Fails for " ++ show (subs1, subs2) ++ " are " ++ show (length failsForSub1)) $
+        in
           if (List.any List.null failsForSub1) then
             []
           else
             concat failsForSub1
   in
-    trace ("Found mismatches " ++ show (length $ concat failsForAllSubs)) $ ctorWarnings ++ concat failsForAllSubs
+    ctorWarnings ++ concat failsForAllSubs
 {-
   concatMap (\(s, subPatsToMatch) ->
       case Map.lookup s d1 of
@@ -621,10 +610,10 @@ getAnnData (AnnVar (pt, _)) =  liftIO $ UF.descriptor pt
 
 --Return true if this union makes a change, false otherwise
 unionUB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
-unionUB r (AnnVar (pt, _)) ann = trace "unionUB" $ do
+unionUB r (AnnVar (pt, _)) ann = do
   annData <- liftIO $ UF.descriptor pt
   let newUB = _ub annData `unionAnn` ann
-  trace ("Old, new UB " ++ show (_ub annData, newUB)) $ liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
+  liftIO $ UF.setDescriptor pt $ annData {_ub = newUB}
   --Check if we changed the set at all
   --TODO faster shortcut method
   case (mismatches r newUB (_ub annData)) of
@@ -636,10 +625,10 @@ unionUB r (AnnVar (pt, _)) ann = trace "unionUB" $ do
   --TODO emit warning
 
 intersectLB :: R.Region -> AnnVar -> RealAnnot -> WorklistM Bool
-intersectLB r (AnnVar (pt, _)) ann = trace "interLB" $ do
+intersectLB r (AnnVar (pt, _)) ann =  do
   annData <- liftIO $ UF.descriptor pt
   let newLB = _lb annData `intersectAnn` ann
-  trace ("Old, new LB " ++ show (_lb annData, newLB)) $ liftIO $ UF.setDescriptor pt $ annData {_lb = newLB}
+  liftIO $ UF.setDescriptor pt $ annData {_lb = newLB}
   case (mismatches r (_lb annData) newLB) of
       [] -> return False
       _ -> do
@@ -680,11 +669,12 @@ addConstraintEdge i (AnnVar (pt, _), Super) = liftIO $ do
 solveSubsetConstraints :: AnnotConstr -> WorklistM ()
 solveSubsetConstraints inCon = do
   emittedConstrs <- applyUnifications inCon
-  wConstraints <- trace ("Emitted " ++ show emittedConstrs) $ concat <$> forM emittedConstrs makeWHelper
+  wConstraints <-  concat <$> forM emittedConstrs makeWHelper
   let constrPairs = zip [1..] wConstraints
-  trace ("Constraint pairs " ++ show constrPairs) $ forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ \v -> trace ("Adding cedges " ++ show (i,c,v)) addConstraintEdge i v
+  forM constrPairs $ \(i, c) -> forM (constraintEdges c) $ \v ->
+    addConstraintEdge i v
   --TODO avoid list ops here?
-  trace ("\n\n\n" ++ show wConstraints) $ workList (Map.fromList constrPairs) wConstraints
+  workList (Map.fromList constrPairs) wConstraints
   --One last check: once we've solved our constraints, check the constraint
   --That all possible values (upperBound) are covered by least possible matches
   --(lower bound)
@@ -695,7 +685,6 @@ solveSubsetConstraints inCon = do
 
 finalLowerBoundsCheck :: [WConstr] -> WorklistM ()
 finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
-  liftIO $ putStrLn ("Final bounds check" ++ show c)
   case c of
       WSubEffect r v1 v2 -> do
         data1 <- getAnnData v1
@@ -714,20 +703,20 @@ finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
         tell $ mismatches r (_ub data2) (_lb data2)
       WLitSubEffectOf r _ v2 -> do
         data2 <- getAnnData v2
-        trace ("Data2 " ++ show (_lb data2, _ub data2)) $ tell $ mismatches r (_ub data2) (_lb data2)
+        tell $ mismatches r (_ub data2) (_lb data2)
       WSubEffectOfLit r v1 _ -> do
         data1 <- getAnnData v1
-        trace ("Data1 " ++ show (_lb data1, _ub data1)) $ tell $ mismatches r (_ub data1) (_lb data1)
+        tell $ mismatches r (_ub data1) (_lb data1)
       WWarning r _ -> return ()
 
 
 workList :: (Map.Map Int WConstr) -> [WConstr] -> WorklistM ()
-workList _ [] = trace "Worklist done" $ return () --When we're finished
-workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case c of
+workList _ [] = return () --When we're finished
+workList allConstrs (c:rest) = case c of
   WWarning r s -> do
     tell [(r, Warning.MissingCase s)]
     workList allConstrs rest
-  WSubEffect r v1 v2 -> trace "WS" $do
+  WSubEffect r v1 v2 -> do
     data1 <- getAnnData v1
     data2 <- getAnnData v2
     changed1 <- unionUB r v2 (_ub data1)
@@ -744,7 +733,7 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
             True -> List.map (allConstrs Map.! ) $ _subOf data1
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
-  WSubEffectOfLit r v1 realAnn -> trace "WSL" $ do
+  WSubEffectOfLit r v1 realAnn -> do
     changed <- intersectLB r v1 realAnn
     ourData <- getAnnData v1
     let needsUpdate =
@@ -753,22 +742,20 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
             True -> List.map (allConstrs Map.! ) $ _superOf ourData
     workList allConstrs (needsUpdate ++ rest)
 
-  WLitSubEffectOf r realAnn v1 -> trace "WLS" $ do
+  WLitSubEffectOf r realAnn v1 -> do
     changed <- unionUB r v1 realAnn
     ourData <- getAnnData v1
-    liftIO $ putStrLn $ "WLS changed " ++ show changed
     let needsUpdate =
           case changed of
             False -> []
             True -> List.map (allConstrs Map.! ) $ _subOf ourData
-    trace ("WLS subs of our data " ++ show (_subOf ourData, needsUpdate)) $ workList allConstrs (needsUpdate ++ rest)
+    workList allConstrs (needsUpdate ++ rest)
 
-  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> trace "WPS" $ do
+  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
-    liftIO $ putStrLn $ "WPS nBottoms " ++ show nBottoms
     changedWhole <- unionUB r wholeVal $ RealAnnot $ Set.singleton (ctor, nBottoms)
 
     let lbPartOfWhole =
@@ -790,7 +777,7 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
             True -> List.map (allConstrs Map.! ) $ _subOf wholeData
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
-  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> trace "WSP" $ do
+  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =

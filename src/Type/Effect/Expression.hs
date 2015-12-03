@@ -410,7 +410,6 @@ constrainCase env region expr branches tipe =
             patternVar <- mkVar
             fragment <- Pattern.constrain env pattern (VarAnnot patternVar)
             branchCon <- constrain env branchExpr (VarAnnot branchVar)
-            putStrLn $ "\nConstrained branch with cond " ++ (show branchCon) ++ "\n"
             return
                 ( (branchVar, branchRegion)
                 , CLet [monoscheme $ typeEnv fragment] branchCon /\ typeConstraint fragment
@@ -466,7 +465,6 @@ constrainDef env info (Canonical.Definition _ (A.A patternRegion pattern) expr _
   case pattern of
     P.Var name ->
         do  -- Some mistake may be happening here. Currently, qs is always [].
-            putStrLn $ "Constraining def of " ++ show name
             rhsVar <- mkVar
 
             let tipe = VarAnnot rhsVar
