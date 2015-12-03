@@ -121,12 +121,7 @@ genPatternWarnings interfaces modul =
 
       forM warnings (\(r,w) -> putStrLn $ show ("WARNING!!!!!", r, Effect.warningString w))
 
-      forM (Map.toList exportedAnnots) $ \(s, (ann, vars, constrs )) ->
-        putStrLn $
-          s ++ " :: " ++
-          (if null vars then "" else "∀ " ++ show vars ++ " . ")
-          ++ (if null constrs then "" else "(" ++ (show $ map Effect.prettyConstr constrs) ++ ") => " )
-          ++ Effect.prettyAnn ann
+      forM (Map.toList exportedAnnots) $ (putStrLn . Effect.prettyEntry)
 
       return (exportedAnnots, warnings)
 

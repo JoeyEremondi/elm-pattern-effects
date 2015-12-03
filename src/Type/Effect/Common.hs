@@ -101,3 +101,9 @@ prettyConstr c = case c of
   CanonCanBeMatchedBy a1 real -> prettyAnn a1 ++ " < " ++ prettyReal real
   CanonImpl (a1, real) (a2, a3) -> "(" ++ prettyReal real ++ " < " ++ prettyAnn a1 ++ ") => ("
     ++ prettyAnn a2 ++ " < " ++ prettyAnn a3 ++ ")"
+
+prettyEntry (s, (ann, vars, constrs )) =
+    s ++ " :: " ++
+    (if null vars then "" else "∀ " ++ (List.intercalate " " $ map show vars) ++ " .\n\t")
+    ++ (if null constrs then "" else "(" ++ (List.intercalate ", " $ map prettyConstr constrs) ++ ") =>\n\t\t" )
+    ++ prettyAnn ann
