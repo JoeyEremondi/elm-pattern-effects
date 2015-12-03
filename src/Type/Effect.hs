@@ -274,8 +274,8 @@ canonicalizeValues
     -> (ModuleName.Canonical, Module.Interface)
     -> IO [(String, ([AnnVar], TypeAnnot), AnnotConstr)]
 canonicalizeValues _env (moduleName, iface)=
-  forM (Map.toList (Module.iAnnots iface)) $ \(name,canonAnnot) ->
-        do  ((instResult, instConstr), finalState) <- State.runStateT (fromCanonical canonAnnot) Map.empty
+  forM (Map.toList (Module.iAnnots iface)) $ \(name,canonTriple) ->
+        do  ((instResult, instConstr), finalState) <- State.runStateT (fromCanonicalTriple canonTriple) Map.empty
             let allVars = Map.elems  finalState
             return
               ( ModuleName.canonicalToString moduleName ++ "." ++ name
@@ -311,6 +311,8 @@ dummyRegion = R.Region (R.Position 0 0) (R.Position 0 0)
 warningString w = case w of
   Warning.MissingCase s -> "Missing case " ++ show s
   _ -> ""
+
+fromCanonicalTriple (canonAnnot, _, _) = fromCanonical canonAnnot
 
 fromCanonical :: CanonicalAnnot -> State.StateT (Map.Map Int AnnVar) IO (TypeAnnot, AnnotConstr)
 fromCanonical canonAnnot = do

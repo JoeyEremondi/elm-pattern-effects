@@ -59,9 +59,14 @@ data CanonicalAnnot =
   | CanonTop
   deriving (Show, Generic)
 
+data CanonicalConstr =
+  CanonSubtype CanonicalAnnot CanonicalAnnot
+  deriving (Show, Generic)
+
 instance (Binary a) => Binary (TypeAnnot' a)
 instance Binary RealAnnot
 instance Binary CanonicalAnnot
+instance Binary CanonicalConstr
 
 prettyReal (RealTop) = "T"
 prettyReal (RealAnnot subPatsSet) = show $ Set.map (\(s,argList) -> (s, map prettyReal argList)) subPatsSet
@@ -74,3 +79,8 @@ prettyAnn ann = case ann of
   CanonLambda from to -> prettyAnn from ++ " ==> " ++ prettyAnn to
   CanonTop -> "T"
   CanonPatDict subPatsSet -> show $ Set.map (\(s,argList) -> (s, map prettyAnn argList)) subPatsSet
+
+
+prettyConstr :: CanonicalConstr -> String
+prettyConstr c = case c of
+  CanonSubtype a1 a2 -> prettyAnn a1 ++ " <= " ++ prettyAnn a2

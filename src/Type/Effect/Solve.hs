@@ -23,7 +23,7 @@ import Debug.Trace (trace)
 solve
   :: AnnotConstr
   -> IO ( [(R.Region, Warning.Warning)]
-     , Map.Map String CanonicalAnnot)
+     , Map.Map String (CanonicalAnnot, [Int], [CanonicalConstr]))
 solve c = do
   let
       stateComp = runWriterT $ solveSubsetConstraints c
@@ -31,8 +31,16 @@ solve c = do
   (((), warnings), finalState) <- ioComp
   finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme quants constrList annVar) -> do
     ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
-    return (s, ourAnnot)
+    quantData <- forM quants $ \(AnnVar (p, _)) -> UF.descriptor p
+    let quantIDs = List.map _uniqueId quantData
+    finalConstrs <- forM constrList toCanonicalConstr
+    return (s, (ourAnnot, quantIDs, finalConstrs)) --TODO translate constraints
   return (warnings, Map.fromList finalEnv)
+
+toCanonicalConstr :: EmittedConstr -> IO CanonicalConstr
+toCanonicalConstr c = case c of
+  ESubEffect r a1 a2 -> CanonSubtype <$> toCanonicalAnnot a1 <*> toCanonicalAnnot a2
+  ECanBeMatchedBy r a1 real -> CanonSubtype <$> toCanonicalAnnot a1 <*> return (CanonLit real)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
 toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound _ub
@@ -176,7 +184,7 @@ makeWHelper (ECanBeMatchedBy r a exact) = do
 
 
     --For our other constraints, we defer solving until after unification is done
-makeSubEffectConstrs :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM' a [WConstr]
+makeSubEffectConstrs :: R.Region -> TypeAnnot -> TypeAnnot -> SolverM [WConstr]
 makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
     (_, VarAnnot vRight) -> do
       mreprRight <- getRepr vRight
@@ -269,7 +277,10 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
     (SinglePattern s1 subs1, SinglePattern s2 subs2) -> do
       case (s1 == s2) of
         False
-          -> return [WWarning r (s1 ++ " " ++ s2)] --TODO better error
+          -> do
+               tell [(r, Warning.MissingCase (s1 ++ " " ++ s2))] --TODO better error
+               return []
+
         True -> do
           subLists <- forM (zip subs1 subs2) $ \(s1, s2) ->
             makeSubEffectConstrs r s1 s2
@@ -522,14 +533,15 @@ unifyAnnots r1 r2 =
 -------------------------
 
 --Constraints we can actually deal with in our workList algorithm
-data WConstr =
-  WSubEffect R.Region AnnVar AnnVar
-  | WSubEffectOfPat R.Region Int AnnVar String Int AnnVar --Specific sub-pattern constraints
-  | WPatSubEffectOf R.Region Int String Int AnnVar AnnVar
-  | WSubEffectOfLit R.Region AnnVar RealAnnot
-  | WLitSubEffectOf R.Region RealAnnot AnnVar
-  | WWarning R.Region String --Directly throw a warning
+data WConstr' v =
+  WSubEffect R.Region v v
+  | WSubEffectOfPat R.Region Int v String Int v --Specific sub-pattern constraints
+  | WPatSubEffectOf R.Region Int String Int v v
+  | WSubEffectOfLit R.Region v RealAnnot
+  | WLitSubEffectOf R.Region RealAnnot v
   deriving (Show)
+
+type WConstr = WConstr' AnnVar
 
 
 unionAnn :: RealAnnot -> RealAnnot -> RealAnnot
@@ -647,7 +659,6 @@ constraintEdges c = case c of
   WPatSubEffectOf _ _ _ _ v1 v2 -> [(v1, Super), (v2, Sub)]
   WLitSubEffectOf _ _ v2 -> [(v2, Super)]
   WSubEffectOfLit _ v1 _ -> [(v1, Sub)]
-  WWarning _ _ -> []
 
 allVars  c = case c of
   WSubEffect _ v1 v2 -> [v1, v2]
@@ -655,7 +666,6 @@ allVars  c = case c of
   WPatSubEffectOf _ _ _ _ v1 v2 -> [v1, v2]
   WLitSubEffectOf _ _ v2 -> [v2]
   WSubEffectOfLit _ v1 _ -> [v1]
-  WWarning _ _ -> []
 
 
 addConstraintEdge :: Int -> (AnnVar, VarPosition) -> WorklistM ()
@@ -707,15 +717,11 @@ finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
       WSubEffectOfLit r v1 _ -> do
         data1 <- getAnnData v1
         tell $ mismatches r (_ub data1) (_lb data1)
-      WWarning r _ -> return ()
 
 
 workList :: (Map.Map Int WConstr) -> [WConstr] -> WorklistM ()
 workList _ [] = return () --When we're finished
 workList allConstrs (c:rest) = case c of
-  WWarning r s -> do
-    tell [(r, Warning.MissingCase s)]
-    workList allConstrs rest
   WSubEffect r v1 v2 -> do
     data1 <- getAnnData v1
     data2 <- getAnnData v2

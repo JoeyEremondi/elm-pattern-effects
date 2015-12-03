@@ -32,7 +32,13 @@ import System.IO.Unsafe
 infer
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> Except [A.Located Error.Error] (Map.Map String Type.Canonical, Map.Map String Effect.CanonicalAnnot, [(R.Region, Warning.Warning)])
+    -> Except
+        [A.Located Error.Error]
+        ( Map.Map String Type.Canonical
+        , Map.Map String ( Effect.CanonicalAnnot
+                         , [Int]
+                         , [Effect.CanonicalConstr])
+        , [(R.Region, Warning.Warning)])
 infer interfaces modul =
   either throwError return $ unsafePerformIO $ runExceptT $
     do  (header, constraint) <-
@@ -82,7 +88,7 @@ genConstraints interfaces modul =
 genPatternWarnings
     :: Module.Interfaces
     -> Module.CanonicalModule
-    -> IO ( Map.Map String Effect.CanonicalAnnot
+    -> IO ( Map.Map String (Effect.CanonicalAnnot, [Int], [Effect.CanonicalConstr])
           , [(R.Region, Warning.Warning)]
           )
 genPatternWarnings interfaces modul =
@@ -115,8 +121,12 @@ genPatternWarnings interfaces modul =
 
       forM warnings (\(r,w) -> putStrLn $ show ("WARNING!!!!!", r, Effect.warningString w))
 
-      forM (Map.toList exportedAnnots) $ \(s, ann) ->
-        putStrLn $ s ++ " :: " ++ Effect.prettyAnn ann
+      forM (Map.toList exportedAnnots) $ \(s, (ann, vars, constrs )) ->
+        putStrLn $
+          s ++ " :: " ++
+          (if null vars then "" else "forall " ++ show vars ++ " . ")
+          ++ (if null constrs then "" else "(" ++ (show $ map Effect.prettyConstr constrs) ++ ") => " )
+          ++ Effect.prettyAnn ann
 
       return (exportedAnnots, warnings)
 

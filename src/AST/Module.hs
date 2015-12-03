@@ -23,7 +23,7 @@ import qualified Elm.Package as Package
 import qualified Elm.Compiler.Version as Compiler
 import qualified Reporting.Annotation as A
 
-import qualified Type.Effect.Common
+import qualified Type.Effect.Common as Effect
 
 
 -- HELPFUL TYPE ALIASES
@@ -77,7 +77,7 @@ data Module docs imports exports body = Module
 data Body expr = Body
     { program   :: expr
     , types     :: Types
-    , annots    :: Map.Map String Type.Effect.Common.CanonicalAnnot
+    , annots    :: Map.Map String (Effect.CanonicalAnnot, [Int], [Effect.CanonicalConstr])
     , fixities  :: [(Decl.Assoc, Int, String)]
     , aliases   :: Aliases
     , datatypes :: ADTs
@@ -118,7 +118,7 @@ data Interface = Interface
     , iPackage  :: Package.Name
     , iExports  :: [Var.Value]
     , iTypes    :: Types
-    , iAnnots   :: Map.Map String Type.Effect.Common.CanonicalAnnot
+    , iAnnots   :: Map.Map String (Effect.CanonicalAnnot, [Int], [Effect.CanonicalConstr])
     , iImports  :: [Name.Raw]
     , iAdts     :: ADTs
     , iAliases  :: Aliases

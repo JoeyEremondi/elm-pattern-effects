@@ -133,9 +133,8 @@ constrain env annotatedExpr@(A.A region expression) tipe =
               -}
 
       E.Let defs body ->
-          do  --putStrLn "Constraining let body"
+          do  
               bodyCon <- constrain env body tipe
-              --putStrLn "Constraining let defs"
               (Info _vars headers constr) <-
                   Monad.foldM
                       (constrainDef env)
