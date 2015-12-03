@@ -62,6 +62,8 @@ data CanonicalAnnot =
 
 data CanonicalConstr =
   CanonSubtype CanonicalAnnot CanonicalAnnot
+  | CanonCanBeMatchedBy CanonicalAnnot RealAnnot
+  | CanonImpl (CanonicalAnnot, RealAnnot) (CanonicalAnnot, CanonicalAnnot)
   deriving (Show, Generic)
 
 instance (Binary a) => Binary (TypeAnnot' a)
@@ -77,11 +79,14 @@ prettyReal (RealAnnot subPatsSet) =
   ++ "}"
 
 
+lambdaList (CanonLambda a1 a2) = prettyAnn a1 ++ " -> " ++ lambdaList a2
+lambdaList c = prettyAnn c
+
 prettyAnn :: CanonicalAnnot -> String
 prettyAnn ann = case ann of
   CanonVar i -> "_" ++ show i
   CanonLit subPatsSet -> "{" ++ prettyReal subPatsSet ++ "}"
-  CanonLambda from to -> prettyAnn from ++ " -> " ++ prettyAnn to
+  c@(CanonLambda _ _) -> "(" ++ lambdaList c ++ ")"
   CanonTop -> "T"
   CanonPatDict subPatsSet ->
     "{" ++
@@ -93,3 +98,6 @@ prettyAnn ann = case ann of
 prettyConstr :: CanonicalConstr -> String
 prettyConstr c = case c of
   CanonSubtype a1 a2 -> prettyAnn a1 ++ " < " ++ prettyAnn a2
+  CanonCanBeMatchedBy a1 real -> prettyAnn a1 ++ " < " ++ prettyReal real
+  CanonImpl (a1, real) (a2, a3) -> "(" ++ prettyReal real ++ " < " ++ prettyAnn a1 ++ ") => ("
+    ++ prettyAnn a2 ++ " < " ++ prettyAnn a3 ++ ")"

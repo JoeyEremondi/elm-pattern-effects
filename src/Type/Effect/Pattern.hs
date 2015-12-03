@@ -100,20 +100,23 @@ isWildcard _ = False
 isTotal patList _ = --TODO check if all cases are exhaustive
   List.any isWildcard patList
 
-patternToAnnot :: Environment -> P.CanonicalPattern -> (String, [RealAnnot])
-patternToAnnot env (A.A reg pat) = case pat of
+requiredMatches = patternListToAnnot RealTop
+possibleMatches = patternListToAnnot realBottom
+
+patternToAnnot :: RealAnnot -> Environment -> P.CanonicalPattern -> (String, [RealAnnot])
+patternToAnnot varCase env (A.A reg pat) = case pat of
   P.Anything -> error "Should have filtered out top"
   P.Var _ -> error "Should have filtered out top"
   P.Record fields -> error "TODO record patterns"
-  P.Alias _ p1 -> patternToAnnot env p1
+  P.Alias _ p1 -> patternToAnnot varCase env p1
   P.Literal l -> (Literal.toCtorString l, [])
-  P.Data s args -> (V.toString s, map (\x -> patternsToAnnot env [x]) args)
+  P.Data s args -> (V.toString s, map (\x -> patternListToAnnot varCase env [x]) args)
 
 
-patternsToAnnot :: Environment -> [P.CanonicalPattern] -> RealAnnot
-patternsToAnnot env patList =
+patternListToAnnot :: RealAnnot -> Environment -> [P.CanonicalPattern] -> RealAnnot
+patternListToAnnot varCase env patList =
   if (isTotal patList env)
-  then RealTop
+  then varCase
   else
     --TODO faster way, always sets?
-    RealAnnot $ Set.fromList $ List.map (patternToAnnot env) patList
+    RealAnnot $ Set.fromList $ List.map (patternToAnnot varCase env) patList

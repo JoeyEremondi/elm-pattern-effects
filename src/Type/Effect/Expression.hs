@@ -392,7 +392,7 @@ constrainCase env region expr branches tipe =
       --TODO what is this?
       -- (vars, cons) <- pairCons region Error.CaseBranch varToCon branchResultInfo
 
-      let matchedSet = Pattern.patternsToAnnot env $ map fst branches
+      let matchedSet = Pattern.requiredMatches env $ map fst branches
       --The type of the value we split on must contain only the patterns we match on
       let inPatternsConstr = CCanBeMatchedBy region (VarAnnot exprVar) matchedSet -- TODO join patterns
 
@@ -401,7 +401,7 @@ constrainCase env region expr branches tipe =
       let joinBranchesConstr = --TODO which region
             CAnd $ zipWith
               (\branchVar pat ->
-                CMatchesImplies region (VarAnnot exprVar, Pattern.patternsToAnnot env [pat]) (VarAnnot branchVar, tipe))
+                CMatchesImplies region (VarAnnot exprVar, Pattern.possibleMatches env [pat]) (VarAnnot branchVar, tipe))
               vars (map fst branches)
 
       --TODO what is ex doing?

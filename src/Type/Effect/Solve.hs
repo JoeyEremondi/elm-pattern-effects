@@ -41,7 +41,11 @@ toCanonicalConstr :: EmittedConstr -> IO CanonicalConstr
 toCanonicalConstr c = case c of
   ESubEffect r a1 a2 -> CanonSubtype <$> toCanonicalAnnot a1 <*> toCanonicalAnnot a2
   ECanBeMatchedBy r a1 real -> CanonSubtype <$> toCanonicalAnnot a1 <*> return (CanonLit real)
-  EMatchesImplies _ _ _ -> error "TODO ematchesImplies canon"
+  EMatchesImplies _ (a1, real) (a2, a3) -> do
+    c1 <- toCanonicalAnnot a1
+    c2 <- toCanonicalAnnot a2
+    c3 <- toCanonicalAnnot a3
+    return $ CanonImpl (c1, real) (c2, c3)
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
 toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound _ub
