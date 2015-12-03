@@ -169,15 +169,11 @@ applyUnifications con =
 
 makeWHelper (ESubEffect r left right ) =
   makeSubEffectConstrs r left right
-makeWHelper (ECanBeMatchedBy r a exact) =
-  makeExactMatchConstrs r a exact
-
-
-makeExactMatchConstrs :: R.Region -> TypeAnnot -> RealAnnot -> SolverM' a [WConstr]
-makeExactMatchConstrs r a exact = do
+makeWHelper (ECanBeMatchedBy r a exact) = do
   vinter <- liftIO $ mkVar
   varMatchesAnn <- makeSubEffectConstrs r a (VarAnnot vinter)
   return $ (WSubEffectOfLit r vinter exact) : varMatchesAnn
+
 
 
     --For our other constraints, we defer solving until after unification is done
@@ -192,15 +188,18 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
         Nothing -> do
           case aLeft of
             VarAnnot vLeft -> do
-              mrepr2 <- getRepr vLeft
-              case mrepr2 of
-                Nothing ->
+              mreprLeft <- getRepr vLeft
+              case mreprLeft of
+                Nothing -> do
+                  liftIO $ putStrLn $ "Vars " ++ show (vLeft, vRight) ++ "sub no repr"
                   return [WSubEffect r vLeft vRight]
 
-                Just rep2 ->
-                  makeSubEffectConstrs  r rep2 (VarAnnot vRight)
+                Just repLeft -> do
+                  liftIO $ putStrLn $ "Vars " ++ show (repLeft, vRight) ++ "left repr"
+                  makeSubEffectConstrs  r repLeft (VarAnnot vRight)
 
-            SinglePattern ctor subPats -> trace "Single pat suppsed case" $ do
+            SinglePattern ctor subPats -> do
+                liftIO $ putStrLn $ "Single pat suppsed case" ++ show (ctor, subPats, vRight)
                 let numArgs = length subPats
                 let indices = [0 .. numArgs - 1]
                 subVars <- forM subPats $ \_ -> liftIO mkVar
@@ -208,7 +207,9 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                 --Constrain our new variables to the sub-annotations they're linked to
                 --as well as adding a constraint for our overall variable to that var as a sub-pattern
                 listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
-                  subConstrs <- makeSubEffectConstrs  r (VarAnnot subVar) subPat
+                  --Constrs: each new argument variable is a contains at least the given pattern
+                  subConstrs <- makeSubEffectConstrs  r subPat (VarAnnot subVar)
+                  --liftIO $ putStrLn $ "Single pat subs" ++ show (i, subVar, subConstrs)
                   return $ (WPatSubEffectOf r numArgs ctor i subVar vRight) : subConstrs
                 --Ensure we have this ctor, even if there are no args
                 let ctorConstr = WLitSubEffectOf r (RealAnnot [(ctor, List.replicate numArgs realBottom)]) vRight
@@ -242,7 +243,9 @@ makeSubEffectConstrs r aLeft aRight = case (aLeft, aRight) of
                     --Constrain our new variables to the sub-annotations they're linked to
                     --as well as adding a constraint for our overall variable to that var as a sub-pattern
                     listsPerTriple <- forM varPatTriples  $ \(subPat, subVar, i) -> do
+                      --Ensure that our new variable is a subeffect of the pattern
                       subConstrs <- makeSubEffectConstrs  r (VarAnnot subVar) subPat
+                      --Specify that the i'th arg of our left side is a subEffect of our variable
                       return $ (WSubEffectOfPat r numArgs vLeft ctor i subVar) : subConstrs
                     --Ensure we have this ctor, even if there are no args
                     let ctorConstr = WSubEffectOfLit r vLeft (RealAnnot [(ctor, List.replicate numArgs RealTop)])
@@ -431,6 +434,8 @@ makeFreshCopy quants inConstrList inVar = do
   --Unify the var for our new annotation with the annotation itself
   unifyAnnots (VarAnnot newVar) newAnn
   unifyPairs $ varPairs ++ (concat pairList)
+  instRepr <- getRepr newVar
+  liftIO $ putStrLn $ "Repr of inst var " ++ show instRepr
   return (newConstrs, newVar)
 
 
@@ -617,7 +622,7 @@ constraintEdges :: WConstr -> [(AnnVar, VarPosition)]
 constraintEdges c = case c of
   WSubEffect _ v1 v2 -> [(v1, Sub), (v2, Super)]
   WSubEffectOfPat _ _ v1 _ _ v2 -> [(v1, Sub), (v2, Super)]
-  WPatSubEffectOf _ _ _ _ v1 v2 -> [(v1, Sub), (v2, Super)]
+  WPatSubEffectOf _ _ _ _ v1 v2 -> [(v1, Super), (v2, Sub)]
   WLitSubEffectOf _ _ v2 -> [(v2, Super)]
   WSubEffectOfLit _ v1 _ -> [(v1, Sub)]
   WWarning _ _ -> []
@@ -724,11 +729,12 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
             True -> List.map (allConstrs Map.! ) $ _subOf ourData
     trace ("WLS subs of our data " ++ show (_subOf ourData, needsUpdate)) $ workList allConstrs (needsUpdate ++ rest)
 
-  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> trace "WSP" $ do
+  WPatSubEffectOf r numArgs ctor argNum argVar wholeVal -> trace "WPS" $ do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =
           (List.replicate argNum realBottom) ++ [_ub argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
+    liftIO $ putStrLn $ "WPS nBottoms " ++ show nBottoms
     changedWhole <- unionUB r wholeVal $ RealAnnot  [(ctor, nBottoms)]
 
     let lbPartOfWhole =
@@ -750,11 +756,11 @@ workList allConstrs (c:rest) = trace ("Worklist top " ++ show (c:rest) ) $ case 
             True -> List.map (allConstrs Map.! ) $ _subOf wholeData
     workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
 
-  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> trace "WPS" $ do
+  WSubEffectOfPat r numArgs wholeVal ctor argNum argVar -> trace "WSP" $ do
     argData <- getAnnData argVar
     wholeData <- getAnnData wholeVal
     let nBottoms =
-          (List.replicate argNum realBottom) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) realBottom)
+          (List.replicate argNum RealTop) ++ [_lb argData] ++ (List.replicate (numArgs - argNum - 1) RealTop)
     changedWhole <- intersectLB r wholeVal $ RealAnnot [(ctor, nBottoms)]
     let wholeMatchingCtor =
           case _ub wholeData of
