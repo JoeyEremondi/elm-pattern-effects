@@ -183,22 +183,28 @@ applyUnifications con =
     CMatchesImplies r pair1 pair2 ->
       return [EMatchesImplies r pair1 pair2]
 
+--The constraints that two annotation sets are equal
+--We do this at times we can't run unification anymore
+makeAnnotsEqual r v1 v2 = do
+  constrs1 <- makeSubEffectConstrs r v1 v2
+  constrs2 <- makeSubEffectConstrs r v2 v1
+  return (constrs1 ++ constrs2 )
 
 --makeWHelper :: EmittedConstr -> SolverM [WConstr]
 makeWHelper (ESubEffect r left right ) =
   makeSubEffectConstrs r left right
 makeWHelper (ECanBeMatchedBy r a exact) = do
   vinter <- liftIO $ mkVar
-  varMatchesAnn <- makeSubEffectConstrs r a (VarAnnot vinter)
+  varMatchesAnn <- makeAnnotsEqual r a (VarAnnot vinter)
   return $ (WSubEffectOfLit r vinter exact) : varMatchesAnn
 makeWHelper (EMatchesImplies r (a1, real) (a2, a3)) = do
   vinter1 <- liftIO $ mkVar
   vinter2 <- liftIO $ mkVar
   vinter3 <- liftIO $ mkVar
-  unifEmitted1 <- applyUnifications $ CEqual r (VarAnnot vinter1) a1
-  unifEmitted2 <- applyUnifications $ CEqual r (VarAnnot vinter2) a2
-  unifEmitted3 <- applyUnifications $ CEqual r (VarAnnot vinter3) a3
-  unifConstrs <- concat <$> forM (unifEmitted1 ++ unifEmitted2 ++ unifEmitted3 ) makeWHelper
+  unifEmitted1 <- makeAnnotsEqual r (VarAnnot vinter1) a1
+  unifEmitted2 <- makeAnnotsEqual r (VarAnnot vinter2) a2
+  unifEmitted3 <- makeAnnotsEqual r (VarAnnot vinter3) a3
+  let unifConstrs = (unifEmitted1 ++ unifEmitted2 ++ unifEmitted3 )
   let implConstr = WSimpleImplies r vinter1 real $ WSubEffect r vinter2 vinter3
   liftIO $ putStrLn $ "IMPL: made " ++ show (EMatchesImplies r (a1, real) (a2, a3))  ++ " into " ++ show (implConstr : unifConstrs)
   return  $ implConstr : unifConstrs
