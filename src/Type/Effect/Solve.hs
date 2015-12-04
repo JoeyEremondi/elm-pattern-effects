@@ -54,7 +54,7 @@ canonLowerBound :: TypeAnnot -> IO CanonicalAnnot
 canonLowerBound = toCanonicalHelper canonLowerBound toCanonicalAnnot _lb
 
 emitWarnings x = do
-  forM x $ \_ -> liftIO $ putStrLn $ "Emitting warning"
+  --forM x $ \_ -> liftIO $ putStrLn $ "Emitting warning"
   tell x
 
 toCanonicalHelper co contra getCo a = case a of
@@ -64,7 +64,7 @@ toCanonicalHelper co contra getCo a = case a of
     ourData <- UF.descriptor pt
     case (_annRepr ourData) of
       Nothing -> do
-        putStrLn $ "Making final int for " ++ show v
+        --putStrLn $ "Making final int for " ++ show v
         return $ CanonVar $ _uniqueId ourData
       Just repr ->
         co repr
@@ -168,7 +168,7 @@ applyUnifications con =
             (freshEmitted, newVar) <- makeFreshCopy quants constr annVar
             --Unify the type of the variable use with our newly instantiated type
             unifyAnnots annot (VarAnnot newVar)
-            liftIO $ putStrLn ("Made instance " ++ show annot ++ " of " ++ show var ++ ": " ++ show newVar ++ "\nconstr: " ++ show freshEmitted)
+            --liftIO $ putStrLn ("Made instance " ++ show annot ++ " of " ++ show var ++ ": " ++ show newVar ++ "\nconstr: " ++ show freshEmitted)
             --Apply our instantiated constraints to that type
             return freshEmitted
       return emittedFromFresh
@@ -206,7 +206,7 @@ makeWHelper (EMatchesImplies r (a1, real) (a2, a3)) = do
   unifEmitted3 <- makeAnnotsEqual r (VarAnnot vinter3) a3
   let unifConstrs = (unifEmitted1 ++ unifEmitted2 ++ unifEmitted3 )
   let implConstr = WSimpleImplies r vinter1 real $ WSubEffect r vinter2 vinter3
-  liftIO $ putStrLn $ "IMPL: made " ++ show (EMatchesImplies r (a1, real) (a2, a3))  ++ " into " ++ show (implConstr : unifConstrs)
+  --liftIO $ putStrLn $ "IMPL: made " ++ show (EMatchesImplies r (a1, real) (a2, a3))  ++ " into " ++ show (implConstr : unifConstrs)
   return  $ implConstr : unifConstrs
 
 
@@ -658,7 +658,7 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
 getAnnData :: AnnVar -> SolverM' a (AnnotData)
 getAnnData v@(AnnVar (pt, _)) = do
    ret <- liftIO $ UF.descriptor pt
-   liftIO $ putStrLn $ "Data for " ++ show v ++ " (LB, UB) " ++ show (_lb ret, _ub ret)
+   --liftIO $ putStrLn $ "Data for " ++ show v ++ " (LB, UB) " ++ show (_lb ret, _ub ret)
    return ret
 
 canMatchAll :: RealAnnot -> RealAnnot -> Bool
@@ -737,13 +737,13 @@ solveSubsetConstraints inCon = do
   --(lower bound)
   --TODO notation backwards
   finalLowerBoundsCheck wConstraints
-  liftIO $ putStrLn $ "WConstraints: " ++ show wConstraints
+  --liftIO $ putStrLn $ "WConstraints: " ++ show wConstraints
 
 --TODO lower bounds for pat and lit cases?
 
 finalLowerBoundsCheck :: [WConstr] -> WorklistM ()
 finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
-  liftIO $ putStrLn $ "\nFinal bounds check on " ++ show c
+  --liftIO $ putStrLn $ "\nFinal bounds check on " ++ show c
   case c of
       WSubEffect r v1 v2 -> do
         data1 <- getAnnData v1
@@ -872,5 +872,5 @@ workList allConstrs (c:rest) = case c of
           case ourUB `canMatchAll` real of
             True -> [subConstr]
             False -> []
-    liftIO $ putStrLn $ "Impl " ++ show c ++ " did match? " ++ show (ourUB, real, ourUB `canMatchAll` real)
+    --liftIO $ putStrLn $ "Impl " ++ show c ++ " did match? " ++ show (ourUB, real, ourUB `canMatchAll` real)
     workList allConstrs (condsToAdd ++ rest)

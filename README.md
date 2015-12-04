@@ -9,10 +9,11 @@ State of the implementation:
 - [x] Implement Constraint Generation
 - [x] Worklist algorithm to solve constraints
 - [x] Instantiation and Generalization
-- [ ] Transfer annotations and constraints across modules
+- [ ] (Almost done) Transfer annotations and constraints across modules
 - [x] Fix bugs in Constructor types
 - [x] Proper types for recursive values
-- [ ]  Implication constraints
+- [x]  Implication constraints for branch results
+- [ ]  Implication constraints for matched variables within branch
 - [ ]  Track Control-flow along with patterns
 - [ ]  Change complete pattern matches to Top
 
