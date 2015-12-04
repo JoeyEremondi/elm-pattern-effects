@@ -330,3 +330,1349 @@ src/Type/Inference.hs:25:1: Warning:
 [90 of 91] Compiling Compile          ( src/Compile.hs, interpreted )
 [91 of 91] Compiling Elm.Compiler     ( src/Elm/Compiler.hs, interpreted )
 Ok, modules loaded: Elm.Compiler, AST.Module, AST.Module.Name, Compile, Docs.Check, Elm.Compiler.Version, Elm.Compiler.Module, Elm.Docs, Elm.Package, Generate.JavaScript, Parse.Module, Parse.Parse, Reporting.Annotation, Reporting.Error, Reporting.Render.Type, Reporting.Report, Reporting.Result, Reporting.Warning, Elm.Compiler.Imports, Elm.Compiler.Type, Elm.Compiler.Type.Extract, AST.Helpers, AST.Type, AST.Variable, Parse.Helpers, Parse.Type, Docs.AST, Elm.Utils, AST.Expression.Source, AST.Pattern, Parse.Expression, AST.Declaration, AST.Expression.General, AST.Expression.Valid, AST.Expression.Canonical, Reporting.Region, AST.Literal, AST.Expression.Optimized, Optimize, Optimize.DecisionTree, Type.Effect, Type.Effect.Common, Canonicalize, Docs.Centralize, Reporting.Error.Canonicalize, Reporting.Error.Helpers, Canonicalize.Declaration, Canonicalize.Environment, Canonicalize.Port, Canonicalize.Result, Canonicalize.Setup, Canonicalize.Sort, Canonicalize.Type, Canonicalize.Variable, Nitpick.PatternMatches, Nitpick.TopLevelTypes, Type.Inference, Reporting.Error.Docs, Paths_elm_compiler, Generate.JavaScript.Expression, Generate.JavaScript.Helpers, Generate.JavaScript.Variable, Generate.JavaScript.BuiltIn, Generate.JavaScript.Literal, Generate.JavaScript.Port, Nitpick.Pattern, Reporting.Error.Pattern, Reporting.Error.Type, Optimize.Case, Optimize.Environment, Optimize.Inline, Parse.Binop, Parse.Declaration, Parse.Literal, Parse.Pattern, Reporting.Error.Syntax, Validate, Reporting.Render.Code, Type.Constrain.Expression, Type.Constrain.Literal, Type.Constrain.Pattern, Type.Environment, Type.Fragment, Type.Type, Type.Effect.Solve, Type.Effect.Expression, Type.Effect.Literal, Type.Effect.Pattern, Type.Solve, Type.State, Type.Unify.
+Made instance VarAnnot (82,"id=100") of "Cons": (99,"id=100")
+constr: []
+Made instance VarAnnot (60,"id=114") of "Nil": (113,"id=114")
+constr: []
+Made instance VarAnnot (68,"id=118") of "Cons": (117,"id=118")
+constr: []
+Made instance VarAnnot (48,"id=128") of "Nil": (127,"id=128")
+constr: []
+Made instance VarAnnot (50,"id=130") of "Nil": (129,"id=130")
+constr: []
+Made instance VarAnnot (41,"id=134") of "myNil": (135,"id=134")
+constr: [EMatchesImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (VarAnnot (47,"id=47"),{4()}) (VarAnnot (48,"id=128"),VarAnnot (133,"id=134")),EMatchesImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (VarAnnot (47,"id=47"),{3()}) (VarAnnot (50,"id=130"),VarAnnot (134,"id=134")),ECanBeMatchedBy (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (VarAnnot (47,"id=47")) {3(), 4()}]
+Made instance VarAnnot (22,"id=145") of "map": (144,"id=145")
+constr: [EMatchesImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (VarAnnot (139,"id=143"),{Test.Nil()}) (VarAnnot (60,"id=114"),VarAnnot (140,"id=142")),EMatchesImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (VarAnnot (141,"id=143"),{Test.Cons({}, {})}) (VarAnnot (62,"id=62"),VarAnnot (142,"id=142")),ECanBeMatchedBy (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (VarAnnot (143,"id=143")) {Test.Cons(T, T), Test.Nil()}]
+Made instance VarAnnot (32,"id=154") of "Nil": (153,"id=154")
+constr: []
+Made instance LambdaAnn (VarAnnot (33,"id=33")) (LambdaAnn (VarAnnot (34,"id=34")) (VarAnnot (35,"id=35"))) of "cons": (155,"id=156")
+constr: []
+Made instance LambdaAnn (VarAnnot (36,"id=36")) (LambdaAnn (VarAnnot (37,"id=37")) (VarAnnot (38,"id=38"))) of "cons": (163,"id=164")
+constr: []
+IMPL: made EMatchesImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (VarAnnot (139,"id=28"),{Test.Nil()}) (VarAnnot (60,"id=114"),VarAnnot (140,"id=21")) into [WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (172,"id=172") "Test.Cons" 0 (175,"id=175"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (175,"id=175") {1()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (172,"id=172") "Test.Cons" 1 (176,"id=176"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (176,"id=176") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (176,"id=176") "Test.Cons" 0 (177,"id=177"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (177,"id=177") {2()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (176,"id=176") "Test.Cons" 1 (178,"id=178"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (178,"id=178") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (172,"id=172"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (179,"id=179") (172,"id=172"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (179,"id=179"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (180,"id=180") (172,"id=172"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (180,"id=180"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (181,"id=181") (180,"id=180"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (181,"id=181"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (182,"id=182") (180,"id=180"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (182,"id=182"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (173,"id=173"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (174,"id=174") (140,"id=21"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (140,"id=21") (174,"id=174")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (VarAnnot (141,"id=28"),{Test.Cons({}, {})}) (VarAnnot (62,"id=62"),VarAnnot (142,"id=21")) into [WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (183,"id=183") "Test.Cons" 0 (186,"id=186"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (186,"id=186") {1()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (183,"id=183") "Test.Cons" 1 (187,"id=187"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (187,"id=187") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (187,"id=187") "Test.Cons" 0 (188,"id=188"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (188,"id=188") {2()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (187,"id=187") "Test.Cons" 1 (189,"id=189"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (189,"id=189") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (183,"id=183"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (190,"id=190") (183,"id=183"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (190,"id=190"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (191,"id=191") (183,"id=183"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (191,"id=191"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (192,"id=192") (191,"id=191"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (192,"id=192"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (193,"id=193") (191,"id=191"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (193,"id=193"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (184,"id=184") "Test.Cons" 0 (194,"id=194"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (194,"id=194") (123,"id=69"),WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (184,"id=184") "Test.Cons" 1 (195,"id=195"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (195,"id=195") T,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (184,"id=184"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (196,"id=196") (184,"id=184"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (123,"id=69") (196,"id=196"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (197,"id=197") (184,"id=184"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T (197,"id=197"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (185,"id=185") (142,"id=21"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (142,"id=21") (185,"id=185")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (VarAnnot (47,"id=47"),{4()}) (VarAnnot (48,"id=128"),VarAnnot (133,"id=134")) into [WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (207,"id=207"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (208,"id=208"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (209,"id=209") (133,"id=134"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (133,"id=134") (209,"id=209")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (VarAnnot (47,"id=47"),{3()}) (VarAnnot (50,"id=130"),VarAnnot (134,"id=134")) into [WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (210,"id=210"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (211,"id=211"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (212,"id=212") (134,"id=134"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (134,"id=134") (212,"id=212")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (VarAnnot (41,"id=134"),{Test.Cons({}, {})}) (VarAnnot (42,"id=42"),VarAnnot (40,"id=40")) into [WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") (41,"id=134"),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (41,"id=134") (214,"id=214"),WSubEffectOfLit (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") {3()},WLitSubEffectOf (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) {3()} (215,"id=215"),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (216,"id=216") (40,"id=40"),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (40,"id=40") (216,"id=216")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (VarAnnot (47,"id=47"),{4()}) (VarAnnot (48,"id=128"),VarAnnot (46,"id=46")) into [WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (218,"id=218"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (219,"id=219"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (220,"id=220") (46,"id=46"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (46,"id=46") (220,"id=220")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (VarAnnot (47,"id=47"),{3()}) (VarAnnot (50,"id=130"),VarAnnot (46,"id=46")) into [WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (221,"id=221"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (222,"id=222"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (223,"id=223") (46,"id=46"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (46,"id=46") (223,"id=223")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (VarAnnot (59,"id=59"),{Test.Nil()}) (VarAnnot (60,"id=114"),VarAnnot (57,"id=57")) into [WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227")),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") (59,"id=59"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (225,"id=225"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (226,"id=226"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (227,"id=227") (57,"id=57"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (57,"id=57") (227,"id=227")]
+IMPL: made EMatchesImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (VarAnnot (59,"id=59"),{Test.Cons({}, {})}) (VarAnnot (62,"id=62"),VarAnnot (57,"id=57")) into [WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") (59,"id=59"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (228,"id=228"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (229,"id=229") "Test.Cons" 0 (231,"id=231"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (231,"id=231") (123,"id=69"),WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (229,"id=229") "Test.Cons" 1 (232,"id=232"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (232,"id=232") T,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (229,"id=229"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (233,"id=233") (229,"id=229"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (123,"id=69") (233,"id=233"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (234,"id=234") (229,"id=229"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T (234,"id=234"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (230,"id=230") (57,"id=57"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (57,"id=57") (230,"id=230")]
+Data for (172,"id=172") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({},{Test.Nil()},False)
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (180,"id=180") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({}, {})},{Test.Nil()},False)
+Data for (179,"id=179") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (176,"id=176") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (175,"id=175") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({}, {})},{Test.Nil()},False)
+Data for (175,"id=175") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (175,"id=175") (LB, UB) ({1()},{})
+Data for (175,"id=175") (LB, UB) ({1()},{})
+Data for (176,"id=176") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (178,"id=178") (LB, UB) (T,{})
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (177,"id=177") (LB, UB) (T,{})
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (177,"id=177") (LB, UB) (T,{})
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (177,"id=177") (LB, UB) ({2()},{})
+Data for (177,"id=177") (LB, UB) ({2()},{})
+Data for (178,"id=178") (LB, UB) (T,{})
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (178,"id=178") (LB, UB) ({Test.Nil()},{})
+Data for (178,"id=178") (LB, UB) ({Test.Nil()},{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (179,"id=179") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (179,"id=179") (LB, UB) (T,{1()})
+Data for (179,"id=179") (LB, UB) (T,{1()})
+Data for (179,"id=179") (LB, UB) (T,{1()})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (180,"id=180") (LB, UB) (T,{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (181,"id=181") (LB, UB) (T,{})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (181,"id=181") (LB, UB) (T,{2()})
+Data for (181,"id=181") (LB, UB) (T,{2()})
+Data for (181,"id=181") (LB, UB) (T,{2()})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (182,"id=182") (LB, UB) (T,{})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (182,"id=182") (LB, UB) (T,{Test.Nil()})
+Data for (182,"id=182") (LB, UB) (T,{Test.Nil()})
+Data for (182,"id=182") (LB, UB) (T,{Test.Nil()})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (173,"id=173") (LB, UB) ({Test.Nil()},{})
+Data for (173,"id=173") (LB, UB) ({Test.Nil()},{})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (173,"id=173") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (173,"id=173") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (174,"id=174") (LB, UB) (T,{})
+Data for (140,"id=21") (LB, UB) (T,{})
+Data for (140,"id=21") (LB, UB) (T,{})
+Data for (174,"id=174") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({},{Test.Cons({}, {})},False)
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (191,"id=191") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) (T,{})
+Data for (185,"id=185") (LB, UB) (T,{})
+Data for (190,"id=190") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (187,"id=187") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (186,"id=186") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) (T,{})
+Data for (185,"id=185") (LB, UB) (T,{})
+Data for (186,"id=186") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (186,"id=186") (LB, UB) ({1()},{})
+Data for (186,"id=186") (LB, UB) ({1()},{})
+Data for (187,"id=187") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (189,"id=189") (LB, UB) (T,{})
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (188,"id=188") (LB, UB) (T,{})
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (188,"id=188") (LB, UB) (T,{})
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (188,"id=188") (LB, UB) ({2()},{})
+Data for (188,"id=188") (LB, UB) ({2()},{})
+Data for (189,"id=189") (LB, UB) (T,{})
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (189,"id=189") (LB, UB) ({Test.Nil()},{})
+Data for (189,"id=189") (LB, UB) ({Test.Nil()},{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (190,"id=190") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (190,"id=190") (LB, UB) (T,{1()})
+Data for (190,"id=190") (LB, UB) (T,{1()})
+Data for (190,"id=190") (LB, UB) (T,{1()})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) (T,{})
+Data for (185,"id=185") (LB, UB) (T,{})
+Data for (191,"id=191") (LB, UB) (T,{})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) (T,{})
+Data for (185,"id=185") (LB, UB) (T,{})
+Data for (192,"id=192") (LB, UB) (T,{})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (192,"id=192") (LB, UB) (T,{2()})
+Data for (192,"id=192") (LB, UB) (T,{2()})
+Data for (192,"id=192") (LB, UB) (T,{2()})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) (T,{})
+Data for (185,"id=185") (LB, UB) (T,{})
+Data for (193,"id=193") (LB, UB) (T,{})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (193,"id=193") (LB, UB) (T,{Test.Nil()})
+Data for (193,"id=193") (LB, UB) (T,{Test.Nil()})
+Data for (193,"id=193") (LB, UB) (T,{Test.Nil()})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) (T,{})
+Data for (185,"id=185") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (197,"id=197") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (142,"id=21") (LB, UB) (T,{})
+Data for (142,"id=21") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (140,"id=21") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (174,"id=174") (LB, UB) (T,{})
+Data for (174,"id=174") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (140,"id=21") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (196,"id=196") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (195,"id=195") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (194,"id=194") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (194,"id=194") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (194,"id=194") (LB, UB) (T,{})
+Data for (123,"id=69") (LB, UB) (T,{})
+Data for (195,"id=195") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (195,"id=195") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (196,"id=196") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (123,"id=69") (LB, UB) (T,{})
+Data for (196,"id=196") (LB, UB) (T,{})
+Data for (197,"id=197") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (197,"id=197") (LB, UB) (T,T)
+Data for (197,"id=197") (LB, UB) (T,T)
+Data for (197,"id=197") (LB, UB) (T,T)
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (142,"id=21") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (142,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (140,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (174,"id=174") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (174,"id=174") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (140,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Nil()},False)
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")) did match? ({Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})},{Test.Cons({}, {})},True)
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (142,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (142,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (204,"id=204") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (204,"id=204") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (203,"id=203") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (200,"id=200") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (199,"id=199") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (203,"id=203") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (199,"id=199") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (199,"id=199") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (199,"id=199") (LB, UB) (T,{1()})
+Data for (199,"id=199") (LB, UB) (T,{1()})
+Data for (199,"id=199") (LB, UB) (T,{1()})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (201,"id=201") (LB, UB) (T,{})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (201,"id=201") (LB, UB) (T,{2()})
+Data for (201,"id=201") (LB, UB) (T,{2()})
+Data for (201,"id=201") (LB, UB) (T,{2()})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (202,"id=202") (LB, UB) (T,{})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (202,"id=202") (LB, UB) (T,{Test.Nil()})
+Data for (202,"id=202") (LB, UB) (T,{Test.Nil()})
+Data for (202,"id=202") (LB, UB) (T,{Test.Nil()})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (203,"id=203") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (203,"id=203") (LB, UB) ({1()},{})
+Data for (203,"id=203") (LB, UB) ({1()},{})
+Data for (204,"id=204") (LB, UB) (T,{})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (206,"id=206") (LB, UB) (T,{})
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (205,"id=205") (LB, UB) (T,{})
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (205,"id=205") (LB, UB) (T,{})
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (205,"id=205") (LB, UB) ({2()},{})
+Data for (205,"id=205") (LB, UB) ({2()},{})
+Data for (206,"id=206") (LB, UB) (T,{})
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (206,"id=206") (LB, UB) ({Test.Nil()},{})
+Data for (206,"id=206") (LB, UB) ({Test.Nil()},{})
+Data for (207,"id=207") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")) did match? ({},{4()},False)
+Data for (207,"id=207") (LB, UB) ({3()},{})
+Data for (207,"id=207") (LB, UB) ({3()},{})
+Data for (207,"id=207") (LB, UB) ({3()},{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")) did match? ({},{4()},False)
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")) did match? ({3()},{4()},False)
+Data for (208,"id=208") (LB, UB) ({Test.Nil()},{})
+Data for (208,"id=208") (LB, UB) ({Test.Nil()},{})
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")) did match? ({3()},{4()},False)
+Data for (208,"id=208") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (208,"id=208") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")) did match? ({3()},{4()},False)
+Data for (209,"id=209") (LB, UB) (T,{})
+Data for (133,"id=134") (LB, UB) (T,{})
+Data for (133,"id=134") (LB, UB) (T,{})
+Data for (209,"id=209") (LB, UB) (T,{})
+Data for (210,"id=210") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({},{3()},False)
+Data for (210,"id=210") (LB, UB) ({3()},{})
+Data for (210,"id=210") (LB, UB) ({3()},{})
+Data for (210,"id=210") (LB, UB) ({3()},{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({},{3()},False)
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({3()},{3()},True)
+Data for (211,"id=211") (LB, UB) (T,{})
+Data for (212,"id=212") (LB, UB) (T,{})
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{})
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{})
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({3()},{3()},True)
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{})
+Data for (212,"id=212") (LB, UB) (T,{})
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({3()},{3()},True)
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (212,"id=212") (LB, UB) (T,{})
+Data for (212,"id=212") (LB, UB) (T,{Test.Nil()})
+Data for (134,"id=134") (LB, UB) (T,{})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (217,"id=217") (LB, UB) (T,{})
+Data for (217,"id=217") (LB, UB) (T,{Test.Nil()})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (214,"id=214") (LB, UB) (T,{})
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Impl WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")) did match? ({Test.Nil()},{Test.Cons({}, {})},False)
+Data for (134,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (212,"id=212") (LB, UB) (T,{Test.Nil()})
+Data for (133,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (209,"id=209") (LB, UB) (T,{})
+Data for (209,"id=209") (LB, UB) (T,{Test.Nil()})
+Data for (133,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")) did match? ({3()},{4()},False)
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({3()},{3()},True)
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (212,"id=212") (LB, UB) (T,{Test.Nil()})
+Data for (212,"id=212") (LB, UB) (T,{Test.Nil()})
+Data for (134,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (134,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (212,"id=212") (LB, UB) (T,{Test.Nil()})
+Data for (213,"id=213") (LB, UB) ({3(), 4()},{})
+Data for (213,"id=213") (LB, UB) ({3()},{})
+Data for (213,"id=213") (LB, UB) ({3()},{})
+Data for (213,"id=213") (LB, UB) ({3()},{})
+Data for (213,"id=213") (LB, UB) ({3()},{})
+Data for (213,"id=213") (LB, UB) ({3()},{3()})
+Data for (213,"id=213") (LB, UB) ({3()},{3()})
+Data for (213,"id=213") (LB, UB) ({3()},{3()})
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Impl WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")) did match? ({Test.Nil()},{Test.Cons({}, {})},False)
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Data for (215,"id=215") (LB, UB) ({3()},{})
+Data for (215,"id=215") (LB, UB) ({3()},{})
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Impl WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")) did match? ({Test.Nil()},{Test.Cons({}, {})},False)
+Data for (215,"id=215") (LB, UB) ({3()},{3()})
+Data for (215,"id=215") (LB, UB) ({3()},{3()})
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Impl WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")) did match? ({Test.Nil()},{Test.Cons({}, {})},False)
+Data for (216,"id=216") (LB, UB) (T,{})
+Data for (40,"id=40") (LB, UB) (T,{})
+Data for (40,"id=40") (LB, UB) (T,{})
+Data for (216,"id=216") (LB, UB) (T,{})
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) (T,{Test.Nil()})
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (214,"id=214") (LB, UB) (T,{Test.Nil()})
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (214,"id=214") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (214,"id=214") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Impl WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")) did match? ({Test.Nil()},{Test.Cons({}, {})},False)
+Data for (212,"id=212") (LB, UB) (T,{Test.Nil()})
+Data for (134,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (134,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (212,"id=212") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({3()},{3()},True)
+Data for (211,"id=211") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (212,"id=212") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (211,"id=211") (LB, UB) ({},{Test.Nil()})
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")) did match? ({3()},{3()},True)
+Data for (211,"id=211") (LB, UB) ({},{Test.Nil()})
+Data for (212,"id=212") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (209,"id=209") (LB, UB) (T,{Test.Nil()})
+Data for (133,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (133,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (209,"id=209") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")) did match? ({3()},{4()},False)
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (218,"id=218") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")) did match? ({},{4()},False)
+Data for (218,"id=218") (LB, UB) ({3()},{})
+Data for (218,"id=218") (LB, UB) ({3()},{})
+Data for (218,"id=218") (LB, UB) ({3()},{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")) did match? ({},{4()},False)
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")) did match? ({3()},{4()},False)
+Data for (219,"id=219") (LB, UB) ({Test.Nil()},{})
+Data for (219,"id=219") (LB, UB) ({Test.Nil()},{})
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")) did match? ({3()},{4()},False)
+Data for (219,"id=219") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (219,"id=219") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")) did match? ({3()},{4()},False)
+Data for (220,"id=220") (LB, UB) (T,{})
+Data for (46,"id=46") (LB, UB) (T,{})
+Data for (46,"id=46") (LB, UB) (T,{})
+Data for (220,"id=220") (LB, UB) (T,{})
+Data for (221,"id=221") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")) did match? ({},{3()},False)
+Data for (221,"id=221") (LB, UB) ({3()},{})
+Data for (221,"id=221") (LB, UB) ({3()},{})
+Data for (221,"id=221") (LB, UB) ({3()},{})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")) did match? ({},{3()},False)
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")) did match? ({3()},{3()},True)
+Data for (222,"id=222") (LB, UB) (T,{})
+Data for (223,"id=223") (LB, UB) (T,{})
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{})
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{})
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")) did match? ({3()},{3()},True)
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{})
+Data for (223,"id=223") (LB, UB) (T,{})
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")) did match? ({3()},{3()},True)
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (223,"id=223") (LB, UB) (T,{})
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+Data for (46,"id=46") (LB, UB) (T,{})
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+Data for (220,"id=220") (LB, UB) (T,{})
+Data for (220,"id=220") (LB, UB) (T,{Test.Nil()})
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")) did match? ({3()},{4()},False)
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+Impl WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")) did match? ({3()},{3()},True)
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+Data for (224,"id=224") (LB, UB) ({3(), 4()},{})
+Data for (224,"id=224") (LB, UB) ({3()},{})
+Data for (224,"id=224") (LB, UB) ({3()},{})
+Data for (224,"id=224") (LB, UB) ({3()},{})
+Data for (224,"id=224") (LB, UB) ({3()},{})
+Data for (224,"id=224") (LB, UB) ({3()},{3()})
+Data for (224,"id=224") (LB, UB) ({3()},{3()})
+Data for (224,"id=224") (LB, UB) ({3()},{3()})
+Data for (225,"id=225") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227")) did match? ({},{Test.Nil()},False)
+Data for (225,"id=225") (LB, UB) (T,{})
+Data for (59,"id=59") (LB, UB) (T,{})
+Data for (59,"id=59") (LB, UB) (T,{})
+Data for (225,"id=225") (LB, UB) (T,{})
+Data for (226,"id=226") (LB, UB) ({Test.Nil()},{})
+Data for (226,"id=226") (LB, UB) ({Test.Nil()},{})
+Data for (225,"id=225") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227")) did match? ({},{Test.Nil()},False)
+Data for (226,"id=226") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (226,"id=226") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (225,"id=225") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227")) did match? ({},{Test.Nil()},False)
+Data for (227,"id=227") (LB, UB) (T,{})
+Data for (57,"id=57") (LB, UB) (T,{})
+Data for (57,"id=57") (LB, UB) (T,{})
+Data for (227,"id=227") (LB, UB) (T,{})
+Data for (228,"id=228") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")) did match? ({},{Test.Cons({}, {})},False)
+Data for (228,"id=228") (LB, UB) (T,{})
+Data for (59,"id=59") (LB, UB) (T,{})
+Data for (59,"id=59") (LB, UB) (T,{})
+Data for (228,"id=228") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (234,"id=234") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (228,"id=228") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")) did match? ({},{Test.Cons({}, {})},False)
+Data for (233,"id=233") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (232,"id=232") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (231,"id=231") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (228,"id=228") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")) did match? ({},{Test.Cons({}, {})},False)
+Data for (231,"id=231") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (231,"id=231") (LB, UB) (T,{})
+Data for (123,"id=69") (LB, UB) (T,{})
+Data for (232,"id=232") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (232,"id=232") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (233,"id=233") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (123,"id=69") (LB, UB) (T,{})
+Data for (233,"id=233") (LB, UB) (T,{})
+Data for (234,"id=234") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (234,"id=234") (LB, UB) (T,T)
+Data for (234,"id=234") (LB, UB) (T,T)
+Data for (234,"id=234") (LB, UB) (T,T)
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, {})})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (228,"id=228") (LB, UB) (T,{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")) did match? ({},{Test.Cons({}, {})},False)
+Data for (230,"id=230") (LB, UB) (T,{})
+Data for (57,"id=57") (LB, UB) (T,{})
+Data for (57,"id=57") (LB, UB) (T,{})
+Data for (230,"id=230") (LB, UB) (T,{})
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) (T,{})
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) (T,{})
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (228,"id=228") (LB, UB) (T,{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (228,"id=228") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (228,"id=228") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")) did match? ({},{Test.Cons({}, {})},False)
+Data for (225,"id=225") (LB, UB) (T,{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (225,"id=225") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (225,"id=225") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Impl WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227")) did match? ({},{Test.Nil()},False)
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174"))
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")
+Data for (173,"id=173") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (174,"id=174") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Cons(T, T)}
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (172,"id=172") "Test.Cons" 0 (175,"id=175")
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (175,"id=175") (LB, UB) ({1()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (175,"id=175") {1()}
+Data for (175,"id=175") (LB, UB) ({1()},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (172,"id=172") "Test.Cons" 1 (176,"id=176")
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (176,"id=176") {Test.Cons(T, T)}
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (176,"id=176") "Test.Cons" 0 (177,"id=177")
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (177,"id=177") (LB, UB) ({2()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (177,"id=177") {2()}
+Data for (177,"id=177") (LB, UB) ({2()},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (176,"id=176") "Test.Cons" 1 (178,"id=178")
+Data for (176,"id=176") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (178,"id=178") (LB, UB) ({Test.Nil()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (178,"id=178") {Test.Nil()}
+Data for (178,"id=178") (LB, UB) ({Test.Nil()},{})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (172,"id=172")
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (179,"id=179") (172,"id=172")
+Data for (179,"id=179") (LB, UB) (T,{1()})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (179,"id=179")
+Data for (179,"id=179") (LB, UB) (T,{1()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (180,"id=180") (172,"id=172")
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (172,"id=172") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (180,"id=180")
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (181,"id=181") (180,"id=180")
+Data for (181,"id=181") (LB, UB) (T,{2()})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (181,"id=181")
+Data for (181,"id=181") (LB, UB) (T,{2()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (182,"id=182") (180,"id=180")
+Data for (182,"id=182") (LB, UB) (T,{Test.Nil()})
+Data for (180,"id=180") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (182,"id=182")
+Data for (182,"id=182") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") {Test.Nil()}
+Data for (173,"id=173") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (173,"id=173")
+Data for (173,"id=173") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (174,"id=174") (140,"id=21")
+Data for (174,"id=174") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (140,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (140,"id=21") (174,"id=174")
+Data for (140,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (174,"id=174") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185"))
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons(T, T)}
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (183,"id=183") "Test.Cons" 0 (186,"id=186")
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (186,"id=186") (LB, UB) ({1()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (186,"id=186") {1()}
+Data for (186,"id=186") (LB, UB) ({1()},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (183,"id=183") "Test.Cons" 1 (187,"id=187")
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (187,"id=187") {Test.Cons(T, T)}
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (187,"id=187") "Test.Cons" 0 (188,"id=188")
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (188,"id=188") (LB, UB) ({2()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (188,"id=188") {2()}
+Data for (188,"id=188") (LB, UB) ({2()},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (187,"id=187") "Test.Cons" 1 (189,"id=189")
+Data for (187,"id=187") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (189,"id=189") (LB, UB) ({Test.Nil()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (189,"id=189") {Test.Nil()}
+Data for (189,"id=189") (LB, UB) ({Test.Nil()},{})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (183,"id=183")
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (190,"id=190") (183,"id=183")
+Data for (190,"id=190") (LB, UB) (T,{1()})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (190,"id=190")
+Data for (190,"id=190") (LB, UB) (T,{1()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (191,"id=191") (183,"id=183")
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (183,"id=183") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (191,"id=191")
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (192,"id=192") (191,"id=191")
+Data for (192,"id=192") (LB, UB) (T,{2()})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (192,"id=192")
+Data for (192,"id=192") (LB, UB) (T,{2()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (193,"id=193") (191,"id=191")
+Data for (193,"id=193") (LB, UB) (T,{Test.Nil()})
+Data for (191,"id=191") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (193,"id=193")
+Data for (193,"id=193") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") {Test.Cons(T, T)}
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (184,"id=184") "Test.Cons" 0 (194,"id=194")
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (194,"id=194") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (194,"id=194") (123,"id=69")
+Data for (194,"id=194") (LB, UB) (T,{})
+Data for (123,"id=69") (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (184,"id=184") "Test.Cons" 1 (195,"id=195")
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (195,"id=195") (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (195,"id=195") T
+Data for (195,"id=195") (LB, UB) (T,{})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (184,"id=184")
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (196,"id=196") (184,"id=184")
+Data for (196,"id=196") (LB, UB) (T,{})
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (123,"id=69") (196,"id=196")
+Data for (123,"id=69") (LB, UB) (T,{})
+Data for (196,"id=196") (LB, UB) (T,{})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (197,"id=197") (184,"id=184")
+Data for (197,"id=197") (LB, UB) (T,T)
+Data for (184,"id=184") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T (197,"id=197")
+Data for (197,"id=197") (LB, UB) (T,T)
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (185,"id=185") (142,"id=21")
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (142,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (142,"id=21") (185,"id=185")
+Data for (142,"id=21") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (185,"id=185") (LB, UB) (T,{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (198,"id=198") {Test.Cons(T, T), Test.Nil()}
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (198,"id=198")
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (199,"id=199") (198,"id=198")
+Data for (199,"id=199") (LB, UB) (T,{1()})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (199,"id=199")
+Data for (199,"id=199") (LB, UB) (T,{1()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (200,"id=200") (198,"id=198")
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (200,"id=200")
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (201,"id=201") (200,"id=200")
+Data for (201,"id=201") (LB, UB) (T,{2()})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (201,"id=201")
+Data for (201,"id=201") (LB, UB) (T,{2()})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (202,"id=202") (200,"id=200")
+Data for (202,"id=202") (LB, UB) (T,{Test.Nil()})
+Data for (200,"id=200") (LB, UB) (T,{Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (202,"id=202")
+Data for (202,"id=202") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (198,"id=198") {Test.Cons(T, T)}
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (198,"id=198") "Test.Cons" 0 (203,"id=203")
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (203,"id=203") (LB, UB) ({1()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (203,"id=203") {1()}
+Data for (203,"id=203") (LB, UB) ({1()},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (198,"id=198") "Test.Cons" 1 (204,"id=204")
+Data for (198,"id=198") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({1()}, {}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {Test.Nil()}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({2()}, {}), Test.Cons({}, {})}), Test.Cons({}, {Test.Cons({}, {})}), Test.Cons({}, {})})
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (204,"id=204") {Test.Cons(T, T)}
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (204,"id=204") "Test.Cons" 0 (205,"id=205")
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (205,"id=205") (LB, UB) ({2()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (205,"id=205") {2()}
+Data for (205,"id=205") (LB, UB) ({2()},{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (204,"id=204") "Test.Cons" 1 (206,"id=206")
+Data for (204,"id=204") (LB, UB) ({Test.Cons(T, T)},{})
+Data for (206,"id=206") (LB, UB) ({Test.Nil()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (206,"id=206") {Test.Nil()}
+Data for (206,"id=206") (LB, UB) ({Test.Nil()},{})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209"))
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")
+Data for (208,"id=208") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (209,"id=209") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {3()}
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (207,"id=207")
+Data for (207,"id=207") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") {Test.Nil()}
+Data for (208,"id=208") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (208,"id=208")
+Data for (208,"id=208") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (209,"id=209") (133,"id=134")
+Data for (209,"id=209") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (133,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (133,"id=134") (209,"id=209")
+Data for (133,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (209,"id=209") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212"))
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")
+Data for (211,"id=211") (LB, UB) ({},{Test.Nil()})
+Data for (212,"id=212") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()}
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (210,"id=210")
+Data for (210,"id=210") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") {Test.Nil()}
+Data for (211,"id=211") (LB, UB) ({},{Test.Nil()})
+Emitting warning
+Emitting warning
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (211,"id=211")
+Data for (211,"id=211") (LB, UB) ({},{Test.Nil()})
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (212,"id=212") (134,"id=134")
+Data for (212,"id=212") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (134,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (134,"id=134") (212,"id=212")
+Data for (134,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (212,"id=212") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (213,"id=213") {3(), 4()}
+Data for (213,"id=213") (LB, UB) ({3()},{3()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (213,"id=213")
+Data for (213,"id=213") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (213,"id=213") {3()}
+Data for (213,"id=213") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216"))
+Data for (214,"id=214") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")
+Data for (215,"id=215") (LB, UB) ({3()},{3()})
+Data for (216,"id=216") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") (41,"id=134")
+Data for (214,"id=214") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (41,"id=134") (214,"id=214")
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (214,"id=214") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") {3()}
+Data for (215,"id=215") (LB, UB) ({3()},{3()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) {3()} (215,"id=215")
+Data for (215,"id=215") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (216,"id=216") (40,"id=40")
+Data for (216,"id=216") (LB, UB) (T,{})
+Data for (40,"id=40") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (40,"id=40") (216,"id=216")
+Data for (40,"id=40") (LB, UB) (T,{})
+Data for (216,"id=216") (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (217,"id=217") {Test.Cons(T, T)}
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (41,"id=134") (217,"id=217")
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (217,"id=217") (41,"id=134")
+Data for (217,"id=217") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Data for (41,"id=134") (LB, UB) ({Test.Cons(T, T)},{Test.Nil()})
+Emitting warning
+Emitting warning
+Emitting warning
+Emitting warning
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220"))
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")
+Data for (219,"id=219") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (220,"id=220") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {3()}
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (218,"id=218")
+Data for (218,"id=218") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") {Test.Nil()}
+Data for (219,"id=219") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (219,"id=219")
+Data for (219,"id=219") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (220,"id=220") (46,"id=46")
+Data for (220,"id=220") (LB, UB) (T,{Test.Nil()})
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (46,"id=46") (220,"id=220")
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+Data for (220,"id=220") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223"))
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()}
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (221,"id=221")
+Data for (221,"id=221") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") {Test.Nil()}
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (222,"id=222")
+Data for (222,"id=222") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (223,"id=223") (46,"id=46")
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (46,"id=46") (223,"id=223")
+Data for (46,"id=46") (LB, UB) (T,{Test.Nil()})
+Data for (223,"id=223") (LB, UB) (T,{Test.Nil()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (224,"id=224") {3(), 4()}
+Data for (224,"id=224") (LB, UB) ({3()},{3()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (224,"id=224")
+Data for (224,"id=224") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (224,"id=224") {3()}
+Data for (224,"id=224") (LB, UB) ({3()},{3()})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227"))
+Data for (225,"id=225") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227")
+Data for (226,"id=226") (LB, UB) ({Test.Nil()},{Test.Nil()})
+Data for (227,"id=227") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") (59,"id=59")
+Data for (225,"id=225") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (225,"id=225")
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (225,"id=225") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") {Test.Nil()}
+Data for (226,"id=226") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (226,"id=226")
+Data for (226,"id=226") (LB, UB) ({Test.Nil()},{Test.Nil()})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (227,"id=227") (57,"id=57")
+Data for (227,"id=227") (LB, UB) (T,{})
+Data for (57,"id=57") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (57,"id=57") (227,"id=227")
+Data for (57,"id=57") (LB, UB) (T,{})
+Data for (227,"id=227") (LB, UB) (T,{})
+
+Final bounds check on WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230"))
+Data for (228,"id=228") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (230,"id=230") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") (59,"id=59")
+Data for (228,"id=228") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (228,"id=228")
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (228,"id=228") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") {Test.Cons(T, T)}
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (229,"id=229") "Test.Cons" 0 (231,"id=231")
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (231,"id=231") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (231,"id=231") (123,"id=69")
+Data for (231,"id=231") (LB, UB) (T,{})
+Data for (123,"id=69") (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (229,"id=229") "Test.Cons" 1 (232,"id=232")
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+Data for (232,"id=232") (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (232,"id=232") T
+Data for (232,"id=232") (LB, UB) (T,{})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (229,"id=229")
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (233,"id=233") (229,"id=229")
+Data for (233,"id=233") (LB, UB) (T,{})
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (123,"id=69") (233,"id=233")
+Data for (123,"id=69") (LB, UB) (T,{})
+Data for (233,"id=233") (LB, UB) (T,{})
+
+Final bounds check on WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (234,"id=234") (229,"id=229")
+Data for (234,"id=234") (LB, UB) (T,T)
+Data for (229,"id=229") (LB, UB) ({Test.Cons(T, T)},{Test.Cons({}, T), Test.Cons({}, {})})
+
+Final bounds check on WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T (234,"id=234")
+Data for (234,"id=234") (LB, UB) (T,T)
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (230,"id=230") (57,"id=57")
+Data for (230,"id=230") (LB, UB) (T,{})
+Data for (57,"id=57") (LB, UB) (T,{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (57,"id=57") (230,"id=230")
+Data for (57,"id=57") (LB, UB) (T,{})
+Data for (230,"id=230") (LB, UB) (T,{})
+
+Final bounds check on WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (235,"id=235") {Test.Cons(T, T), Test.Nil()}
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (235,"id=235")
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+
+Final bounds check on WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (235,"id=235") (59,"id=59")
+Data for (235,"id=235") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+Data for (59,"id=59") (LB, UB) ({Test.Cons(T, T), Test.Nil()},{})
+WConstraints: [WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") (174,"id=174")),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (172,"id=172") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (172,"id=172") "Test.Cons" 0 (175,"id=175"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (175,"id=175") {1()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (172,"id=172") "Test.Cons" 1 (176,"id=176"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (176,"id=176") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (176,"id=176") "Test.Cons" 0 (177,"id=177"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (177,"id=177") {2()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (176,"id=176") "Test.Cons" 1 (178,"id=178"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (178,"id=178") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (172,"id=172"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (179,"id=179") (172,"id=172"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (179,"id=179"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (180,"id=180") (172,"id=172"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (180,"id=180"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (181,"id=181") (180,"id=180"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (181,"id=181"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (182,"id=182") (180,"id=180"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (182,"id=182"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (173,"id=173") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (173,"id=173"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (174,"id=174") (140,"id=21"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (140,"id=21") (174,"id=174"),WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") (185,"id=185")),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (183,"id=183") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (183,"id=183") "Test.Cons" 0 (186,"id=186"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (186,"id=186") {1()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (183,"id=183") "Test.Cons" 1 (187,"id=187"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (187,"id=187") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (187,"id=187") "Test.Cons" 0 (188,"id=188"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (188,"id=188") {2()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (187,"id=187") "Test.Cons" 1 (189,"id=189"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (189,"id=189") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (183,"id=183"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (190,"id=190") (183,"id=183"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (190,"id=190"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (191,"id=191") (183,"id=183"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (191,"id=191"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (192,"id=192") (191,"id=191"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (192,"id=192"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (193,"id=193") (191,"id=191"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (193,"id=193"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (184,"id=184") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (184,"id=184") "Test.Cons" 0 (194,"id=194"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (194,"id=194") (123,"id=69"),WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (184,"id=184") "Test.Cons" 1 (195,"id=195"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (195,"id=195") T,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (184,"id=184"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (196,"id=196") (184,"id=184"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (123,"id=69") (196,"id=196"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (197,"id=197") (184,"id=184"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T (197,"id=197"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (185,"id=185") (142,"id=21"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (142,"id=21") (185,"id=185"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (198,"id=198") {Test.Cons(T, T), Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (198,"id=198"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (199,"id=199") (198,"id=198"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {1()} (199,"id=199"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (200,"id=200") (198,"id=198"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (200,"id=200"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (201,"id=201") (200,"id=200"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {2()} (201,"id=201"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (202,"id=202") (200,"id=200"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (202,"id=202"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (198,"id=198") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (198,"id=198") "Test.Cons" 0 (203,"id=203"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (203,"id=203") {1()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (198,"id=198") "Test.Cons" 1 (204,"id=204"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (204,"id=204") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (204,"id=204") "Test.Cons" 0 (205,"id=205"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (205,"id=205") {2()},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (204,"id=204") "Test.Cons" 1 (206,"id=206"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (206,"id=206") {Test.Nil()},WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") (209,"id=209")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (207,"id=207") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (207,"id=207"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (208,"id=208") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (208,"id=208"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (209,"id=209") (133,"id=134"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (133,"id=134") (209,"id=209"),WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") (212,"id=212")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (210,"id=210") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (210,"id=210"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (211,"id=211") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (211,"id=211"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (212,"id=212") (134,"id=134"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (134,"id=134") (212,"id=212"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (213,"id=213") {3(), 4()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (213,"id=213"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (213,"id=213") {3()},WSimpleImplies (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") (216,"id=216")),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (214,"id=214") (41,"id=134"),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (41,"id=134") (214,"id=214"),WSubEffectOfLit (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (215,"id=215") {3()},WLitSubEffectOf (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) {3()} (215,"id=215"),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (216,"id=216") (40,"id=40"),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (40,"id=40") (216,"id=216"),WSubEffectOfLit (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (217,"id=217") {Test.Cons(T, T)},WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (41,"id=134") (217,"id=217"),WSubEffect (Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}}) (217,"id=217") (41,"id=134"),WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {4()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") (220,"id=220")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (218,"id=218") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (218,"id=218"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (219,"id=219") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (219,"id=219"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (220,"id=220") (46,"id=46"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (46,"id=46") (220,"id=220"),WSimpleImplies (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()} (WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") (223,"id=223")),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (221,"id=221") {3()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (221,"id=221"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (222,"id=222") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {Test.Nil()} (222,"id=222"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (223,"id=223") (46,"id=46"),WSubEffect (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (46,"id=46") (223,"id=223"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (224,"id=224") {3(), 4()},WLitSubEffectOf (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) {3()} (224,"id=224"),WSubEffectOfLit (Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}}) (224,"id=224") {3()},WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") {Test.Nil()} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") (227,"id=227")),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (225,"id=225") (59,"id=59"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (225,"id=225"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (226,"id=226") {Test.Nil()},WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Nil()} (226,"id=226"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (227,"id=227") (57,"id=57"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (57,"id=57") (227,"id=227"),WSimpleImplies (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") {Test.Cons({}, {})} (WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") (230,"id=230")),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (228,"id=228") (59,"id=59"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (228,"id=228"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (229,"id=229") {Test.Cons(T, T)},WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (229,"id=229") "Test.Cons" 0 (231,"id=231"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (231,"id=231") (123,"id=69"),WSubEffectOfPat (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 (229,"id=229") "Test.Cons" 1 (232,"id=232"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (232,"id=232") T,WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) {Test.Cons({}, {})} (229,"id=229"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 0 (233,"id=233") (229,"id=229"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (123,"id=69") (233,"id=233"),WPatSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) 2 "Test.Cons" 1 (234,"id=234") (229,"id=229"),WLitSubEffectOf (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) T (234,"id=234"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (230,"id=230") (57,"id=57"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (57,"id=57") (230,"id=230"),WSubEffectOfLit (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (235,"id=235") {Test.Cons(T, T), Test.Nil()},WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (59,"id=59") (235,"id=235"),WSubEffect (Region {start = Position {line = 10, column = 11}, end = Position {line = 12, column = 35}}) (235,"id=235") (59,"id=59")]
+Making final int for (84,"id=90")
+Making final int for (87,"id=91")
+Making final int for (90,"id=90")
+Making final int for (91,"id=91")
+Making final int for (18,"id=18")
+Making final int for (19,"id=19")
+Making final int for (18,"id=18")
+Making final int for (19,"id=19")
+Making final int for (137,"id=40")
+Making final int for (133,"id=134")
+Making final int for (134,"id=134")
+Making final int for (41,"id=134")
+Making final int for (40,"id=40")
+Making final int for (41,"id=134")
+Making final int for (101,"id=105")
+Making final int for (103,"id=106")
+Making final int for (105,"id=105")
+Making final int for (106,"id=106")
+Making final int for (71,"id=64")
+Making final int for (72,"id=69")
+Making final int for (56,"id=59")
+Making final int for (57,"id=57")
+Making final int for (59,"id=59")
+Making final int for (57,"id=57")
+Making final int for (59,"id=59")
+Making final int for (123,"id=69")
+Making final int for (57,"id=57")
+Making final int for (59,"id=59")
+Making final int for (171,"id=21")
+Making final int for (140,"id=21")
+Making final int for (123,"id=69")
+Making final int for (142,"id=21")
+Making final int for (131,"id=46")
+Making final int for (46,"id=46")
+Making final int for (46,"id=46")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 17, column = 9}, end = Position {line = 19, column = 11}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons()}")
+("WARNING!!!!!",Region {start = Position {line = 21, column = 14}, end = Position {line = 22, column = 16}},"Missing case {Test.Nil()} not matched by {Test.Cons(T, T)}")
+Cons :: ∀ 83 90 85 91 88 90 91 .
+	(_90 -> _91 -> {Test.Cons(_90, _91)})
+Nil :: ∀ 81 .
+	{Test.Nil()}
+Test.Cons :: ∀ 18 19 18 19 .
+	(_18 -> _19 -> {Test.Cons(_18, _19)})
+Test.Nil :: {Test.Nil()}
+badNilTest :: ∀ 40 .
+	(({4()} < {3()}) => ({Test.Nil()} < _134),
+	({3()} < {3()}) => ({Test.Nil()} < _134),
+	{3()} < {{3(), 4()}},
+	({Test.Cons({}, {})} < _134) => ({3()} < _40),
+	_134 < {{Test.Cons(T, T)}}) =>
+		_40
+cons :: ∀ 100 105 102 106 104 105 106 .
+	(_105 -> _106 -> {Test.Cons(_105, _106)})
+map :: ∀ 52 76 64 69 54 59 57 .
+	(({Test.Nil()} < _59) => ({Test.Nil()} < _57),
+	({Test.Cons({}, {})} < _59) => ({Test.Cons(_69, T)} < _57),
+	_59 < {{Test.Cons(T, T), Test.Nil()}}) =>
+		((_64 -> _69) -> _59 -> _57)
+mapTest :: ∀ 21 .
+	(({Test.Nil()} < {Test.Cons({1()}, {Test.Cons({2()}, {Test.Nil()})})}) => ({Test.Nil()} < _21),
+	({Test.Cons({}, {})} < {Test.Cons({1()}, {Test.Cons({2()}, {Test.Nil()})})}) => ({Test.Cons(_69, T)} < _21),
+	{Test.Cons({1()}, {Test.Cons({2()}, {Test.Nil()})})} < {{Test.Cons(T, T), Test.Nil()}}) =>
+		_21
+myNil :: ∀ 46 .
+	(({4()} < {3()}) => ({Test.Nil()} < _46),
+	({3()} < {3()}) => ({Test.Nil()} < _46),
+	{3()} < {{3(), 4()}}) =>
+		_46
+"Ok"
+Leaving GHCi.
