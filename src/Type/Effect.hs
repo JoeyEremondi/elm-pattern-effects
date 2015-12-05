@@ -79,10 +79,7 @@ data AnnotConstr =
 --  | COnlyMatches R.Region TypeAnnot TypeAnnot
   deriving (Show)
 
-data PatternLoc =
-  VarLoc --This is the location in the pattern
-  | PatternLoc String Int PatternLoc --Gen the nth var of the given constructor
-  deriving (Eq, Ord, Show)
+
 
 
 data AnnScheme = Scheme

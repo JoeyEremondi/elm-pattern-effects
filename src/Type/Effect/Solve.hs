@@ -48,6 +48,8 @@ toCanonicalConstr c = case c of
     return $ CanonImpl (c1, real) (c2, c3)
   EForallSubEffect _ a1 real a2 ->
     CanonForall <$> toCanonicalAnnot a1 <*> return real <*> toCanonicalAnnot a2
+  EPatternEqual _ a1 pat a2 ->
+    CanonPatEq <$> toCanonicalAnnot a1 <*> return pat <*> toCanonicalAnnot a2
 
 toCanonicalAnnot :: TypeAnnot -> IO CanonicalAnnot
 toCanonicalAnnot = toCanonicalHelper toCanonicalAnnot canonLowerBound
@@ -95,6 +97,7 @@ data EmittedConstr =
   | ECanBeMatchedBy R.Region TypeAnnot RealAnnot
   | EMatchesImplies R.Region (TypeAnnot, RealAnnot) (TypeAnnot, TypeAnnot)
   | EForallSubEffect R.Region TypeAnnot RealAnnot TypeAnnot
+  | EPatternEqual R.Region TypeAnnot PatternLoc TypeAnnot
   deriving (Show)
 
 getEnv :: SolverM' a Env
@@ -185,6 +188,8 @@ applyUnifications con =
       return [EMatchesImplies r pair1 pair2]
     CForallSubEffect r a1 real a2 ->
       return [EForallSubEffect r a1 real a2]
+    CPatternEqual r a1 pat a2 ->
+      return [EPatternEqual r a1 pat a2]
 
 --The constraints that two annotation sets are equal
 --We do this at times we can't run unification anymore
@@ -218,6 +223,14 @@ makeWHelper (EForallSubEffect r a1 real a2) = do
   unifEmitted2 <- makeAnnotsEqual r (VarAnnot vinter2) a2
   let unifConstrs = unifEmitted1 ++ unifEmitted2
       implConstr = WForallImpliesSubOf r vinter1 real vinter2
+  return  $ implConstr : unifConstrs
+makeWHelper (EPatternEqual r a1 pat a2) = do
+  vinter1 <- liftIO $ mkVar
+  vinter2 <- liftIO $ mkVar
+  unifEmitted1 <- makeAnnotsEqual r (VarAnnot vinter1) a1
+  unifEmitted2 <- makeAnnotsEqual r (VarAnnot vinter2) a2
+  let unifConstrs = unifEmitted1 ++ unifEmitted2
+      implConstr = WPatternEq r vinter1 pat vinter2
   return  $ implConstr : unifConstrs
 
 
@@ -377,6 +390,7 @@ freeVarsInConstr c = case c of
   ECanBeMatchedBy _ a1 _ -> freeVarsInAnnot a1
   EMatchesImplies _ (a1, _) (a2, a3) -> concat <$> forM [a1, a2, a3] (freeVarsInAnnot)
   EForallSubEffect _ a1 _ a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
+  EPatternEqual _ a1 _ a2 -> (++) <$> freeVarsInAnnot a1 <*> freeVarsInAnnot a2
 
 
 freeVarsInEnv :: Env -> SolverM [AnnVar]
@@ -457,6 +471,10 @@ makeFreshCopy quants inConstrList inVar = do
         (b1, pairs1) <- copyHelper a1
         (b2, pairs2) <- copyHelper a2
         return (EForallSubEffect r b1 real b2, pairs1 ++ pairs2)
+      EPatternEqual r a1 pat a2 -> do
+        (b1, pairs1) <- copyHelper a1
+        (b2, pairs2) <- copyHelper a2
+        return (EPatternEqual r b1 pat b2, pairs1 ++ pairs2)
     --We only need to copy our subtyping constraints
     copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
     copyHelper a = case a of
@@ -593,6 +611,7 @@ data WConstr' v =
   | WLitSubEffectOf R.Region RealAnnot v
   | WSimpleImplies R.Region v RealAnnot WConstr
   | WForallImpliesSubOf R.Region v RealAnnot v
+  | WPatternEq R.Region v PatternLoc v --Second arg is one we dig into
   deriving (Show)
 
 type WConstr = WConstr' AnnVar
@@ -726,6 +745,9 @@ constraintEdges c = case c of
   WForallImpliesSubOf _ v1 _ v2 ->
     --TODO this is way too conservative
     [(v, s) | s <- [Super, Sub], v <- [v1,v2] ]
+  WPatternEq _ v1 _ v2 ->
+    --TODO this is way too conservative
+    [(v, s) | s <- [Super, Sub], v <- [v1,v2] ]
 
 allVars  c = case c of
   WSubEffect _ v1 v2 -> [v1, v2]
@@ -735,6 +757,7 @@ allVars  c = case c of
   WSubEffectOfLit _ v1 _ -> [v1]
   WSimpleImplies _ v1 _ subConstr -> [v1] ++ allVars subConstr
   WForallImpliesSubOf _ v1 _ v2 -> [v1, v2]
+  WPatternEq _ v1 _ v2 -> [v1, v2]
 
 
 addConstraintEdge :: Int -> (AnnVar, VarPosition) -> WorklistM ()
@@ -796,6 +819,11 @@ finalLowerBoundsCheck constrList = forM_ constrList $ \c -> do
         finalLowerBoundsCheck [subCon]
         --liftIO $ putStrLn "Done imp RHS"
       WForallImpliesSubOf r v1 _ v2 -> do
+        data1 <- getAnnData v1
+        data2 <- getAnnData v2
+        emitWarnings $ mismatches r (_ub data1) (_lb data1)
+        emitWarnings $ mismatches r (_ub data2) (_lb data2)
+      WPatternEq r v1 _ v2 -> do
         data1 <- getAnnData v1
         data2 <- getAnnData v2
         emitWarnings $ mismatches r (_ub data1) (_lb data1)

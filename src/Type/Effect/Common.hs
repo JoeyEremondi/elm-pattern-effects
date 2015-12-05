@@ -70,12 +70,19 @@ data CanonicalConstr =
   | CanonCanBeMatchedBy CanonicalAnnot RealAnnot
   | CanonImpl (CanonicalAnnot, RealAnnot) (CanonicalAnnot, CanonicalAnnot)
   | CanonForall CanonicalAnnot RealAnnot CanonicalAnnot
+  | CanonPatEq CanonicalAnnot PatternLoc CanonicalAnnot
   deriving (Show, Generic)
 
 instance (Binary a) => Binary (TypeAnnot' a)
 instance Binary RealAnnot
 instance Binary CanonicalAnnot
 instance Binary CanonicalConstr
+instance Binary PatternLoc
+
+data PatternLoc =
+  VarLoc --This is the location in the pattern
+  | PatternLoc String Int PatternLoc --Gen the nth var of the given constructor
+  deriving (Eq, Ord, Show, Generic)
 
 prettyReal (RealTop) = "T"
 prettyReal (RealAnnot subPatsSet) =
@@ -100,6 +107,15 @@ prettyAnn ann = case ann of
       s ++ "(" ++ (List.intercalate ", " $ map prettyAnn argList) ++ ")" ) subPatsSet)
     ++ "}"
 
+prettyStrInPattern ploc str = case ploc of
+  VarLoc ->
+    str
+
+  PatternLoc ctor i subPat ->
+    "(" ++ show ctor ++ " " ++ (concat $ replicate i "_ ")
+    ++ prettyStrInPattern subPat str ++ " ...)"
+
+
 
 prettyConstr :: CanonicalConstr -> String
 prettyConstr c = case c of
@@ -115,6 +131,11 @@ prettyConstr c = case c of
 
   CanonForall a1 real a2 ->
     "(∀ x∈" ++ prettyAnn a1 ++ " . x < " ++ prettyReal real ++ "=> x < " ++ prettyAnn a2 ++ ")"
+
+  CanonPatEq a1 pat a2 ->
+    "(" ++ prettyAnn a2 ++ " == " ++ prettyStrInPattern pat (prettyAnn a1) ++ ")"
+
+
 
 
 prettyEntry (s, (ann, vars, constrs )) =
