@@ -13,7 +13,7 @@ State of the implementation:
 - [x] Fix bugs in Constructor types
 - [x] Proper types for recursive values
 - [x]  Implication constraints for branch results
-- [ ]  Implication constraints for matched variables within branch
+- [x]  Implication constraints for matched variables within branch (implemented but buggy)
 - [ ]  Track Control-flow along with patterns
 - [ ]  Change complete pattern matches to Top
 - [ ] Implement case optimizations for if expressions
