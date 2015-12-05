@@ -188,6 +188,9 @@ applyUnifications con =
       return [EMatchesImplies r pair1 pair2]
     CForallSubEffect r a1 real a2 ->
       return [EForallSubEffect r a1 real a2]
+    --Apply basic unifications as soon as we can
+    CPatternEqual r a1 (VarLoc) a2 ->
+      applyUnifications $ CEqual r a1 a2
     CPatternEqual r a1 pat a2 ->
       return [EPatternEqual r a1 pat a2]
 
@@ -423,7 +426,9 @@ solveScheme oldEnv (Scheme constr hdr) = do
   schemeEmitted <- applyUnifications constr
   newSchemeHeaders <- forM oldHeader $ \(nm, (A.A _ ann)) -> do
     newVar <- liftIO mkVar
-    allVars <- freeVarsInAnnot ann
+    annVars <- freeVarsInAnnot ann
+    conVars <- concat <$> forM schemeEmitted freeVarsInConstr
+    let allVars = annVars ++ conVars
     goodQuants <- filterM (notFreeInEnv oldEnv) allVars
     unifyAnnots (VarAnnot newVar) ann
     --liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
