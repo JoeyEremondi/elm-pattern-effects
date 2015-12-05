@@ -17,6 +17,7 @@ State of the implementation:
 - [ ]  Track Control-flow along with patterns
 - [ ]  Change complete pattern matches to Top
 - [ ] Implement case optimizations for if expressions
+- [ ] Support for Elm's record types
 
 Since module-support isn't there yet, this version
 won't properly compile the core libraries.

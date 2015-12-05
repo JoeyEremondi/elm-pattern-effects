@@ -20,77 +20,72 @@ constrain
     -> P.CanonicalPattern
     -> TypeAnnot
     -> IO AnnFragment
-constrain env (A.A region pattern) tipe =
+constrain env apat@(A.A region _) overallTipe =
   let
-    equal leftType rightType =
-      CEqual region leftType rightType
+    equalAtPos leftType patLocFn rightType  =
+      CPatternEqual region leftType (patLocFn VarLoc) rightType
 
     rvar v =
       A.A region (VarAnnot v)
-  in
-  case pattern of
-    P.Anything ->
-        --TODO wildcard as top?
-        return emptyFragment
 
-    P.Literal lit ->
-        do  c <- Literal.constrain env region lit tipe
-            return $ emptyFragment { typeConstraint = c }
+    constrainHelper :: P.CanonicalPattern -> (PatternLoc -> PatternLoc) -> IO AnnFragment
+    constrainHelper (A.A region pat) patLocFn =
+      case pat of
+        P.Anything ->
+            return emptyFragment
 
-    P.Var name ->
-        --TODO variables top?
-        do  variable <- mkVar
-            return $ Fragment
-                { typeEnv = Map.singleton name (rvar variable)
-                , vars = [variable]
-                , typeConstraint =
-                    equal (VarAnnot variable) tipe
-                }
+        P.Literal _ -> --Already constrained by previous constraint
+                return $ emptyFragment
 
-    P.Alias name p ->
-        do  variable <- mkVar
-            fragment <- constrain env p tipe
-            return $ fragment
-              { typeEnv = Map.insert name (rvar variable) (typeEnv fragment)
-              , vars = variable : vars fragment
-              , typeConstraint =
-                  equal (VarAnnot variable) tipe
-                  /\ typeConstraint fragment
-              }
+        P.Var name ->
+            --TODO variables top?
+            do  variable <- mkVar
+                return $ Fragment
+                    { typeEnv = Map.singleton name (rvar variable)
+                    , vars = [variable]
+                    , typeConstraint =
+                        equalAtPos (VarAnnot variable) patLocFn overallTipe
+                    }
 
-    P.Data name patterns ->
-        do  let stringName = V.toString name
+        P.Alias name p ->
+            do  variable <- mkVar
+                fragment <- constrainHelper p patLocFn
+                return $ fragment
+                  { typeEnv = Map.insert name (rvar variable) (typeEnv fragment)
+                  , vars = variable : vars fragment
+                  , typeConstraint =
+                      equalAtPos (VarAnnot variable) patLocFn overallTipe
+                      /\ typeConstraint fragment
+                  }
 
-            (_kind, cvars, args, result) <-
-                freshDataScheme env stringName
+        P.Data name patterns ->
+            do  let ctorName = V.toString name
+                let numberedPats = List.zip [0..] patterns
+                fragList <-
+                  Monad.forM numberedPats $ \(argNum, subPat) ->
+                    constrainHelper subPat (\pos -> PatternLoc ctorName argNum (patLocFn pos))
+                return $ joinFragments fragList
 
-            fragList <- Monad.zipWithM (constrain env) patterns args
-            let fragment = joinFragments fragList
-            return $ fragment
-                { vars = cvars ++ vars fragment
-                , typeConstraint =
-                    typeConstraint fragment
-                    /\ equal tipe result
-                }
+        P.Record fields ->
+            do  pairs <-
+                    mapM (\name -> (,) name <$> mkVar) fields
 
-    P.Record fields ->
-        do  pairs <-
-                mapM (\name -> (,) name <$> mkVar) fields
+                let tenv =
+                      Map.fromList (map (second rvar) pairs)
 
-            let tenv =
-                  Map.fromList (map (second rvar) pairs)
+                let unannotatedTenv =
+                      Map.map A.drop tenv
 
-            let unannotatedTenv =
-                  Map.map A.drop tenv
+                con <- return CTrue -- exists $ \t ->
+                  --return $ error "TODO record case" -- (equal Error.PRecord tipe (record unannotatedTenv t))
 
-            con <- return CTrue -- exists $ \t ->
-              --return $ error "TODO record case" -- (equal Error.PRecord tipe (record unannotatedTenv t))
+                return $ Fragment
+                    { typeEnv = tenv
+                    , vars = map snd pairs
+                    , typeConstraint = con
+                    }
 
-            return $ Fragment
-                { typeEnv = tenv
-                , vars = map snd pairs
-                , typeConstraint = con
-                }
+      in constrainHelper apat id
 
 isWildcard (A.A _ P.Anything) = True
 isWildcard (A.A _ (P.Var _)) = True

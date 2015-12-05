@@ -75,12 +75,14 @@ data AnnotConstr =
   | CMatchesImplies R.Region (TypeAnnot, RealAnnot) (TypeAnnot, TypeAnnot)
     --Used to filter out values of a variable from a pattern match
   | CForallSubEffect R.Region TypeAnnot RealAnnot TypeAnnot --Forall x in a1, real <= x => x < a2
+  | CPatternEqual R.Region TypeAnnot PatternLoc TypeAnnot
 --  | COnlyMatches R.Region TypeAnnot TypeAnnot
   deriving (Show)
 
 data PatternLoc =
   VarLoc --This is the location in the pattern
   | PatternLoc String Int PatternLoc --Gen the nth var of the given constructor
+  deriving (Eq, Ord, Show)
 
 
 data AnnScheme = Scheme
