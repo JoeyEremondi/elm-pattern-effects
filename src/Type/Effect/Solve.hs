@@ -673,6 +673,7 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
 -}
 
 
+
 getAnnData :: AnnVar -> SolverM' a (AnnotData)
 getAnnData (AnnVar (pt, _)) = do
    ret <- liftIO $ UF.descriptor pt
@@ -902,4 +903,9 @@ workList allConstrs (c:rest) = case c of
     --liftIO $ putStrLn $ "Impl " ++ show c ++ " did match? " ++ show (ourUB, real, ourUB `canMatchAll` real)
     workList allConstrs (condsToAdd ++ rest)
 
-  
+  WForallImpliesSubOf r v1 real v2 -> do
+    ourUB <- _ub <$> getAnnData v1
+    let partMatching = intersectAnn ourUB real
+        condsToAdd = [WLitSubEffectOf r partMatching v2]
+
+    workList allConstrs (condsToAdd ++ rest)
