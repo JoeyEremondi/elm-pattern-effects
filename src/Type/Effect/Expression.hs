@@ -385,8 +385,8 @@ constrainCase env region expr branches tipe =
   do  exprVar <- mkVar
       exprCon <- constrain env expr (VarAnnot exprVar)
 
-      (branchResultInfo, branchResultConstraints, branchPatternAnnots) <-
-          unzip3 <$> mapM branch branches
+      (branchResultInfo, branchResultConstraints) <- {-, branchPatternAnnots-}
+          unzip <$> mapM (branch exprVar) branches
 
       let vars = map fst branchResultInfo
       --TODO what is this?
@@ -401,22 +401,24 @@ constrainCase env region expr branches tipe =
       let joinBranchesConstr = --TODO which region
             CAnd $ zipWith
               (\branchVar pat ->
-                CMatchesImplies region (VarAnnot exprVar, Pattern.possibleMatches env [pat]) (VarAnnot branchVar, tipe))
+                CMatchesImplies region (VarAnnot exprVar, Pattern.possibleMatches env [pat]) (branchVar, tipe))
               vars (map fst branches)
 
       --TODO what is ex doing?
       return $ --ex (exprVar : vars) $
         CAnd (exprCon : joinBranchesConstr  : inPatternsConstr : branchResultConstraints )
   where
-    branch (pattern, branchExpr@(A.A branchRegion _)) =
-        do  branchVar <- mkVar
-            patternVar <- mkVar
-            fragment <- Pattern.constrain env pattern (VarAnnot patternVar)
-            branchCon <- constrain env branchExpr (VarAnnot branchVar)
+    branch exprVar (pattern, branchExpr@(A.A branchRegion _)) =
+        do  branchResultAnn <- VarAnnot <$> mkVar
+            wholePatternAnn <- VarAnnot <$> mkVar
+            let annotToMatch = Pattern.requiredMatches env [pattern]
+                constrOnWholePat = CForallSubEffect branchRegion (VarAnnot exprVar) annotToMatch wholePatternAnn
+            fragment <- Pattern.constrain env pattern wholePatternAnn
+            branchCon <- constrain env branchExpr branchResultAnn
             return
-                ( (branchVar, branchRegion)
-                , CLet [monoscheme $ typeEnv fragment] branchCon /\ typeConstraint fragment
-                , VarAnnot patternVar
+                ( (branchResultAnn, branchRegion)
+                , CLet [monoscheme $ typeEnv fragment] branchCon /\ typeConstraint fragment /\ constrOnWholePat
+                --, wholePatternAnn
                 )
 
 

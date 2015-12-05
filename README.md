@@ -16,6 +16,7 @@ State of the implementation:
 - [ ]  Implication constraints for matched variables within branch
 - [ ]  Track Control-flow along with patterns
 - [ ]  Change complete pattern matches to Top
+- [ ] Implement case optimizations for if expressions
 
 Since module-support isn't there yet, this version
 won't properly compile the core libraries.
