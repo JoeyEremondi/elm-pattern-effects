@@ -691,6 +691,18 @@ mismatches region (RealAnnot subs1) (RealAnnot subs2) =
       )  (Map.toList d2)
 -}
 
+minMatchingPat = findMatchingPat intersectAnn RealTop
+maxMatchingPat = findMatchingPat unionAnn realBottom
+
+findMatchingPat combine neutral pat annot = case (pat, annot) of
+  (VarLoc, x) -> x
+  (_, RealTop) -> RealTop
+  (PatternLoc ctor argNum subPat, RealAnnot annSet) ->
+    Set.foldr combine neutral $ (flip Set.map) annSet $ \(annCtor, argList) ->
+      if (annCtor == ctor) then
+        findMatchingPat combine neutral subPat (argList List.!! argNum )
+      else
+        realBottom
 
 
 getAnnData :: AnnVar -> SolverM' a (AnnotData)
@@ -937,3 +949,21 @@ workList allConstrs (c:rest) = case c of
         condsToAdd = [WLitSubEffectOf r partMatching v2]
 
     workList allConstrs (condsToAdd ++ rest)
+
+  WPatternEq r vpart pat vwhole -> do
+    wholeData <- getAnnData vwhole
+    partData <- getAnnData vpart
+    let newPartUB = maxMatchingPat pat (_ub wholeData)
+        newPartLB = minMatchingPat pat (_lb wholeData)
+    changed1 <- unionUB r vpart newPartUB
+    changed2 <- intersectLB r vpart newPartLB
+    let needsUpdate1 =
+          case changed1 of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _superOf partData
+
+    let needsUpdate2 =
+          case changed2 of
+            False -> []
+            True -> List.map (allConstrs Map.! ) $ _subOf partData
+    workList allConstrs (needsUpdate1 ++ needsUpdate2 ++ rest)
