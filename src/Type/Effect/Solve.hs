@@ -32,7 +32,7 @@ solve c = do
   finalEnv <- forM (Map.toList $ sSavedEnv finalState) $ \(s, StoredScheme quants constrList annVar) -> do
     ourAnnot <- toCanonicalAnnot (VarAnnot annVar)
     quantData <- forM quants $ \(AnnVar (p, _)) -> UF.descriptor p
-    let quantIDs = List.map _uniqueId quantData
+    let quantIDs = List.nub $ List.map _uniqueId quantData
     finalConstrs <- forM constrList toCanonicalConstr
     return (s, (ourAnnot, quantIDs, finalConstrs)) --TODO translate constraints
   return (warnings, Map.fromList finalEnv)
@@ -380,7 +380,8 @@ freeVarsInAnnot a =
       mrepr <- getRepr v
       case mrepr of
         Nothing -> return [v]
-        Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
+        --Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
+        Just rep -> freeVarsInAnnot rep --TODO is this right?
     SinglePattern _s subs ->
      concat <$> forM subs freeVarsInAnnot
     LambdaAnn a1 a2 ->
@@ -503,21 +504,20 @@ makeFreshCopy quants inConstrList inVar = do
     copyHelper :: TypeAnnot -> SolverM (TypeAnnot, [(AnnVar, AnnVar)])
     copyHelper a = case a of
       VarAnnot v -> do
-        vIsFree <- isQuant v
-        case vIsFree of
-          True -> do
-            vnew <- liftIO $ mkVar
-            mOldRepr <- getRepr v
-            repPairs <- case mOldRepr of
-              Nothing -> do
-                return []
-              Just rep -> do
-                (newRep, newPairs) <- copyHelper rep
-                setRepr vnew newRep
-                return newPairs
-            return $ (VarAnnot vnew, [(v, vnew)] ++ repPairs)
-          False ->
-            return (VarAnnot v, [])
+        mrepr <- getRepr v
+        case mrepr of
+          --Unified variables get replaced by what they're unified with
+          Just rep ->
+            copyHelper rep
+          Nothing -> do
+            vIsFree <- isQuant v
+            case vIsFree of
+              True -> do
+                vnew <- liftIO $ mkVar
+                return $ (VarAnnot vnew, [(v, vnew)])
+
+              False ->
+                return (VarAnnot v, [])
       SinglePattern s subPats -> do
         (newSubPats, newVarLists) <- unzip <$> forM subPats copyHelper
         return (SinglePattern s newSubPats, concat newVarLists)
