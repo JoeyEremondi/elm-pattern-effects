@@ -377,7 +377,8 @@ freeVarsInAnnot a =
       mrepr <- getRepr v
       case mrepr of
         Nothing -> return [v]
-        Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
+        Just rep -> freeVarsInAnnot rep --TODO is this right? Var that is unified is not free
+        --Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
     SinglePattern _s subs ->
      concat <$> forM subs freeVarsInAnnot
     LambdaAnn a1 a2 ->
@@ -418,6 +419,17 @@ notFreeInEnv env v = do
   freeInEnv <- freeVarsInEnv env
   varNotInList freeInEnv v
 
+removeDuplicates l = removeDuplicatesHelper [] l
+  where
+    removeDuplicatesHelper :: [AnnVar] -> [AnnVar] -> SolverM [AnnVar]
+    removeDuplicatesHelper seenVars [] = return seenVars
+    removeDuplicatesHelper seenVars (v:rest) = do
+      sameVars <- forM seenVars $ (areSame v)
+      let newSeen = case (List.or sameVars) of
+            True -> seenVars
+            _ -> (v : seenVars)
+      removeDuplicatesHelper newSeen rest
+
 
 solveScheme :: Env -> AnnScheme -> SolverM ([EmittedConstr], Env)
 solveScheme oldEnv (Scheme constr hdr) = do
@@ -428,12 +440,15 @@ solveScheme oldEnv (Scheme constr hdr) = do
     newVar <- liftIO mkVar
     annVars <- freeVarsInAnnot ann
     conVars <- concat <$> forM schemeEmitted freeVarsInConstr
+    liftIO $ putStrLn $ "Solving scheme " ++ show nm
+    liftIO $ putStrLn $ "AnnVars" ++ show annVars ++ "\nconVars " ++ show conVars
     let allVars = annVars ++ conVars
     goodQuants <- filterM (notFreeInEnv oldEnv) allVars
     unifyAnnots (VarAnnot newVar) ann
+    finalQuants <- removeDuplicates goodQuants
     --liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
     --liftIO $ putStrLn $ "Quantified scheme " ++ (show scheme) ++ "\nnew constr " ++ show constr
-    return (schemeEmitted, (nm, StoredScheme goodQuants schemeEmitted  newVar))
+    return (schemeEmitted, (nm, StoredScheme finalQuants schemeEmitted  newVar))
   --Now that we have a new header with variables, actually solve the constraint
   --On our scheme
   let (allSchemesEmitted, newHeader) = unzip newSchemeHeaders
