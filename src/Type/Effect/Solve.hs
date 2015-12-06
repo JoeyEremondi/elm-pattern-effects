@@ -144,7 +144,8 @@ areSame (AnnVar (pt1, _)) (AnnVar (pt2, _)) = liftIO $ UF.equivalent pt1 pt2
 applyUnifications :: AnnotConstr -> SolverM [EmittedConstr]
 applyUnifications con =
   case con of
-    CEqual _ r1 r2 -> do
+    CEqual region r1 r2 -> do
+      liftIO $ putStrLn $ "Unifying in cequal" ++ show region
       _ <- unifyAnnots r1 r2
       return []
     CAnd constrs -> do
@@ -166,11 +167,13 @@ applyUnifications con =
       emittedFromFresh <-
         case Map.lookup var env of
           Nothing -> error $ "Could not find name " ++ show var ++ " in Effect.Solve\nenv:\n" ++ show (Map.keys env)
-          Just (StoredMono storedVar) ->
+          Just (StoredMono storedVar) -> do
+            liftIO $ putStrLn $ "CEqual in instance of " ++ show var
             applyUnifications $ CEqual r (VarAnnot storedVar) annot
           Just (StoredScheme quants constr annVar) -> do
             (freshEmitted, newVar) <- makeFreshCopy quants constr annVar
             --Unify the type of the variable use with our newly instantiated type
+            liftIO $ putStrLn "Unifying in CInstance"
             unifyAnnots annot (VarAnnot newVar)
             --liftIO $ putStrLn ("Made instance " ++ show annot ++ " of " ++ show var ++ ": " ++ show newVar ++ "\nconstr: " ++ show freshEmitted)
             --Apply our instantiated constraints to that type
@@ -377,8 +380,7 @@ freeVarsInAnnot a =
       mrepr <- getRepr v
       case mrepr of
         Nothing -> return [v]
-        Just rep -> freeVarsInAnnot rep --TODO is this right? Var that is unified is not free
-        --Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
+        Just rep -> ([v] ++) <$> freeVarsInAnnot rep --Can't quantify over if have repr
     SinglePattern _s subs ->
      concat <$> forM subs freeVarsInAnnot
     LambdaAnn a1 a2 ->
@@ -444,6 +446,7 @@ solveScheme oldEnv (Scheme constr hdr) = do
     liftIO $ putStrLn $ "AnnVars" ++ show annVars ++ "\nconVars " ++ show conVars
     let allVars = annVars ++ conVars
     goodQuants <- filterM (notFreeInEnv oldEnv) allVars
+    liftIO $ putStrLn "Unifying in SolveScheme"
     unifyAnnots (VarAnnot newVar) ann
     finalQuants <- removeDuplicates goodQuants
     --liftIO $ putStrLn $ "Unified new scheme var " ++ (show newVar) ++ " with " ++ show ann
@@ -457,6 +460,7 @@ solveScheme _ (MonoScheme hdr) = do
   let oldHeader = Map.toList hdr
   newHeader <- forM oldHeader $ \(nm, A.A _ ann) -> do
     newVar <- liftIO mkVar
+    liftIO $ putStrLn "Unifying in monoscheme"
     unifyAnnots (VarAnnot newVar) ann
     return (nm, StoredMono newVar)
   --Now that we have a new header with variables, actually solve the constraint
@@ -535,6 +539,7 @@ makeFreshCopy quants inConstrList inVar = do
   newVar <- liftIO $ mkVar
   (newAnn, varPairs) <- copyHelper (VarAnnot inVar)
   --Unify the var for our new annotation with the annotation itself
+  liftIO $ putStrLn "Unifying in UnifyPairs"
   unifyAnnots (VarAnnot newVar) newAnn
   unifyPairs $ varPairs ++ (concat pairList)
   instRepr <- getRepr newVar
@@ -542,7 +547,7 @@ makeFreshCopy quants inConstrList inVar = do
 
 
 unifyAnnots :: TypeAnnot -> TypeAnnot -> SolverM TypeAnnot
-unifyAnnots r1 r2 =
+unifyAnnots r1 r2 = trace ("Unifying " ++ show (r1, r2)) $
   case (r1, r2) of
     (TopAnnot, TopAnnot) ->
       return TopAnnot
@@ -614,6 +619,12 @@ unifyAnnots r1 r2 =
       return TopAnnot
     (TopAnnot, ReturnsTop) ->
       return TopAnnot
+    --(ReturnsTop, _) -> --TODO is this right?
+    --  return TopAnnot
+    --(_, ReturnsTop) ->
+    --  return TopAnnot
+
+    --TODO singlePattern case?
 
     _ -> error $ "Invalid unify " ++ show r1 ++ " " ++ show r2
 
