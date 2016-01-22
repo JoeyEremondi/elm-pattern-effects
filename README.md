@@ -1,6 +1,6 @@
 # Modified Elm Compiler
 
-An extended abstract detailing this work has been submitted to the [POPL 2016 SRC](http://conf.researchr.org/track/POPL-2016/POPL-2016-SRC).
+Here is the [Extended Abstract](http://eremondi.com/preprints/eremondi-popl16-src.pdf) which was accepted to the POPL 2016 Student Research Competition.
 
 The main changes can be found in the `Type.Effect` modules.
 
