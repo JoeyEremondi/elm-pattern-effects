@@ -1,3 +1,5 @@
+Migrated to https://codeberg.org/JoeyEremondi/elm-pattern-effects
+
 # Modified Elm Compiler
 
 Here is the [Extended Abstract](http://eremondi.com/preprints/eremondi-popl16-src.pdf) which was accepted to the POPL 2016 Student Research Competition.
